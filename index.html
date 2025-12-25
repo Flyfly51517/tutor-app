@@ -5,7 +5,7 @@
 <link rel="shortcut icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>家教小本本 (V165 CleanLayout)</title>
+    <title>家教小本本 (V166 TimeZoneFix)</title>
     <style>
         /* --- Pantone 莫蘭迪 極簡色系 --- */
         :root {
@@ -268,17 +268,17 @@
         
         .income-report-card { padding: 20px; border: 1px solid #EAEAEA; margin-top: 20px; }
         
-        /* V165 Fix: Tight Spacing */
+        /* V166 Fix: Tightest Spacing for Income, Large Gap for List */
         .income-val-big { 
             font-size: 36px; font-weight: 900; color: var(--accent-rose); 
             text-align: center; 
-            margin: 0 0 30px 0; /* Increase bottom margin for spacing with list title */
+            margin: 0 0 40px 0; /* Huge gap below big number */
         }
         
         .income-estimate-small { 
             font-size: 13px; font-weight: 800; color: #BBB; 
             text-align: center; 
-            margin-bottom: -5px; /* Pull closer to big number */
+            margin-bottom: -8px; /* Tighter pull */
             letter-spacing: 0.5px; 
         }
 
@@ -863,7 +863,10 @@
 
     window.renderSchedule = function() {
         const div = document.getElementById('today-schedule-list');
-        const todayStr = new Date().toISOString().split('T')[0];
+        const dObj = new Date();
+        const offset = dObj.getTimezoneOffset() * 60000;
+        const todayStr = new Date(dObj - offset).toISOString().split('T')[0];
+        
         const todays = window.logs.filter(l => l.date === todayStr || l.status === 'running');
         document.getElementById('empty-schedule-hint').style.display = todays.length ? 'none' : 'block';
         
@@ -921,6 +924,7 @@
                     </div>`;
             } else {
                 statusHtml = '<span class="sch-status status-prepared">待上課</span>';
+                // V165: White Background Buttons
                 controlsHtml = `
                     <textarea class="inline-note" placeholder="上課內容..." onblur="updateContent(${l.ts}, this.value)">${l.content || ''}</textarea>
                     <div class="card-controls">
@@ -1226,6 +1230,7 @@
     
     window.triggerLogImageUpload = function(ts) { document.getElementById(`file-${ts}`).click(); }
     
+    // V165 Fix: Instant Photo Refresh
     window.handleLogImageUpload = function(event, ts) {
         const input = event.target;
         if (input.files && input.files.length > 0) {
@@ -1299,6 +1304,7 @@
 
         list.innerHTML += `<div class="portfolio-item"><div>初始本金</div><div class="portfolio-right-col">$${(accId==='taiwan_bank'?100000:13107).toLocaleString()}</div></div>`;
         
+        // V160 Fix: Sort date descending (Newest first)
         myLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         myLogs.forEach(b => {
@@ -1355,6 +1361,7 @@
                 totalIncome += (l.income || 0);
                 if (l.date.startsWith(viewMonthStr)) {
                     monthIncome += (l.income || 0);
+                    // V160 Fix: Show Subject instead of Content in History
                     if(allDiv) {
                         allDiv.innerHTML += `
                         <div class="portfolio-item">
@@ -1375,11 +1382,13 @@
             }
         });
         
+        // V160 Fix: Total Asset = Bank + Stock Only
         document.getElementById('total-assets-val').innerText = '$' + (tw + sp).toLocaleString(); 
         document.getElementById('taiwan-bank-balance').innerText = '$' + tw.toLocaleString();
         document.getElementById('sinopac-balance').innerText = '$' + sp.toLocaleString();
         document.getElementById('month-total').innerText = '$' + monthIncome.toLocaleString();
-        // V165 Fix: Remove prefix text, only numbers
+        
+        // V165 Fix: Remove prefix, just numbers
         document.getElementById('month-estimate-val').innerText = '$' + estimatedIncome.toLocaleString();
         
         document.getElementById('year-label').innerText = y;
@@ -1429,6 +1438,7 @@
                 `;
             }
 
+            // V160 Fix: Show Subject
             list.innerHTML += `
                 <div class="portfolio-item">
                     <div class="portfolio-item-left">
@@ -1451,7 +1461,7 @@
         document.getElementById('profile-modal').style.display = 'flex';
     }
     
-    // V165 Fix: Hide Bear Logic
+    // V160 Fix: Hide Bear Logic
     window.updateProfileDisplay = function() { 
         const el = document.getElementById('profile-avatar'); 
         const sb = document.getElementById('sidebar-avatar');
