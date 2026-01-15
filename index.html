@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V256 FINAL STYLE --- */
+    /* --- V257 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -95,14 +95,14 @@
     }
     
     .header-action-btn {
-        height: 40px; padding: 0 20px; border-radius: 20px; font-size: 13px; font-weight: 800;
+        height: 42px; padding: 0 24px; border-radius: 21px; font-size: 14px; font-weight: 800;
         cursor: pointer; display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
-        border: none;
-        transition: transform 0.1s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        border: 2px solid var(--text-main);
+        background: var(--text-main);
+        color: #FFF;
+        box-sizing: border-box;
     }
-    .btn-style-main { background: var(--text-main); color: #FFF; border: 2px solid var(--text-main); }
-    .btn-style-sec { background: #FFF; color: var(--text-main); border: 2px solid #EDF2F7; }
 
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-card); border: 1px solid rgba(0,0,0,0.02); }
 
@@ -177,6 +177,7 @@
     .month-group-header { padding: 16px 16px; background: #EDF2F7; border-radius: 16px; margin-bottom: 10px; margin-top: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 15px; }
     .month-group-header:first-child { margin-top: 0; }
     
+    /* V257: List Item Layout Fix */
     .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 5px; border-bottom: 1px solid #F0F0F0; font-weight: 500; }
     .list-date { width: 70px; font-weight: 700; color: #718096; font-size: 13px; white-space: nowrap; flex-shrink: 0; text-align: center;}
     .list-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; justify-content:center; margin-right: 15px; margin-left: 5px; min-width: 0; }
@@ -187,6 +188,7 @@
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
         text-align: left;
     }
+    .status-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #EDF2F7; color: #718096; display: inline-block; margin-top: 4px; width: fit-content; }
     
     .est-income-val { font-size: 16px; font-weight: 800; color: #CBD5E0; margin-bottom: 0px; text-align: center; }
     .setup-label { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; margin-left: 4px; }
@@ -299,7 +301,7 @@
                     <div class="est-income-val">$<span id="month-est">0</span></div>
                     <div style="font-size:36px; font-weight:900; color:var(--text-main);" id="month-total">$0</div>
                 </div>
-                <!-- V256: Asset List -->
+                <!-- V257: Asset List -->
                 <div id="all-logs" style="margin-top:20px; border-top:1px dashed #EEE; padding-top:10px;"></div>
             </div>
         </div>
@@ -417,7 +419,7 @@
     <button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button>
 </div></div>
 
-<!-- V256: Stats Modal -->
+<!-- V257: Stats Modal -->
 <div id="student-history-modal" class="modal"><div class="modal-content modal-stats-content"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 
 <div id="profile-modal" class="modal">
@@ -442,6 +444,9 @@
     let currentPlanningStuIdx = null, selectedDates = [], touchStartX = 0, currentPage = 0;
     let currentBankAction = 'deposit', currentAccountId = 'taiwan_bank';
     let viewDate = new Date();
+    // V257: Force date to 1st to prevent month skip bug
+    viewDate.setDate(1); 
+    
     let settlingLogTs = null;
     let currentStatsStudent = null;
     let lastTotalAssets = 0; 
@@ -457,7 +462,7 @@
     let profileData = safeLoad(DB_PROF, { avatar: '🧸', moods: [] });
 
     window.onload = function() {
-        // V256: Fix Auto-Upgrade Old Data
+        // V257: Fix Auto-Upgrade Old Data
         let needsSave = false;
         window.logs.forEach(l => {
             if(l.status === 'done' || !l.status) {
@@ -514,6 +519,12 @@
         }
     });
 
+    // V257: Date Safe Change
+    function changeMonth(d) {
+        viewDate.setMonth(viewDate.getMonth() + d);
+        updateAssets();
+    }
+
     function updateAssets() {
         let tw = 100000; let sp = 13107;
         window.bankLogs.forEach(b => {
@@ -530,26 +541,34 @@
         const histDiv = document.getElementById('all-logs');
         histDiv.innerHTML = '';
         
+        // V257: Unified Logic with History
         window.logs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(l => {
+             // Check if YM matches
              if(l.date.startsWith(ym)) {
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
-                 if(l.status === 'unpaid' || l.status === 'paid') estTotal += income;
+                 
+                 // V257: Est Total = EVERYTHING for this month (Forecast)
+                 estTotal += income;
+                 
+                 // Actual = Paid
                  if(l.status === 'paid') mTotal += income;
 
-                 if(l.status === 'paid' || l.status === 'unpaid') {
+                 // List shows ALL items for this month (Paid + Unpaid + Prepared)
+                 if(l.status === 'paid' || l.status === 'unpaid' || l.status === 'prepared') {
                      const dObj = new Date(l.date);
                      const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
                      const dayStr = l.date.split('-')[2];
-                     const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
                      const isPaid = l.status === 'paid';
                      const color = isPaid ? 'var(--money-green)' : '#AAA';
                      
+                     const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
                      histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income);
                  }
              }
         });
 
-        const finalTotal = tw + sp + mTotal;
+        // V257: Net Assets = Bank + Stock (Stable)
+        const finalTotal = tw + sp; 
         animateValue(document.getElementById('total-assets-val'), 0, finalTotal, 1500);
 
         if(lastTotalAssets > 0 && Math.floor(finalTotal/50000) > Math.floor(lastTotalAssets/50000)) {
@@ -566,7 +585,8 @@
 
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null) {
         let actionBtn = '';
-        if(l.status === 'unpaid') {
+        // V257: Allow pay for any non-paid status
+        if(l.status !== 'paid') {
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
         }
         
@@ -777,7 +797,6 @@
         document.getElementById('log-name-display').innerText = s.name; 
         document.getElementById('log-subject').value = s.subject || ''; 
         
-        // Auto-highlight subject
         const subjContainer = document.getElementById('log-subject-group');
         if(subjContainer && s.subject) {
             Array.from(subjContainer.children).forEach(btn => {
