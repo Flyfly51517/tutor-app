@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V257 STYLE --- */
+    /* --- V258 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -106,13 +106,13 @@
 
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-card); border: 1px solid rgba(0,0,0,0.02); }
 
-    /* ASSETS CARD */
+    /* V258 FIX: CLEAN ASSET CARD (Removed artifacts) */
     .asset-card {
         background: var(--text-main); 
         border-radius: 32px; padding: 32px 28px; margin-bottom: 30px;
         color: #FFF; position: relative; overflow: hidden;
         box-shadow: var(--shadow-float);
-        transform: translateZ(0); 
+        /* 移除 transform: translateZ(0) 以避免 iOS 邊框渲染問題 */
     }
     .asset-card::before { content: ''; position: absolute; bottom: -60px; right: -60px; width: 240px; height: 240px; background: var(--accent-primary); border-radius: 50%; opacity: 0.8; filter: blur(50px); z-index: 1; }
     .asset-card::after { content: ''; position: absolute; top: -60px; left: -60px; width: 180px; height: 180px; background: var(--accent-highlight); border-radius: 50%; opacity: 0.3; filter: blur(60px); z-index: 1; }
@@ -177,7 +177,6 @@
     .month-group-header { padding: 16px 16px; background: #EDF2F7; border-radius: 16px; margin-bottom: 10px; margin-top: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 15px; }
     .month-group-header:first-child { margin-top: 0; }
     
-    /* V257: List Item Layout Fix */
     .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 5px; border-bottom: 1px solid #F0F0F0; font-weight: 500; }
     .list-date { width: 70px; font-weight: 700; color: #718096; font-size: 13px; white-space: nowrap; flex-shrink: 0; text-align: center;}
     .list-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; justify-content:center; margin-right: 15px; margin-left: 5px; min-width: 0; }
@@ -194,10 +193,21 @@
     .setup-label { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; margin-left: 4px; }
     .error-hint { color: var(--money-red); font-size: 12px; margin-top: -10px; margin-bottom: 10px; display: none; font-weight: 700; text-align: center; }
 
-    /* SWIPE CONTAINER */
-    .swipe-container { position: relative; overflow: hidden; width: 100%; border-bottom: 1px solid #F0F0F0; touch-action: pan-y; height: 72px; background: #FFF; }
-    .swipe-bg-delete { position: absolute; top: 0; right: 0; bottom: 0; width: 90px; background: var(--money-red); display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; }
-    .swipe-content { position: relative; background: #FFF; z-index: 2; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 5px; transition: transform 0.15s ease-out; }
+    /* SWIPE CONTAINER FIX */
+    .swipe-container { 
+        position: relative; overflow: hidden; width: 100%; border-bottom: 1px solid #F0F0F0; 
+        touch-action: pan-y; height: 72px; background: #FFF; 
+    }
+    .swipe-bg-delete { 
+        position: absolute; top: 0; right: 0; bottom: 0; width: 90px; 
+        background: var(--money-red); display: flex; align-items: center; justify-content: center; 
+        color: #FFF; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; 
+    }
+    .swipe-content { 
+        position: relative; background: #FFF; z-index: 2; width: 100%; height: 100%; 
+        display: flex; align-items: center; padding: 0 5px; 
+        transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); /* Better snap */
+    }
 
     .modal-stats-content { height: 70vh; display: flex; flex-direction: column; }
 </style>
@@ -301,7 +311,7 @@
                     <div class="est-income-val">$<span id="month-est">0</span></div>
                     <div style="font-size:36px; font-weight:900; color:var(--text-main);" id="month-total">$0</div>
                 </div>
-                <!-- V257: Asset List -->
+                <!-- V258: Asset List -->
                 <div id="all-logs" style="margin-top:20px; border-top:1px dashed #EEE; padding-top:10px;"></div>
             </div>
         </div>
@@ -419,7 +429,7 @@
     <button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button>
 </div></div>
 
-<!-- V257: Stats Modal -->
+<!-- V258: Stats Modal -->
 <div id="student-history-modal" class="modal"><div class="modal-content modal-stats-content"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 
 <div id="profile-modal" class="modal">
@@ -444,7 +454,7 @@
     let currentPlanningStuIdx = null, selectedDates = [], touchStartX = 0, currentPage = 0;
     let currentBankAction = 'deposit', currentAccountId = 'taiwan_bank';
     let viewDate = new Date();
-    // V257: Force date to 1st to prevent month skip bug
+    // V258: Fix Date init
     viewDate.setDate(1); 
     
     let settlingLogTs = null;
@@ -462,7 +472,6 @@
     let profileData = safeLoad(DB_PROF, { avatar: '🧸', moods: [] });
 
     window.onload = function() {
-        // V257: Fix Auto-Upgrade Old Data
         let needsSave = false;
         window.logs.forEach(l => {
             if(l.status === 'done' || !l.status) {
@@ -510,16 +519,15 @@
     }
 
     document.addEventListener('touchstart', e => { 
-        if(!e.target.closest('.student-scroll') && !e.target.closest('.modal')) touchStartX = e.changedTouches[0].screenX; 
+        if(!e.target.closest('.student-scroll') && !e.target.closest('.modal') && !e.target.closest('.swipe-container')) touchStartX = e.changedTouches[0].screenX; 
     });
     document.addEventListener('touchend', e => {
-        if(!e.target.closest('.student-scroll') && !e.target.closest('.modal')) {
+        if(!e.target.closest('.student-scroll') && !e.target.closest('.modal') && !e.target.closest('.swipe-container')) {
             const touchEndX = e.changedTouches[0].screenX;
             if(Math.abs(touchEndX - touchStartX) > 100) switchTab(touchEndX < touchStartX ? 1 : 0);
         }
     });
 
-    // V257: Date Safe Change
     function changeMonth(d) {
         viewDate.setMonth(viewDate.getMonth() + d);
         updateAssets();
@@ -541,34 +549,25 @@
         const histDiv = document.getElementById('all-logs');
         histDiv.innerHTML = '';
         
-        // V257: Unified Logic with History
         window.logs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(l => {
-             // Check if YM matches
              if(l.date.startsWith(ym)) {
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
-                 
-                 // V257: Est Total = EVERYTHING for this month (Forecast)
-                 estTotal += income;
-                 
-                 // Actual = Paid
+                 if(l.status === 'unpaid' || l.status === 'paid' || l.status === 'prepared') estTotal += income;
                  if(l.status === 'paid') mTotal += income;
 
-                 // List shows ALL items for this month (Paid + Unpaid + Prepared)
-                 if(l.status === 'paid' || l.status === 'unpaid' || l.status === 'prepared') {
+                 if(l.status === 'paid' || l.status === 'unpaid') {
                      const dObj = new Date(l.date);
                      const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
                      const dayStr = l.date.split('-')[2];
                      const isPaid = l.status === 'paid';
                      const color = isPaid ? 'var(--money-green)' : '#AAA';
-                     
                      const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
                      histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income);
                  }
              }
         });
 
-        // V257: Net Assets = Bank + Stock (Stable)
-        const finalTotal = tw + sp; 
+        const finalTotal = tw + sp + mTotal;
         animateValue(document.getElementById('total-assets-val'), 0, finalTotal, 1500);
 
         if(lastTotalAssets > 0 && Math.floor(finalTotal/50000) > Math.floor(lastTotalAssets/50000)) {
@@ -585,8 +584,7 @@
 
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null) {
         let actionBtn = '';
-        // V257: Allow pay for any non-paid status
-        if(l.status !== 'paid') {
+        if(l.status === 'unpaid') {
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
         }
         
@@ -614,13 +612,11 @@
     let listSwipeStartX = 0;
     let listSwipeCurrentX = 0;
     let activeSwipeId = null;
-    let isDragging = false;
     
     function handleSwipeStart(e, id) {
         if(activeSwipeId && activeSwipeId !== id) closeAllSwipes();
         listSwipeStartX = e.touches[0].clientX;
         listSwipeCurrentX = listSwipeStartX; 
-        isDragging = false; 
         const el = e.currentTarget;
         el.style.transition = 'none';
     }
@@ -628,8 +624,6 @@
     function handleSwipeMove(e, id) {
         listSwipeCurrentX = e.touches[0].clientX;
         const diff = listSwipeCurrentX - listSwipeStartX;
-        
-        if(Math.abs(diff) > 10) isDragging = true;
         
         if (diff < 0) {
             if(e.cancelable) e.preventDefault();
@@ -639,8 +633,6 @@
     }
 
     function handleSwipeEnd(e, id) {
-        if (!isDragging) return;
-
         const diff = listSwipeCurrentX - listSwipeStartX;
         const el = e.currentTarget;
         el.style.transition = 'transform 0.2s ease-out';
@@ -652,9 +644,6 @@
             el.style.transform = 'translateX(0)';
             activeSwipeId = null;
         }
-        listSwipeStartX = 0;
-        listSwipeCurrentX = 0;
-        isDragging = false;
     }
 
     function closeAllSwipes() {
@@ -767,7 +756,6 @@
         }).join('');
     }
 
-    // V256: Fixed Missing updateContent Function
     function updateContent(ts, val) {
         const log = window.logs.find(l => String(l.ts) === String(ts));
         if(log) {
@@ -790,7 +778,6 @@
     function selectSubject(val, btn, inputId) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
     function deleteStudent(idx) { if(confirm('刪除這位學生？')) { window.students.splice(idx, 1); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); } }
     
-    // V256: Auto-select subject in modal
     function openBatchPlanModal(idx) { 
         currentPlanningStuIdx = idx; 
         const s = window.students[idx]; 
@@ -816,7 +803,6 @@
     function addDateTag() { const d = document.getElementById('log-date').value; if(d && !selectedDates.includes(d)) { selectedDates.push(d); renderDateTags(); document.getElementById('log-error-msg').style.display = 'none'; } }
     function removeDateTag(date) { selectedDates = selectedDates.filter(d => d !== date); renderDateTags(); }
     
-    // V256: Strict Validation
     function saveBatchPlan() { 
         const h = document.getElementById('log-hours').value; 
         const subj = document.getElementById('log-subject').value; 
@@ -870,7 +856,6 @@
     function openSetupModal() { document.getElementById('setup-modal').style.display='flex'; }
     function changeMonth(d) { viewDate.setMonth(viewDate.getMonth()+d); updateAssets(); }
     
-    // V256: Import Safety
     function exportData() { const data = {students:window.students, logs:window.logs, bankLogs:window.bankLogs}; const blob = new Blob([JSON.stringify(data)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup.json'; a.click(); }
     function triggerImport() { document.getElementById('import-file').click(); }
     function importData(input) { 
