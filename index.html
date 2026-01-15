@@ -7,186 +7,195 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#F5F2EB">
 <meta name="format-detection" content="telephone=no">
-<title>家教小本本 (V250 Spacing Fix)</title>
 
-<!-- 請確保目錄下有 icon.png -->
+<title>家教小本本</title>
+
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-    /* --- V250 STYLE --- */
+    /* --- V254 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     :root {
-        --bg-color: #F5F2EB; 
+        --bg-color: #F7F6F2; 
         --card-bg: #FFFFFF;
-        --text-main: #2C3B4D; 
-        --text-sub: #7A8699;
-        --accent-primary: #A35139;
-        --accent-highlight: #FFB162; 
-        --money-green: #4A8568; 
-        --money-red: #C95D4E;
-        --shadow-card: 0 10px 40px -10px rgba(44, 59, 77, 0.08);
-        --shadow-float: 0 20px 50px -10px rgba(44, 59, 77, 0.2);
+        --text-main: #1A202C; 
+        --text-sub: #718096;
+        --accent-primary: #C05621; 
+        --accent-highlight: #ED8936; 
+        --money-green: #38A169; 
+        --money-red: #E53E3E;
+        --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05); 
+        --shadow-float: 0 10px 30px -5px rgba(192, 86, 33, 0.25);
     }
 
     html, body { 
         background-color: var(--bg-color); margin: 0; padding: 0; 
-        font-family: "Urbanist", "PingFang TC", sans-serif; 
-        padding-bottom: 30px; overflow-x: hidden; width: 100vw; 
+        font-family: "Urbanist", "Noto Sans TC", sans-serif; 
+        padding-bottom: 40px; overflow-x: hidden; width: 100vw; 
         color: var(--text-main); min-height: 100vh;
         overscroll-behavior-y: none;
+        -webkit-font-smoothing: antialiased;
     }
     
-    /* V250: 增加上方推擠距離，適應變高的 Header */
-    body { padding-top: 125px; }
+    body { padding-top: 115px; }
 
     #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
-    .btn-bubble { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .btn-bubble:active { transform: scale(0.95); }
+    
+    .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .btn-bubble:active { transform: scale(0.94); }
 
-    /* HEADER - V250 Spacing Fix */
+    /* HEADER */
     header {
-        background: rgba(245, 242, 235, 0.95);
+        background: rgba(247, 246, 242, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding-top: max(15px, env(safe-area-inset-top));
-        padding-bottom: 12px; /* 增加底部內距 */
-        padding-left: 20px; padding-right: 20px;
+        padding-bottom: 15px; 
+        padding-left: 24px; padding-right: 24px;
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
-        display: grid; grid-template-columns: 40px 1fr 40px; align-items: center;
-        border-bottom: 1px solid rgba(44, 59, 77, 0.05);
-        height: 115px; /* 加高 Header 高度 */
+        display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        height: 115px;
     }
     .header-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    #header-title { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; color: var(--text-main); text-transform: uppercase; margin-bottom: 8px; /* 增加標題與點點的距離 */ }
-    
-    /* V250: 點點往上推一點 */
-    .page-indicator { display: flex; gap: 6px; margin-bottom: 5px; }
-    
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: #D1CDBC; transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+    #header-title { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--text-main); text-transform: uppercase; margin-bottom: 8px; }
+    .page-indicator { display: flex; gap: 6px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #CBD5E0; transition: 0.3s; }
     .dot.active { background: var(--accent-primary); width: 20px; border-radius: 10px; }
-    .menu-btn { font-size: 24px; color: var(--text-main); cursor: pointer; display: flex; justify-content: center; align-items: center; height: 40px; width: 40px; }
+    .menu-btn { font-size: 26px; color: var(--text-main); cursor: pointer; display: flex; justify-content: center; align-items: center; height: 44px; width: 44px; }
 
-    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 59, 77, 0.3); z-index: 9998; display: none; backdrop-filter: blur(4px); }
+    /* SIDEBAR */
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.4); z-index: 9998; display: none; backdrop-filter: blur(5px); }
     .sidebar { 
-        position: fixed; top: 0; right: -300px; width: 280px; height: 100%; 
-        background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(30px);
-        z-index: 9999; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        position: fixed; top: 0; right: -320px; width: 280px; height: 100%; 
+        background: #FFFFFF;
+        z-index: 9999; transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
         padding: 60px 30px; display: flex; flex-direction: column;
         box-shadow: -10px 0 40px rgba(0,0,0,0.1);
         padding-top: max(60px, env(safe-area-inset-top));
     }
     .sidebar.active { right: 0; }
-    .sidebar-avatar { width: 80px; height: 80px; border-radius: 50%; background: #EEE; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; font-size: 40px; background-size: cover; background-position: center; cursor: pointer; border: 3px solid #FFF; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-    .sidebar-name { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 30px; }
-    .sidebar-item { padding: 16px; border-radius: 16px; margin-bottom: 10px; font-size: 16px; font-weight: 700; color: var(--text-main); background: #F9F9F9; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
-    .sidebar-item:active { background: #EEE; transform: scale(0.98); }
+    .sidebar-avatar { width: 88px; height: 88px; border-radius: 50%; background: #F7FAFC; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; font-size: 42px; background-size: cover; background-position: center; cursor: pointer; border: 4px solid #FFF; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+    .sidebar-name { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 40px; color: var(--text-main); }
+    .sidebar-item { padding: 18px; border-radius: 16px; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: var(--text-main); background: #F9FAFB; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
+    .sidebar-item:active { background: #EDF2F7; transform: scale(0.98); }
 
+    /* LAYOUT */
     #main-viewport { width: 100vw; overflow: hidden; position: relative; z-index: 1; }
     #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
     .page { width: 100vw; flex-shrink: 0; padding: 10px 24px 100px 24px; }
 
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 4px; }
-    #today-title-display, .section-title { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
+    #today-title-display, .section-title { 
+        font-size: 13px; font-weight: 800; color: var(--text-sub); 
+        letter-spacing: 1.5px; text-transform: uppercase; 
+    }
     
     .header-action-btn {
-        height: 42px; padding: 0 24px; border-radius: 21px; font-size: 14px; font-weight: 800;
+        height: 40px; padding: 0 20px; border-radius: 20px; font-size: 13px; font-weight: 800;
         cursor: pointer; display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        border: 2px solid var(--text-main); background: var(--text-main); color: #FFF;
-        box-sizing: border-box;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+        border: none;
+        transition: transform 0.1s;
     }
+    .btn-style-main { background: var(--text-main); color: #FFF; border: 2px solid var(--text-main); }
+    .btn-style-sec { background: #FFF; color: var(--text-main); border: 2px solid #EDF2F7; }
 
-    .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-card); border: 1px solid rgba(255,255,255,0.8); }
+    .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-card); border: 1px solid rgba(0,0,0,0.02); }
 
+    /* ASSETS CARD */
     .asset-card {
         background: var(--text-main); 
         border-radius: 32px; padding: 32px 28px; margin-bottom: 30px;
         color: #FFF; position: relative; overflow: hidden;
         box-shadow: var(--shadow-float);
-        transform: translateZ(0); -webkit-mask-image: -webkit-radial-gradient(white, black);
+        transform: translateZ(0); 
     }
-    .asset-card::before { content: ''; position: absolute; bottom: -50px; right: -50px; width: 200px; height: 200px; background: var(--accent-primary); border-radius: 50%; opacity: 0.8; filter: blur(40px); z-index: 1; }
-    .asset-card::after { content: ''; position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: var(--accent-highlight); border-radius: 50%; opacity: 0.3; filter: blur(50px); z-index: 1; }
-    .asset-label { font-size: 14px; font-weight: 700; opacity: 0.6; margin-bottom: 8px; letter-spacing: 1px; position: relative; z-index: 2; }
-    .asset-amount { font-size: 48px; font-weight: 800; color: var(--accent-highlight); position: relative; z-index: 2; line-height: 1; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
+    .asset-card::before { content: ''; position: absolute; bottom: -60px; right: -60px; width: 240px; height: 240px; background: var(--accent-primary); border-radius: 50%; opacity: 0.8; filter: blur(50px); z-index: 1; }
+    .asset-card::after { content: ''; position: absolute; top: -60px; left: -60px; width: 180px; height: 180px; background: var(--accent-highlight); border-radius: 50%; opacity: 0.3; filter: blur(60px); z-index: 1; }
+    .asset-label { font-size: 14px; font-weight: 700; opacity: 0.7; margin-bottom: 8px; letter-spacing: 1px; position: relative; z-index: 2; }
+    .asset-amount { font-size: 48px; font-weight: 800; color: #FFF; position: relative; z-index: 2; line-height: 1; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
 
-    .account-item { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid #F0F0F0; align-items: center; }
-    .acc-name { font-size: 16px; font-weight: 800; color: var(--text-main); white-space: nowrap; margin-right: 10px; }
+    .account-item { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid #EDF2F7; align-items: center; }
+    .acc-name { font-size: 16px; font-weight: 800; color: var(--text-main); white-space: nowrap; margin-right: 15px; }
     .acc-right { display: flex; flex-direction: column; align-items: flex-end; width: 100%; }
-    .acc-val { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; }
+    .acc-val { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
     .btn-group { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
-    .btn-bank { padding: 8px 16px; background: #F5F2EB; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); white-space: nowrap; }
+    .btn-bank { padding: 8px 16px; background: #F7FAFC; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); white-space: nowrap; transition: 0.1s; }
+    .btn-bank:active { background: #EDF2F7; }
 
-    .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 5px 5px 15px 5px; scrollbar-width: none; }
+    /* SCHEDULE PAGE */
+    .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 5px 5px 20px 5px; scrollbar-width: none; }
     .student-wrapper { display: flex; flex-direction: column; align-items: center; width: 72px; flex-shrink: 0; position: relative; -webkit-user-select:none; user-select:none; }
-    .student-chip { width: 68px; height: 68px; border-radius: 50%; background: #FFF; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.06); font-size: 24px; margin-bottom: 8px; border: 4px solid #FFF; transition: 0.2s; color: var(--text-main); font-weight: 700; }
+    .student-chip { width: 72px; height: 72px; border-radius: 50%; background: #FFF; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.06); font-size: 24px; margin-bottom: 10px; border: 4px solid #FFF; transition: 0.2s; color: var(--text-main); font-weight: 700; }
     .student-wrapper:active .student-chip { transform: scale(0.95); }
     .chip-name { font-size: 13px; font-weight: 700; color: var(--text-main); text-align: center; width: 100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .delete-x { position: absolute; top: 0; right: 0; width: 22px; height: 22px; background: var(--money-red); color: #FFF; border-radius: 50%; display: none; justify-content: center; align-items: center; font-size: 14px; border: 2px solid #FFF; z-index: 10; font-weight: 900; }
+    .delete-x { position: absolute; top: 0; right: 0; width: 24px; height: 24px; background: var(--money-red); color: #FFF; border-radius: 50%; display: none; justify-content: center; align-items: center; font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; }
     .is-editing .delete-x { display: flex; }
     .is-editing .student-chip { animation: shake 0.3s infinite; }
     @keyframes shake { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
 
-    .schedule-card { background: #FFFFFF; border-radius: 28px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow-card); position: relative; border: 1px solid rgba(0,0,0,0.02); }
+    .schedule-card { background: #FFFFFF; border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-card); position: relative; border: 1px solid rgba(0,0,0,0.02); }
     .sch-top { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
-    .sch-title, .history-name-link { 
-        font-size: 16px; font-weight: 800; color: var(--text-main); 
-        text-decoration: underline !important; 
-        text-decoration-color: var(--accent-primary) !important;
-        text-decoration-thickness: 2px !important;
-        text-underline-offset: 4px; 
-        cursor: pointer; 
-    }
-    .history-name-link { font-size: 16px; font-weight: 800; color: var(--text-main) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; text-align: left; }
-    
-    .sch-badge { font-size: 12px; padding: 4px 10px; background: var(--bg-color); border-radius: 8px; color: var(--text-sub); font-weight: 700; }
-    .inline-note { width: 100%; padding: 14px; background: #F9F9F9; border: none; border-radius: 16px; font-size: 15px; color: var(--text-main); outline: none; margin-top: 15px; min-height: 50px; resize: none; box-sizing: border-box; }
+    .sch-title { font-size: 18px; font-weight: 800; color: var(--text-main); text-decoration: underline; text-decoration-color: var(--accent-primary); text-decoration-thickness: 3px; text-underline-offset: 4px; cursor: pointer; }
+    .sch-badge { font-size: 12px; padding: 4px 10px; background: #EDF2F7; border-radius: 8px; color: var(--text-sub); font-weight: 700; }
+    .inline-note { width: 100%; padding: 16px; background: #F9FAFB; border: none; border-radius: 16px; font-size: 15px; color: var(--text-main); outline: none; margin-top: 15px; min-height: 50px; resize: none; box-sizing: border-box; }
     .timer-display { font-size: 42px; font-weight: 800; color: var(--text-main); text-align: center; margin: 20px 0; font-feature-settings: "tnum"; }
-    .controls { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #EEE; flex-wrap: wrap;}
-    .ctrl-btn { flex: 1; padding: 12px; border-radius: 16px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; background: #F5F2EB; color: var(--text-main); white-space: nowrap; }
+    .controls { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #EDF2F7; flex-wrap: wrap;}
+    .ctrl-btn { flex: 1; padding: 12px; border-radius: 16px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; background: #EDF2F7; color: var(--text-main); white-space: nowrap; }
     .btn-start { background: var(--text-main) !important; color: #FFF !important; }
     .btn-pay { background: var(--money-green) !important; color: #FFF !important; box-shadow: 0 4px 15px rgba(74, 133, 104, 0.3); }
-    .btn-mini-pay { padding: 6px 14px; background: var(--money-green); color: #FFF; border: none; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.15); white-space: nowrap; flex-shrink: 0; }
+    .btn-mini-pay { padding: 6px 14px; background: var(--money-green); color: #FFF; border: none; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(56, 161, 105, 0.4); white-space: nowrap; flex-shrink: 0; }
 
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 59, 77, 0.4); z-index: 9000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-    .modal-content { background: #FFF; width: 88%; max-width: 360px; border-radius: 32px; padding: 28px; box-shadow: 0 30px 80px rgba(0,0,0,0.3); max-height: 85vh; overflow-y: auto; transition: 0.1s; }
+    /* MODALS */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.4); z-index: 9000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+    .modal-content { background: #FFF; width: 88%; max-width: 360px; border-radius: 32px; padding: 32px; box-shadow: 0 30px 80px rgba(0,0,0,0.3); max-height: 85vh; overflow-y: auto; transition: 0.1s; }
     .modal-content.shake-error { animation: shake 0.3s; border: 2px solid var(--money-red); }
-    .modal-title { font-size: 20px; font-weight: 800; color: var(--text-main); text-align: center; margin-bottom: 20px; margin-top: 0; }
+    .modal-title { font-size: 20px; font-weight: 800; color: var(--text-main); text-align: center; margin-bottom: 24px; margin-top: 0; }
     
-    input, select, textarea { width: 100%; padding: 14px; margin-bottom: 12px; border: 2px solid #F5F2EB; border-radius: 16px; font-size: 16px; font-weight: 700; box-sizing: border-box; outline: none; background: #FFF; color: var(--text-main); -webkit-appearance: none; }
-    input:focus, textarea:focus { border-color: var(--accent-highlight); background: #FFFDF9; }
+    input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border: 2px solid #EDF2F7; border-radius: 16px; font-size: 16px; font-weight: 700; box-sizing: border-box; outline: none; background: #FFF; color: var(--text-main); -webkit-appearance: none; }
+    input:focus, textarea:focus { border-color: var(--accent-highlight); background: #FFFAF0; }
 
-    .modal-btn { width: 100%; height: 48px; border-radius: 16px; border: none; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 8px; }
+    .modal-btn { width: 100%; height: 50px; border-radius: 16px; border: none; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 10px; }
     .btn-confirm { background: var(--text-main); color: #FFF; }
     .btn-cancel { background: transparent; color: var(--text-sub); }
-    .btn-delete-all { background: var(--bg-color); color: var(--money-red); border: 2px solid var(--money-red); margin-top: 20px; }
+    .btn-delete-all { background: #FFF5F5; color: var(--money-red); border: 2px solid var(--money-red); margin-top: 20px; }
 
-    .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; justify-content: flex-start; }
-    .tag { padding: 8px 16px; background: #F5F5F5; border-radius: 14px; font-size: 13px; font-weight: 700; color: var(--text-sub); cursor: pointer; border: 2px solid transparent; flex: 0 0 auto; width: auto; min-width: 50px; text-align: center; }
+    .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: flex-start; }
+    .tag { padding: 10px 18px; background: #EDF2F7; border-radius: 14px; font-size: 14px; font-weight: 700; color: var(--text-sub); cursor: pointer; border: 2px solid transparent; flex: 0 0 auto; width: auto; min-width: 60px; text-align: center; transition: 0.1s; }
     .tag.selected { background: var(--accent-primary); color: #FFF; border-color: var(--accent-primary); }
     
-    .date-tag-item { flex: 0 0 auto; width: auto; background: var(--accent-primary); color: #FFF; border-radius: 20px; padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-flex; justify-content: space-between; align-items: center; margin-right: 5px; margin-bottom: 5px; gap: 8px; }
+    .date-tag-item { flex: 0 0 auto; width: auto; background: var(--accent-primary); color: #FFF; border-radius: 20px; padding: 8px 14px; font-size: 14px; font-weight: 700; display: inline-flex; justify-content: space-between; align-items: center; margin-right: 5px; margin-bottom: 5px; gap: 8px; }
     
-    .color-picker { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-    .color-opt { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
-    .color-opt.selected { border-color: var(--text-main); transform: scale(1.1); }
+    .color-picker { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; }
+    .color-opt { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.1s; }
+    .color-opt.selected { border-color: var(--text-main); transform: scale(1.15); }
 
-    .month-group-header { padding: 14px 16px; background: #F2F2F2; border-radius: 16px; margin-bottom: 8px; margin-top: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 15px; }
+    .month-group-header { padding: 16px 16px; background: #EDF2F7; border-radius: 16px; margin-bottom: 10px; margin-top: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 15px; }
     .month-group-header:first-child { margin-top: 0; }
     
-    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #F5F5F5; font-weight: 500; }
-    .list-date { width: 65px; font-weight: 700; color: #888; font-size: 13px; white-space: nowrap; flex-shrink: 0; text-align: center;}
-    .list-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; justify-content:center; margin-right: 10px; min-width: 0; }
-    .list-right { display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; gap: 6px; flex-shrink: 0; }
+    /* V254: Clean List Layout */
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 5px; border-bottom: 1px solid #F0F0F0; font-weight: 500; }
+    .list-date { width: 70px; font-weight: 700; color: #718096; font-size: 13px; white-space: nowrap; flex-shrink: 0; text-align: center;}
+    .list-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; justify-content:center; margin-right: 15px; margin-left: 5px; min-width: 0; }
+    .list-right { display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; gap: 8px; flex-shrink: 0; }
     
-    .est-income-val { font-size: 16px; font-weight: 800; color: #E0E0E0; margin-bottom: 0px; text-align: center; }
+    .history-name-link { 
+        font-size: 16px; font-weight: 800; color: var(--text-main) !important;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+        text-align: left;
+    }
+    
+    .est-income-val { font-size: 16px; font-weight: 800; color: #CBD5E0; margin-bottom: 0px; text-align: center; }
     .setup-label { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; margin-left: 4px; }
     .error-hint { color: var(--money-red); font-size: 12px; margin-top: -10px; margin-bottom: 10px; display: none; font-weight: 700; text-align: center; }
 
-    .swipe-container { position: relative; overflow: hidden; width: 100%; border-bottom: 1px solid #F5F5F5; touch-action: pan-y; height: 68px; background: #FFF; }
-    .swipe-bg-delete { position: absolute; top: 0; right: 0; bottom: 0; width: 80px; background: var(--money-red); display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; }
+    /* SWIPE CONTAINER */
+    .swipe-container { position: relative; overflow: hidden; width: 100%; border-bottom: 1px solid #F0F0F0; touch-action: pan-y; height: 72px; background: #FFF; }
+    .swipe-bg-delete { position: absolute; top: 0; right: 0; bottom: 0; width: 90px; background: var(--money-red); display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; }
     .swipe-content { position: relative; background: #FFF; z-index: 2; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 5px; transition: transform 0.15s ease-out; }
 </style>
 </head>
@@ -223,10 +232,11 @@
 
 <div id="main-viewport">
     <div id="page-slider">
+        <!-- PAGE 1: SCHEDULE -->
         <div id="page-schedule" class="page">
             <div class="section-header">
                 <div class="section-title">Students</div>
-                <button class="header-action-btn btn-add btn-bubble" onclick="openSetupModal()">+ NEW</button>
+                <button class="header-action-btn btn-style-main btn-bubble" onclick="openSetupModal()">+ NEW</button>
             </div>
             
             <div class="card" style="padding: 20px 0;">
@@ -235,13 +245,14 @@
             
             <div class="section-header" style="margin-top: 30px;">
                 <div id="today-title-display">TODAY</div>
-                <button class="header-action-btn btn-add btn-bubble" onclick="openAllScheduleModal()">歷史紀錄</button>
+                <button class="header-action-btn btn-style-main btn-bubble" onclick="openAllScheduleModal()">歷史紀錄</button>
             </div>
             
             <div id="today-schedule-list"></div>
             <div id="empty-schedule-hint" style="text-align:center; padding: 60px 20px; color:#AAA; font-weight:700;">No classes today 🌿</div>
         </div>
 
+        <!-- PAGE 2: ASSETS -->
         <div id="page-assets" class="page">
             <div class="asset-card">
                 <div class="asset-label">NET ASSETS</div>
@@ -287,12 +298,14 @@
                     <div class="est-income-val">$<span id="month-est">0</span></div>
                     <div style="font-size:36px; font-weight:900; color:var(--text-main);" id="month-total">$0</div>
                 </div>
+                <!-- V254: Asset List -->
                 <div id="all-logs" style="margin-top:20px; border-top:1px dashed #EEE; padding-top:10px;"></div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- MODALS -->
 <div id="setup-modal" class="modal">
     <div class="modal-content">
         <h3 class="modal-title">新增學生</h3>
@@ -304,7 +317,11 @@
             <div class="color-opt" style="background:#C95D4E;" onclick="selectColor('#C95D4E', this)"></div>
         </div>
         <input type="hidden" id="new-color-val" value="#FFB162">
-        <div class="setup-label">姓名</div><input id="new-name" placeholder="輸入姓名"><div id="setup-error-name" class="error-hint">請輸入姓名</div>
+
+        <div class="setup-label">姓名</div>
+        <input id="new-name" placeholder="輸入姓名">
+        <div id="setup-error-name" class="error-hint">請輸入姓名</div>
+
         <div class="setup-label">時薪</div>
         <div class="tag-container">
             <div class="tag" onclick="forceSelectButton(650, this, 'new-rate')">650</div>
@@ -312,7 +329,9 @@
             <div class="tag" onclick="forceSelectButton(800, this, 'new-rate')">800</div>
             <div class="tag" onclick="forceSelectButton(1000, this, 'new-rate')">1000</div>
         </div>
-        <input type="hidden" id="new-rate"><div id="setup-error-rate" class="error-hint">請選擇時薪</div>
+        <input type="hidden" id="new-rate">
+        <div id="setup-error-rate" class="error-hint">請選擇時薪</div>
+
         <div class="setup-label">年級</div>
         <div class="tag-container">
             <div class="tag" onclick="selectSubject('國小', this, 'new-grade')">國小</div>
@@ -321,6 +340,7 @@
             <div class="tag" onclick="selectSubject('國三', this, 'new-grade')">國三</div>
         </div>
         <input type="hidden" id="new-grade">
+
         <div class="setup-label">科目</div>
         <div class="tag-container">
             <div class="tag" onclick="selectSubject('數學', this, 'new-subject-def')">數學</div>
@@ -329,7 +349,9 @@
             <div class="tag" onclick="selectSubject('生物', this, 'new-subject-def')">生物</div>
         </div>
         <input type="hidden" id="new-subject-def">
-        <button onclick="addStudent()" class="modal-btn btn-confirm btn-bubble">確認新增</button><button onclick="closeModal('setup-modal')" class="modal-btn btn-cancel">取消</button>
+        
+        <button onclick="addStudent()" class="modal-btn btn-confirm btn-bubble">確認新增</button>
+        <button onclick="closeModal('setup-modal')" class="modal-btn btn-cancel">取消</button>
     </div>
 </div>
 
@@ -344,6 +366,7 @@
             <div class="tag" onclick="forceSelectButton(3.0, this, 'log-hours')">3.0</div>
         </div>
         <input type="number" id="log-hours" placeholder="時數">
+        
         <div class="setup-label" style="margin-top:10px;">科目</div>
         <div class="tag-container">
             <div class="tag" onclick="selectSubject('數學', this, 'log-subject')">數學</div>
@@ -352,23 +375,62 @@
             <div class="tag" onclick="selectSubject('生物', this, 'log-subject')">生物</div>
         </div>
         <input type="hidden" id="log-subject">
+
         <textarea id="log-content-modal" placeholder="備註..." style="height:70px;"></textarea>
+        
         <div style="display:flex; gap:10px;">
             <input type="date" id="log-date" style="margin-bottom:0;">
             <button onclick="addDateTag()" class="add-date-btn btn-bubble" style="height:50px;">+</button>
         </div>
+        
         <div id="date-tags" class="tag-container" style="margin-top:10px; margin-bottom:10px; min-height:20px; display:flex; flex-wrap:wrap; gap:6px;"></div>
         <div id="log-error-msg" class="error-hint">請選擇日期</div>
-        <button onclick="saveBatchPlan()" class="modal-btn btn-confirm btn-bubble">儲存</button><button onclick="closeModal('log-modal')" class="modal-btn btn-cancel">取消</button>
+        
+        <button onclick="saveBatchPlan()" class="modal-btn btn-confirm btn-bubble">儲存</button>
+        <button onclick="closeModal('log-modal')" class="modal-btn btn-cancel">取消</button>
     </div>
 </div>
 
-<div id="bank-input-modal" class="modal"><div class="modal-content"><h3 class="modal-title" id="bank-title">存入</h3><input type="date" id="bank-date" style="text-align:center;"><input id="bank-amount" type="number" placeholder="$0" style="font-size:32px; text-align:center;"><button onclick="submitBankTransaction()" class="modal-btn btn-confirm btn-bubble">確認</button><button onclick="closeModal('bank-input-modal')" class="modal-btn btn-cancel">取消</button></div></div>
+<div id="bank-input-modal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title" id="bank-title">存入</h3>
+        <input type="date" id="bank-date" style="text-align:center;">
+        <input id="bank-amount" type="number" placeholder="$0" style="font-size:32px; text-align:center;">
+        <button onclick="submitBankTransaction()" class="modal-btn btn-confirm btn-bubble">確認</button>
+        <button onclick="closeModal('bank-input-modal')" class="modal-btn btn-cancel">取消</button>
+    </div>
+</div>
+
 <div id="bank-history-modal" class="modal"><div class="modal-content" style="height:60vh; display:flex; flex-direction:column;"><h3 class="modal-title">交易明細</h3><div id="bank-history-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('bank-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 <div id="all-schedule-modal" class="modal"><div class="modal-content" style="height:70vh; display:flex; flex-direction:column;"><h3 class="modal-title">歷史紀錄</h3><div id="all-schedule-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('all-schedule-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
-<div id="settlement-modal" class="modal"><div class="modal-content"><h3 class="modal-title">結算</h3><div style="text-align:center; font-size:36px; font-weight:800; margin-bottom:20px; color:var(--text-main);" id="settlement-timer-display">00:00:00</div><div class="setup-label">時數</div><div class="tag-container"><div class="tag" onclick="forceSelectButton(1.5, this, 'settlement-manual-hours')">1.5</div><div class="tag" onclick="forceSelectButton(2.0, this, 'settlement-manual-hours')">2.0</div><div class="tag" onclick="forceSelectButton(2.5, this, 'settlement-manual-hours')">2.5</div><div class="tag" onclick="forceSelectButton(3.0, this, 'settlement-manual-hours')">3.0</div></div><input id="settlement-manual-hours" type="number" placeholder="確認時數"><button onclick="confirmSettlement()" class="modal-btn btn-confirm btn-bubble">確認</button><button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button></div></div>
+<div id="settlement-modal" class="modal"><div class="modal-content"><h3 class="modal-title">結算</h3><div style="text-align:center; font-size:36px; font-weight:800; margin-bottom:20px; color:var(--text-main);" id="settlement-timer-display">00:00:00</div>
+    <div class="setup-label">時數</div>
+    <div class="tag-container">
+        <div class="tag" onclick="forceSelectButton(1.5, this, 'settlement-manual-hours')">1.5</div>
+        <div class="tag" onclick="forceSelectButton(2.0, this, 'settlement-manual-hours')">2.0</div>
+        <div class="tag" onclick="forceSelectButton(2.5, this, 'settlement-manual-hours')">2.5</div>
+        <div class="tag" onclick="forceSelectButton(3.0, this, 'settlement-manual-hours')">3.0</div>
+    </div>
+    <input id="settlement-manual-hours" type="number" placeholder="確認時數">
+    <button onclick="confirmSettlement()" class="modal-btn btn-confirm btn-bubble">確認</button>
+    <button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button>
+</div></div>
+
+<!-- V254: Stats Modal with correct date parameter -->
 <div id="student-history-modal" class="modal"><div class="modal-content" style="height:60vh; display:flex; flex-direction:column;"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="overflow-y:auto; flex:1;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
-<div id="profile-modal" class="modal"><div class="modal-content" style="max-height:80vh; overflow-y:auto;"><h3 class="modal-title">心情日記</h3><input type="file" id="avatar-upload" style="display:none" onchange="handleAvatarUpload(this)"><div class="sidebar-avatar" id="profile-avatar" onclick="triggerUpload()" style="margin-bottom:10px; margin-left:auto; margin-right:auto;">🧸</div><div style="text-align:center; margin-bottom:15px; color:#999; font-size:12px;">點擊頭像更換照片</div><textarea id="mood-input" placeholder="今天發生了什麼好玩的事？" style="height:80px;"></textarea><button onclick="saveMood()" class="modal-btn btn-confirm btn-bubble">記錄心情</button><div id="mood-list" style="margin-top:20px; max-height:200px; overflow-y:auto;"></div><button onclick="closeModal('profile-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
+
+<div id="profile-modal" class="modal">
+    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+        <h3 class="modal-title">心情日記</h3>
+        <input type="file" id="avatar-upload" style="display:none" onchange="handleAvatarUpload(this)">
+        <div class="sidebar-avatar" id="profile-avatar" onclick="triggerUpload()" style="margin-bottom:10px; margin-left:auto; margin-right:auto;">🧸</div>
+        <div style="text-align:center; margin-bottom:15px; color:#999; font-size:12px;">點擊頭像更換照片</div>
+        <textarea id="mood-input" placeholder="今天發生了什麼好玩的事？" style="height:80px;"></textarea>
+        <button onclick="saveMood()" class="modal-btn btn-confirm btn-bubble">記錄心情</button>
+        <div id="mood-list" style="margin-top:20px; max-height:200px; overflow-y:auto;"></div>
+        <button onclick="closeModal('profile-modal')" class="modal-btn btn-cancel">關閉</button>
+    </div>
+</div>
 
 <script>
     const DB_STU = 'tutor_v10_students';
@@ -396,19 +458,59 @@
     window.onload = function() {
         renderStudents(); renderSchedule(); updateAssets(); updateProfileDisplay();
         setInterval(updateRunningTimers, 1000);
-        document.addEventListener('click', (e) => { if(!e.target.closest('.swipe-content')) closeAllSwipes(); });
+        
+        // V254: Global click listener to close swipes
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.swipe-content')) {
+                closeAllSwipes();
+            }
+        });
     };
 
-    function hardReset() { if(confirm("警告：這將刪除所有資料並重置系統。確定嗎？")) { localStorage.clear(); location.reload(); } }
-    function switchTab(idx) { currentPage = idx; const slider = document.getElementById('page-slider'); const titles = ["排課系統", "資產報表"]; document.getElementById('header-title').innerText = titles[idx]; slider.style.transform = `translateX(-${idx * 100}vw)`; const dots = document.querySelectorAll('.dot'); dots.forEach((d, i) => d.classList.toggle('active', i === idx)); if(idx === 1) updateAssets(); const sb = document.getElementById('sidebar'); if(sb.classList.contains('active')) toggleSidebar(); }
-    function toggleSidebar() { const sb = document.getElementById('sidebar'); const ov = document.getElementById('sidebar-overlay'); const active = sb.classList.contains('active'); sb.classList.toggle('active', !active); ov.style.display = active ? 'none' : 'block'; }
-    document.addEventListener('touchstart', e => { if(!e.target.closest('.student-scroll') && !e.target.closest('.modal') && !e.target.closest('.swipe-container')) mainTouchStartX = e.changedTouches[0].screenX; });
-    document.addEventListener('touchend', e => { if(!e.target.closest('.student-scroll') && !e.target.closest('.modal') && !e.target.closest('.swipe-container')) { const touchEndX = e.changedTouches[0].screenX; if(Math.abs(touchEndX - mainTouchStartX) > 100) switchTab(touchEndX < mainTouchStartX ? 1 : 0); } });
-    let mainTouchStartX = 0;
+    function hardReset() {
+        if(confirm("警告：這將刪除所有資料並重置系統。確定嗎？")) {
+            localStorage.clear(); location.reload();
+        }
+    }
+
+    function switchTab(idx) {
+        currentPage = idx;
+        const slider = document.getElementById('page-slider');
+        const titles = ["排課系統", "資產報表"];
+        document.getElementById('header-title').innerText = titles[idx];
+        slider.style.transform = `translateX(-${idx * 100}vw)`;
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        if(idx === 1) updateAssets(); 
+        const sb = document.getElementById('sidebar');
+        if(sb.classList.contains('active')) toggleSidebar();
+    }
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebar-overlay');
+        const active = sb.classList.contains('active');
+        sb.classList.toggle('active', !active);
+        ov.style.display = active ? 'none' : 'block';
+    }
+
+    document.addEventListener('touchstart', e => { 
+        if(!e.target.closest('.student-scroll') && !e.target.closest('.modal')) touchStartX = e.changedTouches[0].screenX; 
+    });
+    document.addEventListener('touchend', e => {
+        if(!e.target.closest('.student-scroll') && !e.target.closest('.modal')) {
+            const touchEndX = e.changedTouches[0].screenX;
+            if(Math.abs(touchEndX - touchStartX) > 100) switchTab(touchEndX < touchStartX ? 1 : 0);
+        }
+    });
 
     function updateAssets() {
         let tw = 100000; let sp = 13107;
-        window.bankLogs.forEach(b => { const amt = parseInt(b.amount); if(b.accountId === 'taiwan_bank') tw += (b.type==='deposit'?amt:-amt); else sp += (b.type==='deposit'?amt:-amt); });
+        window.bankLogs.forEach(b => {
+            const amt = parseInt(b.amount);
+            if(b.accountId === 'taiwan_bank') tw += (b.type==='deposit'?amt:-amt);
+            else sp += (b.type==='deposit'?amt:-amt);
+        });
         
         let mTotal = 0; let estTotal = 0; 
         const y = viewDate.getFullYear();
@@ -422,15 +524,16 @@
              if(l.date.startsWith(ym)) {
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
                  if(l.status === 'unpaid' || l.status === 'paid') estTotal += income;
-                 
+                 if(l.status === 'paid') mTotal += income;
+
                  if(l.status === 'paid' || l.status === 'unpaid') {
-                     if(l.status === 'paid') mTotal += income;
                      const dObj = new Date(l.date);
                      const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
                      const dayStr = l.date.split('-')[2];
                      const isPaid = l.status === 'paid';
                      const color = isPaid ? 'var(--money-green)' : '#AAA';
                      
+                     // V254: Asset List Item
                      const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
                      histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income);
                  }
@@ -440,7 +543,9 @@
         const finalTotal = tw + sp + mTotal;
         animateValue(document.getElementById('total-assets-val'), 0, finalTotal, 1500);
 
-        if(lastTotalAssets > 0 && Math.floor(finalTotal/50000) > Math.floor(lastTotalAssets/50000)) { launchConfetti(); }
+        if(lastTotalAssets > 0 && Math.floor(finalTotal/50000) > Math.floor(lastTotalAssets/50000)) {
+            launchConfetti();
+        }
         lastTotalAssets = finalTotal;
 
         document.getElementById('taiwan-bank-balance').innerText = "$" + tw.toLocaleString();
@@ -450,49 +555,441 @@
         document.getElementById('month-est').innerText = estTotal.toLocaleString();
     }
 
-    // V250: Updated generateSwipeItem - No Trash Icon
+    // V254: Generate Swipe Item
     function generateSwipeItem(l, dateHTML, color, income) {
         let actionBtn = '';
-        if(l.status === 'unpaid') actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
-        return `<div class="swipe-container" id="swipe-${l.ts}"><div class="swipe-bg-delete" onclick="deleteLogFromHistory(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${l.ts}')" ontouchmove="handleSwipeMove(event, '${l.ts}')" ontouchend="handleSwipeEnd(event, '${l.ts}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}')">${l.name}</span></div><div class="list-right"><div style="font-weight:700; color:${color}; white-space:nowrap;">+$${income}</div>${actionBtn}</div></div></div>`;
+        if(l.status === 'unpaid') {
+            actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
+        }
+        
+        // V254: Pass date to openStudentMonthStats for correct monthly report
+        const monthStr = l.date.slice(0, 7); // yyyy-mm
+
+        return `
+        <div class="swipe-container" id="swipe-${l.ts}">
+            <!-- Delete Background -->
+            <div class="swipe-bg-delete" onclick="deleteLogFromHistory(event, '${l.ts}')">刪除</div>
+            
+            <!-- Content Foreground -->
+            <div class="swipe-content" 
+                 ontouchstart="handleSwipeStart(event, '${l.ts}')"
+                 ontouchmove="handleSwipeMove(event, '${l.ts}')"
+                 ontouchend="handleSwipeEnd(event, '${l.ts}')">
+                 
+                <div class="list-date">${dateHTML}</div>
+                <div class="list-info">
+                     <span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${monthStr}')">${l.name}</span>
+                </div>
+                <div class="list-right">
+                    <div style="font-weight:700; color:${color}; white-space:nowrap; font-size:15px;">+$${income}</div>
+                    ${actionBtn}
+                </div>
+            </div>
+        </div>`;
     }
 
-    let listSwipeStartX = 0; let listSwipeCurrentX = 0; let activeSwipeId = null; let isDragging = false;
-    function handleSwipeStart(e, id) { if(activeSwipeId && activeSwipeId !== id) closeAllSwipes(); listSwipeStartX = e.touches[0].clientX; listSwipeCurrentX = listSwipeStartX; isDragging = false; const el = e.currentTarget; el.style.transition = 'none'; }
-    function handleSwipeMove(e, id) { listSwipeCurrentX = e.touches[0].clientX; const diff = listSwipeCurrentX - listSwipeStartX; if(Math.abs(diff) > 10) isDragging = true; if (diff < 0) { if(e.cancelable) e.preventDefault(); const el = e.currentTarget; if (diff > -100) el.style.transform = `translateX(${diff}px)`; } }
-    function handleSwipeEnd(e, id) { if (!isDragging) return; const diff = listSwipeCurrentX - listSwipeStartX; const el = e.currentTarget; el.style.transition = 'transform 0.2s ease-out'; if (diff < -60) { el.style.transform = 'translateX(-80px)'; activeSwipeId = id; } else { el.style.transform = 'translateX(0)'; activeSwipeId = null; } listSwipeStartX = 0; listSwipeCurrentX = 0; isDragging = false; }
-    function closeAllSwipes() { document.querySelectorAll('.swipe-content').forEach(el => el.style.transform = 'translateX(0)'); activeSwipeId = null; }
-
-    function animateValue(obj, start, end, duration) { let startTimestamp = null; const step = (timestamp) => { if (!startTimestamp) startTimestamp = timestamp; const progress = Math.min((timestamp - startTimestamp) / duration, 1); obj.innerHTML = "$" + Math.floor(progress * (end - start) + start).toLocaleString(); if (progress < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
-
-    function launchConfetti() { const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; const particles = []; for(let i=0; i<100; i++) { particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, size: Math.random() * 20 + 10, speedY: Math.random() * 2 + 1, speedX: Math.random() * 2 - 1, opacity: Math.random() * 0.5 + 0.5 }); } let startTime = Date.now(); let duration = 6000; function draw() { let elapsed = Date.now() - startTime; let remaining = duration - elapsed; if (remaining <= 0) { ctx.clearRect(0,0,canvas.width,canvas.height); return; } ctx.clearRect(0,0,canvas.width,canvas.height); let globalAlpha = 1; if (remaining < 2000) globalAlpha = remaining / 2000; particles.forEach(p => { p.y += p.speedY; p.x += p.speedX; if(p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; } ctx.globalAlpha = p.opacity * globalAlpha; ctx.fillStyle = "white"; ctx.font = `${p.size}px serif`; ctx.fillText("❄", p.x, p.y); }); requestAnimationFrame(draw); } draw(); }
-
-    function renderSchedule() { const div = document.getElementById('today-schedule-list'); const now = new Date(); const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const day = String(now.getDate()).padStart(2, '0'); const todayStr = `${year}-${month}-${day}`; const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]; const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; document.getElementById('today-title-display').innerText = `${months[now.getMonth()]} ${now.getDate()} ${weekDays[now.getDay()]}`; const todays = window.logs.filter(l => l.date === todayStr); document.getElementById('empty-schedule-hint').style.display = todays.length ? 'none' : 'block'; div.innerHTML = todays.map(l => { let controls = ''; if(l.status === 'running') { controls = `<div class="timer-display" id="timer-${l.ts}">00:00:00</div><div class="controls"><button class="ctrl-btn btn-bubble" style="background:#C95D4E; color:#FFF;" onclick="openSettlementModal('${l.ts}')">⏹ 結束 & 結算</button></div>`; } else if(l.status === 'unpaid') { controls = `<div class="controls"><button class="ctrl-btn btn-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button><button onclick="deleteLog(event, '${l.ts}')" class="ctrl-btn btn-bubble" style="color:#AAA;">🗑</button></div>`; } else if(l.status === 'paid') { controls = `<div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; align-items:center;"><b style="color:var(--money-green); margin-right:10px;">已入帳 +$${l.income}</b><button onclick="deleteLog(event, '${l.ts}')" style="background:none; border:none; color:#CCC; font-size:16px;">🗑</button></div>`; } else { controls = `<div class="controls"><button class="ctrl-btn btn-bubble" onclick="deleteLog(event, '${l.ts}')">取消</button><button class="ctrl-btn btn-bubble" onclick="openSettlementModal('${l.ts}')">✓ 直接結算</button><button class="ctrl-btn btn-start btn-bubble" onclick="startClass(event, '${l.ts}')">▶ 開始</button></div>`; } return `<div class="schedule-card ${l.status}"><div class="sch-top"><div class="sch-title" onclick="openStudentMonthStats('${l.name}')">${l.name}</div><div class="sch-badge">${l.subject||'課程'}</div></div><div style="font-size:14px; font-weight:700; color:var(--text-sub);">${l.hours}h • $${Math.round(l.rate * l.hours)}</div><textarea class="inline-note" placeholder="紀錄上課內容..." onblur="updateContent('${l.ts}', this.value)">${l.content || ''}</textarea>${controls}</div>`; }).join(''); }
-
-    function startClass(e, ts) { if(e) e.stopPropagation(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(log) { log.status = 'running'; log.startTime = Date.now(); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); } }
-    function markAsPaid(e, ts) { if(e) e.stopPropagation(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(log) { if(confirm(`確認收到 $${log.income} 了嗎？`)) { log.status = 'paid'; localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); updateAssets(); if(document.getElementById('all-schedule-modal').style.display === 'flex') openAllScheduleModal(); } } }
-    function updateRunningTimers() { window.logs.filter(l => l.status === 'running').forEach(l => { const el = document.getElementById(`timer-${l.ts}`); if (el) { const diff = Date.now() - l.startTime; const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000); el.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; } }); }
-
-    function openSettlementModal(ts) { settlingLogTs = ts; const timerEl = document.getElementById(`timer-${ts}`); document.getElementById('settlement-timer-display').innerText = timerEl ? timerEl.innerText : "00:00:00"; document.getElementById('settlement-modal').style.display='flex'; }
-    function confirmSettlement() { const h = document.getElementById('settlement-manual-hours').value; const log = window.logs.find(l => String(l.ts) === String(settlingLogTs)); if(h && log) { log.status = 'unpaid'; log.hours = h; log.income = Math.round(h * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('settlement-modal'); renderSchedule(); updateAssets(); } }
+    // Swipe Logic
+    let listSwipeStartX = 0;
+    let listSwipeCurrentX = 0;
+    let activeSwipeId = null;
+    let isDragging = false;
     
-    function renderStudents() { const div = document.getElementById('student-scroll'); div.innerHTML = window.students.map((s, idx) => `<div class="student-wrapper" onclick="openBatchPlanModal(${idx})" onmousedown="startLongPress(this)" ontouchstart="startLongPress(this)"><div class="student-chip" style="background:${s.color || '#FFF'}; color:${s.color ? '#FFF' : '#2C3B4D'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div><div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div><div class="chip-name">${s.name}</div><div class="chip-grade">${s.grade || ''}</div></div>`).join(''); }
-    function addStudent() { const name = document.getElementById('new-name').value; const rate = document.getElementById('new-rate').value; const grade = document.getElementById('new-grade').value; const subject = document.getElementById('new-subject-def').value; const color = document.getElementById('new-color-val').value; document.getElementById('setup-error-name').style.display = 'none'; document.getElementById('setup-error-rate').style.display = 'none'; let isValid = true; if(!name) { document.getElementById('setup-error-name').style.display = 'block'; isValid = false; } if(!rate) { document.getElementById('setup-error-rate').style.display = 'block'; isValid = false; } if(!isValid) { const m = document.querySelector('#setup-modal .modal-content'); m.classList.add('shake-error'); setTimeout(() => m.classList.remove('shake-error'), 300); return; } if(name && rate) { window.students.push({name, rate, grade, subject, color}); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); closeModal('setup-modal'); } }
-    function selectColor(color, el) { document.getElementById('new-color-val').value = color; document.querySelectorAll('.color-opt').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); }
-    function forceSelectButton(val, btn, inputId) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
-    function selectSubject(val, btn, inputId) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
-    function deleteStudent(idx) { if(confirm('刪除這位學生？')) { window.students.splice(idx, 1); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); } }
+    function handleSwipeStart(e, id) {
+        if(activeSwipeId && activeSwipeId !== id) closeAllSwipes();
+        listSwipeStartX = e.touches[0].clientX;
+        listSwipeCurrentX = listSwipeStartX; 
+        isDragging = false; 
+        const el = e.currentTarget;
+        el.style.transition = 'none';
+    }
 
-    function openBatchPlanModal(idx) { currentPlanningStuIdx = idx; const s = window.students[idx]; document.getElementById('log-name-display').innerText = s.name; document.getElementById('log-subject').value = s.subject || ''; selectedDates = []; renderDateTags(); document.getElementById('log-date').value = new Date().toISOString().split('T')[0]; document.getElementById('log-error-msg').style.display = 'none'; document.getElementById('log-modal').style.display = 'flex'; }
-    function renderDateTags() { const container = document.getElementById('date-tags'); container.innerHTML = selectedDates.map(date => `<div class="date-tag-item" onclick="removeDateTag('${date}')"><span>${date.slice(5)}</span><span style="font-size:16px;">✕</span></div>`).join(''); }
-    function addDateTag() { const d = document.getElementById('log-date').value; if(d && !selectedDates.includes(d)) { selectedDates.push(d); renderDateTags(); document.getElementById('log-error-msg').style.display = 'none'; } }
-    function removeDateTag(date) { selectedDates = selectedDates.filter(d => d !== date); renderDateTags(); }
-    function saveBatchPlan() { const h = document.getElementById('log-hours').value; const subj = document.getElementById('log-subject').value; const note = document.getElementById('log-content-modal').value; const s = window.students[currentPlanningStuIdx]; if (selectedDates.length === 0) { const pickerDate = document.getElementById('log-date').value; if (pickerDate) selectedDates.push(pickerDate); } let errorText = ''; if (!h) errorText = '請選擇時數'; else if (!subj) errorText = '請選擇科目'; else if (selectedDates.length === 0) errorText = '請選擇日期'; if (errorText) { const modalContent = document.querySelector('#log-modal .modal-content'); modalContent.classList.add('shake-error'); const errorEl = document.getElementById('log-error-msg'); errorEl.style.display = 'block'; errorEl.innerText = errorText; setTimeout(() => modalContent.classList.remove('shake-error'), 300); return; } const duplicateDates = selectedDates.filter(date => window.logs.some(l => l.date === date && l.name === s.name)); if(duplicateDates.length > 0) { alert(`⚠️ 注意：${duplicateDates.join(', ')} 已經排過 ${s.name} 的課了！`); selectedDates = selectedDates.filter(date => !duplicateDates.includes(date)); if(selectedDates.length === 0) return; } if(h) { selectedDates.forEach(date => { window.logs.push({ ts: Date.now() + Math.random(), name: s.name, rate: s.rate, hours: h, subject: subj, content: note, date: date, status: 'prepared', income: Math.round(h * s.rate) }); }); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); closeModal('log-modal'); updateAssets(); } }
+    function handleSwipeMove(e, id) {
+        listSwipeCurrentX = e.touches[0].clientX;
+        const diff = listSwipeCurrentX - listSwipeStartX;
+        if(Math.abs(diff) > 10) isDragging = true;
+        if (diff < 0) {
+            if(e.cancelable) e.preventDefault();
+            const el = e.currentTarget;
+            if (diff > -100) el.style.transform = `translateX(${diff}px)`;
+        }
+    }
 
-    function deleteLog(e, ts) { if(e) { e.preventDefault(); e.stopPropagation(); } if(confirm('刪除此課程紀錄？')) { window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); openAllScheduleModal(); updateAssets(); renderSchedule(); } }
-    function openBankInput(t, id) { currentBankAction=t; currentAccountId=id; document.getElementById('bank-title').innerText=t==='deposit'?'存入':'提領'; const now = new Date(); const y = now.getFullYear(); const m = String(now.getMonth()+1).padStart(2,'0'); const d = String(now.getDate()).padStart(2,'0'); document.getElementById('bank-date').value = `${y}-${m}-${d}`; document.getElementById('bank-input-modal').style.display='flex'; }
-    function submitBankTransaction() { const amt = document.getElementById('bank-amount').value; const date = document.getElementById('bank-date').value; if(amt && date) { window.bankLogs.push({ts:Date.now(), amount:amt, type:currentBankAction, accountId:currentAccountId, date:date}); localStorage.setItem(DB_BANK, JSON.stringify(window.bankLogs)); closeModal('bank-input-modal'); updateAssets(); } }
-    function openBankHistory(id) { const sortedLogs = window.bankLogs.filter(b=>b.accountId===id).sort((a,b) => new Date(b.date) - new Date(a.date)); document.getElementById('bank-history-list').innerHTML = sortedLogs.map(b=>`<div class="list-item"><div class="list-date" style="width:80px;">${b.date}</div><div style="flex:1; text-align:right; font-weight:700; color:${b.type==='deposit'?'var(--money-green)':'var(--money-red)'}">${b.type==='deposit'?'+':'-'}$${b.amount}</div></div>`).join(''); document.getElementById('bank-history-modal').style.display='flex'; }
+    function handleSwipeEnd(e, id) {
+        if (!isDragging) return;
+        const diff = listSwipeCurrentX - listSwipeStartX;
+        const el = e.currentTarget;
+        el.style.transition = 'transform 0.2s ease-out';
+        if (diff < -60) {
+            el.style.transform = 'translateX(-80px)';
+            activeSwipeId = id;
+        } else {
+            el.style.transform = 'translateX(0)';
+            activeSwipeId = null;
+        }
+        listSwipeStartX = 0;
+        listSwipeCurrentX = 0;
+        isDragging = false;
+    }
+
+    function closeAllSwipes() {
+        document.querySelectorAll('.swipe-content').forEach(el => el.style.transform = 'translateX(0)');
+        activeSwipeId = null;
+    }
+
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = "$" + Math.floor(progress * (end - start) + start).toLocaleString();
+            if (progress < 1) window.requestAnimationFrame(step);
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    function launchConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        for(let i=0; i<100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 20 + 10,
+                speedY: Math.random() * 2 + 1,
+                speedX: Math.random() * 2 - 1,
+                opacity: Math.random() * 0.5 + 0.5
+            });
+        }
+        
+        let startTime = Date.now();
+        let duration = 6000;
+
+        function draw() {
+            let elapsed = Date.now() - startTime;
+            let remaining = duration - elapsed;
+            
+            if (remaining <= 0) {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                return;
+            }
+            
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            let globalAlpha = 1;
+            if (remaining < 2000) globalAlpha = remaining / 2000;
+
+            particles.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                if(p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+                
+                ctx.globalAlpha = p.opacity * globalAlpha;
+                ctx.fillStyle = "white";
+                ctx.font = `${p.size}px serif`;
+                ctx.fillText("❄", p.x, p.y);
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    function renderSchedule() {
+        const div = document.getElementById('today-schedule-list');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+        
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+        document.getElementById('today-title-display').innerText = `${months[now.getMonth()]} ${now.getDate()} ${weekDays[now.getDay()]}`;
+        
+        const todays = window.logs.filter(l => l.date === todayStr);
+        document.getElementById('empty-schedule-hint').style.display = todays.length ? 'none' : 'block';
+        
+        div.innerHTML = todays.map(l => {
+            let controls = '';
+            if(l.status === 'running') {
+                controls = `<div class="timer-display" id="timer-${l.ts}">00:00:00</div><div class="controls"><button class="ctrl-btn btn-bubble" style="background:#C95D4E; color:#FFF;" onclick="openSettlementModal('${l.ts}')">⏹ 結束 & 結算</button></div>`;
+            } else if(l.status === 'unpaid') {
+                controls = `<div class="controls"><button class="ctrl-btn btn-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button><button onclick="deleteLog(event, '${l.ts}')" class="ctrl-btn btn-bubble" style="color:#AAA;">🗑</button></div>`;
+            } else if(l.status === 'paid') {
+                controls = `<div style="text-align:right; margin-top:10px; display:flex; justify-content:flex-end; align-items:center;"><b style="color:var(--money-green); margin-right:10px;">已入帳 +$${l.income}</b><button onclick="deleteLog(event, '${l.ts}')" style="background:none; border:none; color:#CCC; font-size:16px;">🗑</button></div>`;
+            } else {
+                controls = `
+                    <div class="controls">
+                        <button class="ctrl-btn btn-bubble" onclick="deleteLog(event, '${l.ts}')">取消</button>
+                        <button class="ctrl-btn btn-bubble" onclick="openSettlementModal('${l.ts}')">✓ 直接結算</button>
+                        <button class="ctrl-btn btn-start btn-bubble" onclick="startClass(event, '${l.ts}')">▶ 開始</button>
+                    </div>
+                `;
+            }
+            return `
+            <div class="schedule-card ${l.status}">
+                <div class="sch-top">
+                    <div class="sch-title" onclick="openStudentMonthStats('${l.name}', '${todayStr.slice(0,7)}')">${l.name}</div>
+                    <div class="sch-badge">${l.subject||'課程'}</div>
+                </div>
+                <div style="font-size:14px; font-weight:700; color:var(--text-sub);">${l.hours}h • $${Math.round(l.rate * l.hours)}</div>
+                <textarea class="inline-note" placeholder="紀錄上課內容..." onblur="updateContent('${l.ts}', this.value)">${l.content || ''}</textarea>
+                ${controls}
+            </div>`; 
+        }).join('');
+    }
+
+    function startClass(e, ts) {
+        if(e) e.stopPropagation();
+        const log = window.logs.find(l => String(l.ts) === String(ts));
+        if(log) {
+            log.status = 'running'; log.startTime = Date.now();
+            localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+            renderSchedule();
+        }
+    }
+
+    function markAsPaid(e, ts) {
+        if(e) e.stopPropagation();
+        const log = window.logs.find(l => String(l.ts) === String(ts));
+        if(log) {
+            if(confirm(`確認收到 $${log.income} 了嗎？`)) {
+                log.status = 'paid';
+                localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+                renderSchedule();
+                updateAssets(); 
+                if(document.getElementById('all-schedule-modal').style.display === 'flex') openAllScheduleModal();
+            }
+        }
+    }
+
+    function updateRunningTimers() {
+        window.logs.filter(l => l.status === 'running').forEach(l => {
+            const el = document.getElementById(`timer-${l.ts}`);
+            if (el) {
+                const diff = Date.now() - l.startTime;
+                const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+                el.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }
+        });
+    }
+
+    function openSettlementModal(ts) {
+        settlingLogTs = ts;
+        const timerEl = document.getElementById(`timer-${ts}`);
+        document.getElementById('settlement-timer-display').innerText = timerEl ? timerEl.innerText : "00:00:00";
+        document.getElementById('settlement-modal').style.display='flex';
+    }
+
+    function confirmSettlement() {
+        const h = document.getElementById('settlement-manual-hours').value;
+        const log = window.logs.find(l => String(l.ts) === String(settlingLogTs));
+        if(h && log) {
+            log.status = 'unpaid'; 
+            log.hours = h; 
+            log.income = Math.round(h * log.rate);
+            localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+            closeModal('settlement-modal'); renderSchedule(); updateAssets();
+        }
+    }
+
+    function renderStudents() {
+        const div = document.getElementById('student-scroll');
+        div.innerHTML = window.students.map((s, idx) => `
+            <div class="student-wrapper" onclick="openBatchPlanModal(${idx})" onmousedown="startLongPress(this)" ontouchstart="startLongPress(this)">
+                <div class="student-chip" style="background:${s.color || '#FFF'}; color:${s.color ? '#FFF' : '#2C3B4D'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div>
+                <div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div>
+                <div class="chip-name">${s.name}</div>
+                <div class="chip-grade">${s.grade || ''}</div>
+            </div>
+        `).join('');
+    }
+
+    function addStudent() { 
+        const name = document.getElementById('new-name').value; 
+        const rate = document.getElementById('new-rate').value; 
+        const grade = document.getElementById('new-grade').value; 
+        const subject = document.getElementById('new-subject-def').value;
+        const color = document.getElementById('new-color-val').value;
+        
+        document.getElementById('setup-error-name').style.display = 'none';
+        document.getElementById('setup-error-rate').style.display = 'none';
+        let isValid = true;
+
+        if(!name) { document.getElementById('setup-error-name').style.display = 'block'; isValid = false; }
+        if(!rate) { document.getElementById('setup-error-rate').style.display = 'block'; isValid = false; }
+
+        if(!isValid) {
+            const m = document.querySelector('#setup-modal .modal-content');
+            m.classList.add('shake-error');
+            setTimeout(() => m.classList.remove('shake-error'), 300);
+            return;
+        }
+        
+        if(name && rate) { 
+            window.students.push({name, rate, grade, subject, color}); 
+            localStorage.setItem(DB_STU, JSON.stringify(window.students)); 
+            renderStudents(); closeModal('setup-modal'); 
+        } 
+    }
+
+    function selectColor(color, el) {
+        document.getElementById('new-color-val').value = color;
+        document.querySelectorAll('.color-opt').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+    
+    function forceSelectButton(val, btn, inputId) {
+        document.getElementById(inputId).value = val;
+        Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+    
+    function selectSubject(val, btn, inputId) {
+        document.getElementById(inputId).value = val;
+        Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+
+    function deleteStudent(idx) { 
+        if(confirm('刪除這位學生？')) { 
+            window.students.splice(idx, 1); 
+            localStorage.setItem(DB_STU, JSON.stringify(window.students)); 
+            renderStudents(); 
+        } 
+    }
+
+    function openBatchPlanModal(idx) {
+        currentPlanningStuIdx = idx;
+        const s = window.students[idx];
+        document.getElementById('log-name-display').innerText = s.name;
+        document.getElementById('log-subject').value = s.subject || '';
+        
+        selectedDates = []; 
+        renderDateTags(); 
+        document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('log-error-msg').style.display = 'none'; 
+        document.getElementById('log-modal').style.display = 'flex';
+    }
+
+    function renderDateTags() {
+        const container = document.getElementById('date-tags');
+        container.innerHTML = selectedDates.map(date => 
+            `<div class="date-tag-item" onclick="removeDateTag('${date}')">
+                <span>${date.slice(5)}</span>
+                <span style="font-size:16px;">✕</span>
+            </div>`
+        ).join('');
+    }
+
+    function addDateTag() {
+        const d = document.getElementById('log-date').value;
+        if(d && !selectedDates.includes(d)) {
+            selectedDates.push(d);
+            renderDateTags(); 
+            document.getElementById('log-error-msg').style.display = 'none';
+        }
+    }
+
+    function removeDateTag(date) {
+        selectedDates = selectedDates.filter(d => d !== date);
+        renderDateTags();
+    }
+
+    function saveBatchPlan() {
+        const h = document.getElementById('log-hours').value;
+        const subj = document.getElementById('log-subject').value;
+        const note = document.getElementById('log-content-modal').value;
+        const s = window.students[currentPlanningStuIdx];
+        
+        if (selectedDates.length === 0) {
+            const pickerDate = document.getElementById('log-date').value;
+            if (pickerDate) selectedDates.push(pickerDate);
+        }
+
+        let errorText = '';
+        if (!h) errorText = '請選擇時數';
+        else if (!subj) errorText = '請選擇科目';
+        else if (selectedDates.length === 0) errorText = '請選擇日期';
+
+        if (errorText) {
+            const modalContent = document.querySelector('#log-modal .modal-content');
+            modalContent.classList.add('shake-error');
+            const errorEl = document.getElementById('log-error-msg');
+            errorEl.style.display = 'block';
+            errorEl.innerText = errorText;
+            setTimeout(() => modalContent.classList.remove('shake-error'), 300);
+            return;
+        }
+
+        const duplicateDates = selectedDates.filter(date => 
+            window.logs.some(l => l.date === date && l.name === s.name)
+        );
+
+        if(duplicateDates.length > 0) {
+            alert(`⚠️ 注意：${duplicateDates.join(', ')} 已經排過 ${s.name} 的課了！`);
+            selectedDates = selectedDates.filter(date => !duplicateDates.includes(date));
+            if(selectedDates.length === 0) return; 
+        }
+
+        if(h) {
+            selectedDates.forEach(date => {
+                window.logs.push({
+                    ts: Date.now() + Math.random(), name: s.name, rate: s.rate,
+                    hours: h, subject: subj, content: note, date: date, status: 'prepared',
+                    income: Math.round(h * s.rate)
+                });
+            });
+            localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+            renderSchedule(); closeModal('log-modal'); updateAssets(); 
+        }
+    }
+
+    function deleteLog(e, ts) { 
+        if(e) { e.preventDefault(); e.stopPropagation(); }
+        if(confirm('刪除此課程紀錄？')) { 
+            window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); 
+            localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
+            openAllScheduleModal(); updateAssets(); renderSchedule(); 
+        } 
+    }
+
+    function openBankInput(t, id) { 
+        currentBankAction=t; 
+        currentAccountId=id; 
+        document.getElementById('bank-title').innerText=t==='deposit'?'存入':'提領'; 
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth()+1).padStart(2,'0');
+        const d = String(now.getDate()).padStart(2,'0');
+        document.getElementById('bank-date').value = `${y}-${m}-${d}`;
+        document.getElementById('bank-input-modal').style.display='flex'; 
+    }
+
+    function submitBankTransaction() { 
+        const amt = document.getElementById('bank-amount').value; 
+        const date = document.getElementById('bank-date').value;
+        if(amt && date) { 
+            window.bankLogs.push({ts:Date.now(), amount:amt, type:currentBankAction, accountId:currentAccountId, date:date}); 
+            localStorage.setItem(DB_BANK, JSON.stringify(window.bankLogs)); 
+            closeModal('bank-input-modal'); 
+            updateAssets(); 
+        } 
+    }
+
+    function openBankHistory(id) { 
+        const sortedLogs = window.bankLogs.filter(b=>b.accountId===id).sort((a,b) => new Date(b.date) - new Date(a.date));
+        document.getElementById('bank-history-list').innerHTML = sortedLogs.map(b=>`
+            <div class="list-item">
+                <div class="list-date" style="width:80px;">${b.date}</div>
+                <div style="flex:1; text-align:right; font-weight:700; color:${b.type==='deposit'?'var(--money-green)':'var(--money-red)'}">
+                    ${b.type==='deposit'?'+':'-'}$${b.amount}
+                </div>
+            </div>`).join(''); 
+        document.getElementById('bank-history-modal').style.display='flex'; 
+    }
 
     function closeModal(id) { document.getElementById(id).style.display='none'; }
     function openSetupModal() { document.getElementById('setup-modal').style.display='flex'; }
@@ -510,12 +1007,137 @@
     function handleAvatarUpload(input) { if(input.files[0]) { const reader = new FileReader(); reader.onload = e => { profileData.avatar = e.target.result; localStorage.setItem(DB_PROF, JSON.stringify(profileData)); updateProfileDisplay(); }; reader.readAsDataURL(input.files[0]); } }
     function updateProfileDisplay() { if(profileData.avatar && profileData.avatar.startsWith('data:')) { document.getElementById('sidebar-avatar').style.backgroundImage = `url(${profileData.avatar})`; document.getElementById('sidebar-avatar').innerText = ''; } }
 
-    function openStudentMonthStats(name) { currentStatsStudent = name; const ym = viewDate.getFullYear() + '-' + String(viewDate.getMonth() + 1).padStart(2, '0'); const myLogs = window.logs.filter(l => l.name === name && l.date.startsWith(ym) && l.status === 'paid'); let total = 0; const listHtml = myLogs.map(l => { total += parseInt(l.income); return `<div class="list-item"><div>${l.date}</div><div>$${l.income}</div></div>`; }).join(''); document.getElementById('stu-history-name').innerText = name + " 月貢獻 (已收款)"; document.getElementById('stu-history-total').innerText = "$" + total.toLocaleString(); document.getElementById('stu-history-list').innerHTML = listHtml || '<div style="text-align:center; padding:20px; color:#AAA;">本月無收款紀錄</div>'; document.getElementById('btn-delete-all-logs').onclick = function() { deleteAllStudentMonthLogs(name, ym); }; document.getElementById('student-history-modal').style.display = 'flex'; }
-    function deleteAllStudentMonthLogs(name, ym) { if(confirm(`⚠️ 危險：確定要刪除 ${name} 在 ${ym} 的所有課程紀錄嗎？\n(包含已收款和未收款)`)) { window.logs = window.logs.filter(l => !(l.name === name && l.date.startsWith(ym))); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('student-history-modal'); openAllScheduleModal(); updateAssets(); renderSchedule(); } }
-    function openAllScheduleModal() { const list = document.getElementById('all-schedule-list'); list.innerHTML = ''; const groups = {}; window.logs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(l => { const d = new Date(l.date); const k = `${d.getFullYear()}年 ${d.getMonth()+1}月`; if(!groups[k]) groups[k] = []; groups[k].push(l); }); if(Object.keys(groups).length === 0) list.innerHTML = '<div style="text-align:center;padding:20px;color:#999">無紀錄</div>'; for(let [month, items] of Object.entries(groups)) { const total = items.reduce((s, x) => s + (x.status === 'paid' ? (parseInt(x.income)||0) : 0), 0); const header = document.createElement('div'); header.className = 'month-group-header'; header.innerHTML = `<span>${month}</span><span>$${total.toLocaleString()} ▼</span>`; header.onclick = function() { toggleMonthView(this); }; const container = document.createElement('div'); container.className = 'month-logs'; container.style.display = 'none'; container.innerHTML = items.map(l => { const dObj = new Date(l.date); const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()]; const dayStr = l.date.split('-')[2]; const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`; const isPaid = l.status === 'paid'; const color = isPaid ? 'var(--money-green)' : '#AAA'; const income = l.income; return generateSwipeItem(l, dateHTML, color, income); }).join(''); list.appendChild(header); list.appendChild(container); } document.getElementById('all-schedule-modal').style.display = 'flex'; }
-    function deleteLogFromHistory(e, ts) { if(e) { e.preventDefault(); e.stopPropagation(); } if(confirm('確定刪除？')) { window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); openAllScheduleModal(); updateAssets(); renderSchedule(); } }
-    function toggleMonthView(header) { const content = header.nextElementSibling; const allContents = document.querySelectorAll('.month-logs'); const isOpening = content.style.display === 'none'; allContents.forEach(c => c.style.display = 'none'); if(isOpening) content.style.display = 'block'; }
-    let pressTimer; function startLongPress(el) { pressTimer = setTimeout(() => { document.querySelectorAll('.student-wrapper').forEach(w => w.classList.add('is-editing')); document.addEventListener('click', () => document.querySelectorAll('.student-wrapper').forEach(w => w.classList.remove('is-editing')), {once:true}); }, 800); }
+    // V254: Stats Modal with correct date parameter
+    function openStudentMonthStats(name, specificYM) {
+        currentStatsStudent = name;
+        // Use the passed YM or fallback to current viewDate if missing
+        const ym = specificYM || (viewDate.getFullYear() + '-' + String(viewDate.getMonth() + 1).padStart(2, '0'));
+        
+        // V254: Include PAID and UNPAID
+        const myLogs = window.logs.filter(l => l.name === name && l.date.startsWith(ym) && (l.status === 'paid' || l.status === 'unpaid'));
+        
+        let total = 0;
+        const listHtml = myLogs.map(l => { 
+            total += parseInt(l.income); 
+            // Color code for status
+            const color = l.status === 'paid' ? 'var(--money-green)' : '#999';
+            return `<div class="list-item">
+                <div class="list-date">${l.date}</div>
+                <div style="font-weight:700; color:${color};">$${l.income}</div>
+            </div>`; 
+        }).join('');
+        
+        document.getElementById('stu-history-name').innerText = `${name} ${ym} 月貢獻`;
+        document.getElementById('stu-history-total').innerText = "$" + total.toLocaleString();
+        document.getElementById('stu-history-list').innerHTML = listHtml || '<div style="text-align:center; padding:20px; color:#AAA;">本月無紀錄</div>';
+        
+        document.getElementById('btn-delete-all-logs').onclick = function() { deleteAllStudentMonthLogs(name, ym); };
+        document.getElementById('student-history-modal').style.display = 'flex';
+    }
+
+    function deleteAllStudentMonthLogs(name, ym) {
+        if(confirm(`⚠️ 危險：確定要刪除 ${name} 在 ${ym} 的所有課程紀錄嗎？\n(包含已收款和未收款)`)) {
+            window.logs = window.logs.filter(l => !(l.name === name && l.date.startsWith(ym)));
+            localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+            closeModal('student-history-modal');
+            openAllScheduleModal(); 
+            updateAssets();
+            renderSchedule();
+        }
+    }
+
+    // V254: Fixed Month Passing
+    function openAllScheduleModal() {
+        const list = document.getElementById('all-schedule-list');
+        list.innerHTML = '';
+        const groups = {};
+        window.logs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(l => {
+            const d = new Date(l.date);
+            const k = `${d.getFullYear()}年 ${d.getMonth()+1}月`;
+            if(!groups[k]) groups[k] = [];
+            groups[k].push(l);
+        });
+
+        if(Object.keys(groups).length === 0) list.innerHTML = '<div style="text-align:center;padding:20px;color:#999">無紀錄</div>';
+
+        for(let [month, items] of Object.entries(groups)) {
+            const total = items.reduce((s, x) => s + (parseInt(x.income)||0), 0);
+            const header = document.createElement('div');
+            header.className = 'month-group-header';
+            header.innerHTML = `<span>${month}</span><span>$${total.toLocaleString()} ▼</span>`;
+            header.onclick = function() { toggleMonthView(this); };
+            
+            const container = document.createElement('div');
+            container.className = 'month-logs';
+            container.style.display = 'none'; 
+            
+            // Get YYYY-MM from the first item
+            const currentMonthStr = items[0].date.slice(0, 7);
+
+            container.innerHTML = items.map(l => {
+                const dObj = new Date(l.date);
+                const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
+                const dayStr = l.date.split('-')[2];
+                const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
+                const isPaid = l.status === 'paid';
+                const color = isPaid ? 'var(--money-green)' : '#AAA';
+                const income = l.income;
+
+                // Pass currentMonthStr to openStudentMonthStats
+                return generateSwipeItem(l, dateHTML, color, income).replace("openStudentMonthStats('"+l.name+"')", "openStudentMonthStats('"+l.name+"', '"+currentMonthStr+"')");
+            }).join('');
+            list.appendChild(header);
+            list.appendChild(container);
+        }
+        document.getElementById('all-schedule-modal').style.display = 'flex';
+    }
+    
+    // Original Generator (Used by Assets List too)
+    function generateSwipeItem(l, dateHTML, color, income) {
+        let actionBtn = '';
+        if(l.status === 'unpaid') {
+            actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
+        }
+        
+        // Note: The click handler here needs to be generic or replaced in specific contexts
+        return `
+        <div class="swipe-container" id="swipe-${l.ts}">
+            <div class="swipe-bg-delete" onclick="deleteLogFromHistory(event, '${l.ts}')">刪除</div>
+            <div class="swipe-content" 
+                 ontouchstart="handleSwipeStart(event, '${l.ts}')" 
+                 ontouchmove="handleSwipeMove(event, '${l.ts}')" 
+                 ontouchend="handleSwipeEnd(event, '${l.ts}')">
+                <div class="list-date">${dateHTML}</div>
+                <div class="list-info">
+                     <span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}')">${l.name}</span>
+                </div>
+                <div class="list-right">
+                    <div style="font-weight:700; color:${color}; white-space:nowrap; font-size:15px;">+$${income}</div>
+                    ${actionBtn}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function deleteLogFromHistory(e, ts) { 
+        if(e) { e.preventDefault(); e.stopPropagation(); }
+        if(confirm('確定刪除？')) { 
+            window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); 
+            localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
+            openAllScheduleModal(); updateAssets(); renderSchedule(); 
+        } 
+    }
+
+    function toggleMonthView(header) {
+        const content = header.nextElementSibling;
+        const allContents = document.querySelectorAll('.month-logs');
+        const isOpening = content.style.display === 'none';
+        allContents.forEach(c => c.style.display = 'none'); 
+        if(isOpening) content.style.display = 'block';
+    }
+
+    let pressTimer; 
+    function startLongPress(el) { pressTimer = setTimeout(() => { document.querySelectorAll('.student-wrapper').forEach(w => w.classList.add('is-editing')); document.addEventListener('click', () => document.querySelectorAll('.student-wrapper').forEach(w => w.classList.remove('is-editing')), {once:true}); }, 800); }
     document.addEventListener('mouseup', () => clearTimeout(pressTimer)); document.addEventListener('touchend', () => clearTimeout(pressTimer));
 </script>
 </body>
