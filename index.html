@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V266 STYLE: Glossy Glass Bead Effect --- */
+    /* --- V267 STYLE: Fix Assets, Swipe & History Status --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -40,7 +40,6 @@
         -webkit-font-smoothing: antialiased;
     }
     
-    /* 保持 160px 的推擠高度 */
     body { padding-top: 160px !important; }
 
     #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
@@ -48,25 +47,18 @@
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
 
-    /* HEADER - 玻璃珠質感調整 */
+    /* HEADER */
     header {
-        /* 1. 背景改為徑向漸層，模擬光澤 (左上角較亮) */
         background: radial-gradient(100% 100% at 0% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
-        
-        /* 2. 關鍵特效：降低 Blur (不毛)，提高 Saturate (增強透視顏色的鮮豔度) */
         backdrop-filter: saturate(180%) blur(12px);
         -webkit-backdrop-filter: saturate(180%) blur(12px);
-        
-        /* 3. 邊緣光與陰影，增加立體感 */
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-
         padding-top: max(15px, env(safe-area-inset-top));
         padding-bottom: 15px; 
         padding-left: 24px; padding-right: 24px;
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
         display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
-        
         height: 160px !important;
     }
     .header-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -212,10 +204,15 @@
     .setup-label { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; margin-left: 4px; }
     .error-hint { color: var(--money-red); font-size: 12px; margin-top: -10px; margin-bottom: 10px; display: none; font-weight: 700; text-align: center; }
 
-    /* SWIPE CONTAINER */
+    /* SWIPE CONTAINER - FIX */
     .swipe-container { position: relative; overflow: hidden; width: 100%; border-bottom: 1px solid #F0F0F0; touch-action: pan-y; height: 72px; background: #FFF; }
     .swipe-bg-delete { position: absolute; top: 0; right: 0; bottom: 0; width: 90px; background: var(--money-red); display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; }
-    .swipe-content { position: relative; background: #FFF; z-index: 2; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 5px; transition: transform 0.15s ease-out; }
+    .swipe-content { 
+        position: relative; background: #FFF; z-index: 2; width: 100%; height: 100%; 
+        display: flex; align-items: center; padding: 0 5px; 
+        transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28); /* Bouncy Snap */
+        will-change: transform;
+    }
 
     .modal-stats-content { height: 70vh; display: flex; flex-direction: column; }
 </style>
@@ -559,7 +556,6 @@
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
                  
                  if(['paid', 'unpaid', 'prepared', 'running'].includes(l.status)) estTotal += income;
-                 
                  if(l.status === 'paid') mTotal += income;
 
                  const dObj = new Date(l.date);
@@ -576,7 +572,8 @@
              }
         });
 
-        const finalTotal = tw + sp + mTotal;
+        // V267 FIX: Total Assets now only includes Bank + Stock. Income (mTotal) excluded.
+        const finalTotal = tw + sp;
         animateValue(document.getElementById('total-assets-val'), 0, finalTotal, 1500);
 
         if(lastTotalAssets > 0 && Math.floor(finalTotal/50000) > Math.floor(lastTotalAssets/50000)) {
@@ -597,7 +594,8 @@
         if(l.status === 'unpaid') {
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
         } else if (l.status === 'prepared') {
-            actionBtn = `<span style="font-size:11px; color:#CCC; font-weight:700;">(預排)</span>`;
+            // V267 FIX: Add "Settle" button for Prepared items so user can easily fix past classes
+            actionBtn = `<button class="btn-mini-pay btn-bubble" style="background:transparent; border:1px solid #CBD5E0; color:#718096;" onclick="quickSettle(event, '${l.ts}')">✓ 結算</button>`;
         } else if (l.status === 'running') {
             actionBtn = `<span style="font-size:11px; color:#C95D4E; font-weight:700;">(進行中)</span>`;
         }
@@ -625,6 +623,30 @@
         </div>`;
     }
 
+    // V267: New function for Quick Settle from history list
+    function quickSettle(e, ts) {
+        if(e) e.stopPropagation();
+        const log = window.logs.find(l => String(l.ts) === String(ts));
+        if(log) {
+            if(confirm(`確認將 ${log.name} 的課程標記為「已結算/待收款」嗎？`)) {
+                log.status = 'unpaid';
+                // Recalculate income just in case
+                log.income = Math.round(log.hours * log.rate);
+                localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+                
+                // Refresh view
+                updateAssets();
+                renderSchedule();
+                
+                if(document.getElementById('all-schedule-modal').style.display === 'flex') {
+                    const d = new Date(log.date);
+                    const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`;
+                    openAllScheduleModal(targetMonthKey); 
+                }
+            }
+        }
+    }
+
     let listSwipeStartX = 0;
     let listSwipeCurrentX = 0;
     let activeSwipeId = null;
@@ -635,6 +657,8 @@
         listSwipeStartX = e.touches[0].clientX;
         listSwipeCurrentX = listSwipeStartX; 
         isDragging = false; 
+        
+        // V267 FIX: Disable transition during drag for responsiveness
         const el = e.currentTarget;
         el.style.transition = 'none';
     }
@@ -646,9 +670,12 @@
         if(Math.abs(diff) > 10) isDragging = true;
         
         if (diff < 0) {
-            if(e.cancelable) e.preventDefault();
+            // Prevent scrolling vertically while swiping horizontally
+            if(e.cancelable && Math.abs(diff) > 5) e.preventDefault();
+            
             const el = e.currentTarget;
-            if (diff > -100) el.style.transform = `translateX(${diff}px)`;
+            // Limit pull to avoid dragging too far
+            if (diff > -120) el.style.transform = `translateX(${diff}px)`;
         }
     }
 
@@ -657,10 +684,13 @@
 
         const diff = listSwipeCurrentX - listSwipeStartX;
         const el = e.currentTarget;
-        el.style.transition = 'transform 0.2s ease-out';
         
+        // V267 FIX: Add transition back for snap effect
+        el.style.transition = 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+        
+        // Threshold to snap open (-60px)
         if (diff < -60) {
-            el.style.transform = 'translateX(-80px)';
+            el.style.transform = 'translateX(-90px)'; // Fixed width of delete button
             activeSwipeId = id;
         } else {
             el.style.transform = 'translateX(0)';
@@ -672,7 +702,10 @@
     }
 
     function closeAllSwipes() {
-        document.querySelectorAll('.swipe-content').forEach(el => el.style.transform = 'translateX(0)');
+        document.querySelectorAll('.swipe-content').forEach(el => {
+            el.style.transition = 'transform 0.2s ease-out';
+            el.style.transform = 'translateX(0)';
+        });
         activeSwipeId = null;
     }
 
