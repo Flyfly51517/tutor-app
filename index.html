@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V260 STYLE --- */
+    /* --- V261 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -47,9 +47,9 @@
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
 
-    /* HEADER */
+    /* HEADER - 已調整透明度 */
     header {
-        background: rgba(247, 246, 242, 0.95);
+        background: rgba(247, 246, 242, 0.75); /* 從 0.95 改為 0.75，更透明 */
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding-top: max(15px, env(safe-area-inset-top));
@@ -545,16 +545,12 @@
         const histDiv = document.getElementById('all-logs');
         histDiv.innerHTML = '';
         
-        // V260: Show ALL statuses (including prepared)
         window.logs.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(l => {
              if(l.date.startsWith(ym)) {
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
                  
-                 // Estimated includes everything except cancelled (if you had cancelled status)
-                 // Here we include prepared, running, unpaid, paid
                  if(['paid', 'unpaid', 'prepared', 'running'].includes(l.status)) estTotal += income;
                  
-                 // Actual money only paid
                  if(l.status === 'paid') mTotal += income;
 
                  const dObj = new Date(l.date);
@@ -589,7 +585,6 @@
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null) {
         let actionBtn = '';
         
-        // V260: Show pay button for unpaid. Show text for others.
         if(l.status === 'unpaid') {
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
         } else if (l.status === 'prepared') {
@@ -787,7 +782,6 @@
 
     function startClass(e, ts) { if(e) e.stopPropagation(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(log) { log.status = 'running'; log.startTime = Date.now(); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); } }
     
-    // V260: markAsPaid now refreshes the specific month view if open
     function markAsPaid(e, ts) { 
         if(e) e.stopPropagation(); 
         const log = window.logs.find(l => String(l.ts) === String(ts)); 
@@ -888,7 +882,6 @@
         } 
     }
 
-    // V260: deleteLog also auto-expands the history month view
     function deleteLog(e, ts) { 
         if(e) { e.preventDefault(); e.stopPropagation(); } 
         if(confirm('刪除此課程紀錄？')) { 
@@ -946,7 +939,6 @@
     function openStudentMonthStats(name, specificYM) { currentStatsStudent = name; const ym = specificYM || (viewDate.getFullYear() + '-' + String(viewDate.getMonth() + 1).padStart(2, '0')); const myLogs = window.logs.filter(l => l.name === name && l.date.startsWith(ym) && (l.status === 'paid' || l.status === 'unpaid')); let total = 0; const listHtml = myLogs.map(l => { const isPaid = l.status === 'paid'; const income = parseInt(l.income); if(isPaid) total += income; return `<div class="list-item"><div class="list-date">${l.date}</div><div style="font-weight:700; color:${isPaid ? 'var(--money-green)' : '#AAA'};">${isPaid ? '' : '(待收) '}$${l.income}</div></div>`; }).join(''); document.getElementById('stu-history-name').innerText = `${name} ${ym} 月貢獻`; document.getElementById('stu-history-total').innerText = "$" + total.toLocaleString(); document.getElementById('stu-history-list').innerHTML = listHtml || '<div style="text-align:center; padding:20px; color:#AAA;">本月無紀錄</div>'; document.getElementById('btn-delete-all-logs').onclick = function() { deleteAllStudentMonthLogs(name, ym); }; document.getElementById('student-history-modal').style.display = 'flex'; }
     function deleteAllStudentMonthLogs(name, ym) { if(confirm(`⚠️ 危險：確定要刪除 ${name} 在 ${ym} 的所有課程紀錄嗎？\n(包含已收款和未收款)`)) { window.logs = window.logs.filter(l => !(l.name === name && l.date.startsWith(ym))); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('student-history-modal'); openAllScheduleModal(); updateAssets(); renderSchedule(); } }
     
-    // V260: New history modal logic with auto-expand
     function openAllScheduleModal(autoExpandKey = null) { 
         const list = document.getElementById('all-schedule-list'); 
         list.innerHTML = ''; 
