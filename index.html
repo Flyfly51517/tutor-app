@@ -8,14 +8,14 @@
 <meta name="theme-color" content="#F5F2EB">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本</title>
+<title>家教小本本 (V255 Fix Stats)</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V254 STYLE --- */
+    /* --- V255 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -177,7 +177,6 @@
     .month-group-header { padding: 16px 16px; background: #EDF2F7; border-radius: 16px; margin-bottom: 10px; margin-top: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 15px; }
     .month-group-header:first-child { margin-top: 0; }
     
-    /* V254: Clean List Layout */
     .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 5px; border-bottom: 1px solid #F0F0F0; font-weight: 500; }
     .list-date { width: 70px; font-weight: 700; color: #718096; font-size: 13px; white-space: nowrap; flex-shrink: 0; text-align: center;}
     .list-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; justify-content:center; margin-right: 15px; margin-left: 5px; min-width: 0; }
@@ -188,6 +187,7 @@
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
         text-align: left;
     }
+    .status-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #EDF2F7; color: #718096; display: inline-block; margin-top: 4px; width: fit-content; }
     
     .est-income-val { font-size: 16px; font-weight: 800; color: #CBD5E0; margin-bottom: 0px; text-align: center; }
     .setup-label { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; margin-left: 4px; }
@@ -197,6 +197,13 @@
     .swipe-container { position: relative; overflow: hidden; width: 100%; border-bottom: 1px solid #F0F0F0; touch-action: pan-y; height: 72px; background: #FFF; }
     .swipe-bg-delete { position: absolute; top: 0; right: 0; bottom: 0; width: 90px; background: var(--money-red); display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; }
     .swipe-content { position: relative; background: #FFF; z-index: 2; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 5px; transition: transform 0.15s ease-out; }
+
+    /* V255: Taller Student Stats Modal */
+    .modal-stats-content {
+        height: 70vh; /* Fixed taller height */
+        display: flex;
+        flex-direction: column;
+    }
 </style>
 </head>
 <body>
@@ -298,7 +305,7 @@
                     <div class="est-income-val">$<span id="month-est">0</span></div>
                     <div style="font-size:36px; font-weight:900; color:var(--text-main);" id="month-total">$0</div>
                 </div>
-                <!-- V254: Asset List -->
+                <!-- V255: Asset List -->
                 <div id="all-logs" style="margin-top:20px; border-top:1px dashed #EEE; padding-top:10px;"></div>
             </div>
         </div>
@@ -416,8 +423,19 @@
     <button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button>
 </div></div>
 
-<!-- V254: Stats Modal with correct date parameter -->
-<div id="student-history-modal" class="modal"><div class="modal-content" style="height:60vh; display:flex; flex-direction:column;"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="overflow-y:auto; flex:1;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
+<!-- V255: Taller Student Stats Modal with Scroll -->
+<div id="student-history-modal" class="modal">
+    <div class="modal-content modal-stats-content">
+        <h3 id="stu-history-name" class="modal-title"></h3>
+        <div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div>
+        
+        <!-- Scrollable list area -->
+        <div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div>
+        
+        <button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble">🗑 刪除本月所有紀錄</button>
+        <button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button>
+    </div>
+</div>
 
 <div id="profile-modal" class="modal">
     <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
@@ -459,7 +477,7 @@
         renderStudents(); renderSchedule(); updateAssets(); updateProfileDisplay();
         setInterval(updateRunningTimers, 1000);
         
-        // V254: Global click listener to close swipes
+        // V255: Global click listener to close swipes
         document.addEventListener('click', (e) => {
             if(!e.target.closest('.swipe-content')) {
                 closeAllSwipes();
@@ -533,9 +551,10 @@
                      const isPaid = l.status === 'paid';
                      const color = isPaid ? 'var(--money-green)' : '#AAA';
                      
-                     // V254: Asset List Item
+                     // V255: Reuse generateSwipeItem, pass YM
                      const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
-                     histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income);
+                     // Pass 'ym' so click opens correct month stats
+                     histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income, ym);
                  }
              }
         });
@@ -555,30 +574,27 @@
         document.getElementById('month-est').innerText = estTotal.toLocaleString();
     }
 
-    // V254: Generate Swipe Item
-    function generateSwipeItem(l, dateHTML, color, income) {
+    // V255: Generate Swipe Item (With specific month YM)
+    function generateSwipeItem(l, dateHTML, color, income, specificYM = null) {
         let actionBtn = '';
         if(l.status === 'unpaid') {
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
         }
         
-        // V254: Pass date to openStudentMonthStats for correct monthly report
-        const monthStr = l.date.slice(0, 7); // yyyy-mm
+        // Use provided YM or derive from record date
+        const clickYM = specificYM || l.date.slice(0, 7);
 
         return `
         <div class="swipe-container" id="swipe-${l.ts}">
-            <!-- Delete Background -->
             <div class="swipe-bg-delete" onclick="deleteLogFromHistory(event, '${l.ts}')">刪除</div>
-            
-            <!-- Content Foreground -->
             <div class="swipe-content" 
-                 ontouchstart="handleSwipeStart(event, '${l.ts}')"
-                 ontouchmove="handleSwipeMove(event, '${l.ts}')"
+                 ontouchstart="handleSwipeStart(event, '${l.ts}')" 
+                 ontouchmove="handleSwipeMove(event, '${l.ts}')" 
                  ontouchend="handleSwipeEnd(event, '${l.ts}')">
-                 
                 <div class="list-date">${dateHTML}</div>
                 <div class="list-info">
-                     <span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${monthStr}')">${l.name}</span>
+                     <!-- V255: Pass accurate YM -->
+                     <span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span>
                 </div>
                 <div class="list-right">
                     <div style="font-weight:700; color:${color}; white-space:nowrap; font-size:15px;">+$${income}</div>
@@ -588,7 +604,6 @@
         </div>`;
     }
 
-    // Swipe Logic
     let listSwipeStartX = 0;
     let listSwipeCurrentX = 0;
     let activeSwipeId = null;
@@ -606,7 +621,9 @@
     function handleSwipeMove(e, id) {
         listSwipeCurrentX = e.touches[0].clientX;
         const diff = listSwipeCurrentX - listSwipeStartX;
+        
         if(Math.abs(diff) > 10) isDragging = true;
+        
         if (diff < 0) {
             if(e.cancelable) e.preventDefault();
             const el = e.currentTarget;
@@ -616,9 +633,11 @@
 
     function handleSwipeEnd(e, id) {
         if (!isDragging) return;
+
         const diff = listSwipeCurrentX - listSwipeStartX;
         const el = e.currentTarget;
         el.style.transition = 'transform 0.2s ease-out';
+        
         if (diff < -60) {
             el.style.transform = 'translateX(-80px)';
             activeSwipeId = id;
@@ -1007,23 +1026,26 @@
     function handleAvatarUpload(input) { if(input.files[0]) { const reader = new FileReader(); reader.onload = e => { profileData.avatar = e.target.result; localStorage.setItem(DB_PROF, JSON.stringify(profileData)); updateProfileDisplay(); }; reader.readAsDataURL(input.files[0]); } }
     function updateProfileDisplay() { if(profileData.avatar && profileData.avatar.startsWith('data:')) { document.getElementById('sidebar-avatar').style.backgroundImage = `url(${profileData.avatar})`; document.getElementById('sidebar-avatar').innerText = ''; } }
 
-    // V254: Stats Modal with correct date parameter
+    // V255: Fixed Student Stats Month Logic
     function openStudentMonthStats(name, specificYM) {
         currentStatsStudent = name;
-        // Use the passed YM or fallback to current viewDate if missing
+        
+        // V255 Fix: If specificYM is passed (from list click), use it. Else use current viewDate.
         const ym = specificYM || (viewDate.getFullYear() + '-' + String(viewDate.getMonth() + 1).padStart(2, '0'));
         
-        // V254: Include PAID and UNPAID
         const myLogs = window.logs.filter(l => l.name === name && l.date.startsWith(ym) && (l.status === 'paid' || l.status === 'unpaid'));
         
         let total = 0;
         const listHtml = myLogs.map(l => { 
-            total += parseInt(l.income); 
-            // Color code for status
-            const color = l.status === 'paid' ? 'var(--money-green)' : '#999';
+            const isPaid = l.status === 'paid';
+            const income = parseInt(l.income);
+            if(isPaid) total += income;
+            
             return `<div class="list-item">
                 <div class="list-date">${l.date}</div>
-                <div style="font-weight:700; color:${color};">$${l.income}</div>
+                <div style="font-weight:700; color:${isPaid ? 'var(--money-green)' : '#AAA'};">
+                    ${isPaid ? '' : '(待收) '}$${l.income}
+                </div>
             </div>`; 
         }).join('');
         
@@ -1046,7 +1068,6 @@
         }
     }
 
-    // V254: Fixed Month Passing
     function openAllScheduleModal() {
         const list = document.getElementById('all-schedule-list');
         list.innerHTML = '';
@@ -1071,8 +1092,8 @@
             container.className = 'month-logs';
             container.style.display = 'none'; 
             
-            // Get YYYY-MM from the first item
-            const currentMonthStr = items[0].date.slice(0, 7);
+            // V255: Pass correct YM for stats
+            const currentYM = items[0].date.slice(0, 7); // yyyy-mm
 
             container.innerHTML = items.map(l => {
                 const dObj = new Date(l.date);
@@ -1083,23 +1104,23 @@
                 const color = isPaid ? 'var(--money-green)' : '#AAA';
                 const income = l.income;
 
-                // Pass currentMonthStr to openStudentMonthStats
-                return generateSwipeItem(l, dateHTML, color, income).replace("openStudentMonthStats('"+l.name+"')", "openStudentMonthStats('"+l.name+"', '"+currentMonthStr+"')");
+                return generateSwipeItem(l, dateHTML, color, income, currentYM);
             }).join('');
             list.appendChild(header);
             list.appendChild(container);
         }
         document.getElementById('all-schedule-modal').style.display = 'flex';
     }
-    
-    // Original Generator (Used by Assets List too)
-    function generateSwipeItem(l, dateHTML, color, income) {
+
+    // V255: Generate Swipe Item (Pass YM)
+    function generateSwipeItem(l, dateHTML, color, income, specificYM = null) {
         let actionBtn = '';
         if(l.status === 'unpaid') {
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`;
         }
         
-        // Note: The click handler here needs to be generic or replaced in specific contexts
+        const clickYM = specificYM || l.date.slice(0, 7);
+
         return `
         <div class="swipe-container" id="swipe-${l.ts}">
             <div class="swipe-bg-delete" onclick="deleteLogFromHistory(event, '${l.ts}')">刪除</div>
@@ -1109,7 +1130,7 @@
                  ontouchend="handleSwipeEnd(event, '${l.ts}')">
                 <div class="list-date">${dateHTML}</div>
                 <div class="list-info">
-                     <span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}')">${l.name}</span>
+                     <span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span>
                 </div>
                 <div class="list-right">
                     <div style="font-weight:700; color:${color}; white-space:nowrap; font-size:15px;">+$${income}</div>
@@ -1119,25 +1140,15 @@
         </div>`;
     }
 
-    function deleteLogFromHistory(e, ts) { 
-        if(e) { e.preventDefault(); e.stopPropagation(); }
-        if(confirm('確定刪除？')) { 
-            window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); 
-            localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
-            openAllScheduleModal(); updateAssets(); renderSchedule(); 
-        } 
-    }
+    let listSwipeStartX = 0; let listSwipeCurrentX = 0; let activeSwipeId = null; let isDragging = false;
+    function handleSwipeStart(e, id) { if(activeSwipeId && activeSwipeId !== id) closeAllSwipes(); listSwipeStartX = e.touches[0].clientX; listSwipeCurrentX = listSwipeStartX; isDragging = false; const el = e.currentTarget; el.style.transition = 'none'; }
+    function handleSwipeMove(e, id) { listSwipeCurrentX = e.touches[0].clientX; const diff = listSwipeCurrentX - listSwipeStartX; if(Math.abs(diff) > 10) isDragging = true; if (diff < 0) { if(e.cancelable) e.preventDefault(); const el = e.currentTarget; if (diff > -100) el.style.transform = `translateX(${diff}px)`; } }
+    function handleSwipeEnd(e, id) { if (!isDragging) return; const diff = listSwipeCurrentX - listSwipeStartX; const el = e.currentTarget; el.style.transition = 'transform 0.2s ease-out'; if (diff < -60) { el.style.transform = 'translateX(-80px)'; activeSwipeId = id; } else { el.style.transform = 'translateX(0)'; activeSwipeId = null; } listSwipeStartX = 0; listSwipeCurrentX = 0; isDragging = false; }
+    function closeAllSwipes() { document.querySelectorAll('.swipe-content').forEach(el => el.style.transform = 'translateX(0)'); activeSwipeId = null; }
 
-    function toggleMonthView(header) {
-        const content = header.nextElementSibling;
-        const allContents = document.querySelectorAll('.month-logs');
-        const isOpening = content.style.display === 'none';
-        allContents.forEach(c => c.style.display = 'none'); 
-        if(isOpening) content.style.display = 'block';
-    }
-
-    let pressTimer; 
-    function startLongPress(el) { pressTimer = setTimeout(() => { document.querySelectorAll('.student-wrapper').forEach(w => w.classList.add('is-editing')); document.addEventListener('click', () => document.querySelectorAll('.student-wrapper').forEach(w => w.classList.remove('is-editing')), {once:true}); }, 800); }
+    function deleteLogFromHistory(e, ts) { if(e) { e.preventDefault(); e.stopPropagation(); } if(confirm('確定刪除？')) { window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); openAllScheduleModal(); updateAssets(); renderSchedule(); } }
+    function toggleMonthView(header) { const content = header.nextElementSibling; const allContents = document.querySelectorAll('.month-logs'); const isOpening = content.style.display === 'none'; allContents.forEach(c => c.style.display = 'none'); if(isOpening) content.style.display = 'block'; }
+    let pressTimer; function startLongPress(el) { pressTimer = setTimeout(() => { document.querySelectorAll('.student-wrapper').forEach(w => w.classList.add('is-editing')); document.addEventListener('click', () => document.querySelectorAll('.student-wrapper').forEach(w => w.classList.remove('is-editing')), {once:true}); }, 800); }
     document.addEventListener('mouseup', () => clearTimeout(pressTimer)); document.addEventListener('touchend', () => clearTimeout(pressTimer));
 </script>
 </body>
