@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V261 STYLE --- */
+    /* --- V262 STYLE (More Transparent & Taller Header) --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -40,25 +40,34 @@
         -webkit-font-smoothing: antialiased;
     }
     
-    body { padding-top: 115px; }
+    /* 調整 1: Body padding 增加，避免內容被加高的 Header 擋住 */
+    body { padding-top: 140px; }
 
     #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
     
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
 
-    /* HEADER - 已調整透明度 */
+    /* HEADER */
     header {
-        background: rgba(247, 246, 242, 0.75); /* 從 0.95 改為 0.75，更透明 */
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        /* 調整 2: 透明度從 0.75 改為 0.4 (非常透明) */
+        background: rgba(247, 246, 242, 0.4);
+        
+        /* 保持模糊效果，讓文字保持可讀性 */
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        
         padding-top: max(15px, env(safe-area-inset-top));
         padding-bottom: 15px; 
         padding-left: 24px; padding-right: 24px;
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
         display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
-        border-bottom: 1px solid rgba(0,0,0,0.03);
-        height: 115px;
+        
+        /* 讓底線更淡，幾乎看不見，增加通透感 */
+        border-bottom: 1px solid rgba(0,0,0,0.01); 
+        
+        /* 調整 3: 高度從 115px 增加到 140px */
+        height: 140px;
     }
     .header-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
     #header-title { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--text-main); text-transform: uppercase; margin-bottom: 8px; }
