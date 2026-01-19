@@ -8,14 +8,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V283 (iOS Glass)</title>
+<title>家教小本本 V287 (Liquid Glass)</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V283 STYLE: VisionOS "Glass Bead" Aesthetics --- */
+    /* --- V287 STYLE: Liquid Glass (iOS/VisionOS Aesthetic) --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -28,14 +28,13 @@
         --money-red: #E53E3E;
         --edit-blue: #4299E1;
         --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05); 
-        --shadow-float: 0 10px 30px -5px rgba(224, 122, 95, 0.3);
         
         --input-bg: #F7FAFC;
         --input-border: #E2E8F0;
         --std-height: 52px; 
         --radius-std: 16px;
 
-        /* Solid Card Colors */
+        /* Theme Colors */
         --theme-black: #2B2E35;
         --theme-green: #D4E09B;
         --theme-purple: #A4A4D6;
@@ -50,7 +49,7 @@
         -webkit-font-smoothing: antialiased;
     }
     
-    /* V283: Adjusted top padding for shorter header */
+    /* V287: Adjusted padding for floating header */
     body { padding-top: 140px !important; }
 
     #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none !important; z-index: 9999; }
@@ -58,113 +57,101 @@
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
 
-    /* HEADER: VisionOS Glass Bead Style */
+    /* HEADER: LIQUID GLASS EFFECT */
     header {
-        /* Glass Bead Structure */
-        background: rgba(255, 255, 255, 0.65); /* High transparency */
-        backdrop-filter: saturate(180%) blur(35px); /* Heavy blur */
-        -webkit-backdrop-filter: saturate(180%) blur(35px);
+        /* The Liquid Glass Formula */
+        background: rgba(255, 255, 255, 0.55); /* High transparency */
+        backdrop-filter: saturate(200%) blur(30px); /* Vibrant Blur */
+        -webkit-backdrop-filter: saturate(200%) blur(30px);
         
-        /* 3D Volume & Light Simulation */
+        /* 3D Thickness & Shine (Bead Effect) */
         box-shadow: 
-            0 10px 30px -5px rgba(0,0,0,0.1), /* Soft Drop Shadow */
-            inset 0 -1px 1px rgba(255,255,255,0.4), /* Bottom Edge Reflection */
-            inset 0 1px 2px rgba(255,255,255,0.9); /* Top Edge Highlight */
+            0 15px 35px -5px rgba(0,0,0,0.1), /* Soft shadow */
+            inset 0 1px 2px rgba(255,255,255,0.9), /* Top Rim Highlight */
+            inset 0 -2px 5px rgba(0,0,0,0.05); /* Bottom Rim Depth */
         
-        border-bottom: 1px solid rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.4); /* Subtle glass edge */
         
-        /* Shape: Hanging Tab */
-        height: 130px !important; /* Reduced Height (-30px) */
-        border-bottom-left-radius: 35px;
-        border-bottom-right-radius: 35px;
+        /* Shape */
+        height: 120px !important; /* Slightly shorter */
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
         
-        padding-top: max(10px, env(safe-area-inset-top));
-        padding-bottom: 15px; 
+        padding-top: max(10px, env(safe-area-inset-top)); 
+        padding-bottom: 10px; 
         padding-left: 24px; padding-right: 24px;
-        
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
         display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
     }
     
     .header-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    #header-title { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); }
-    .page-indicator { display: flex; gap: 6px; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: #CBD5E0; transition: 0.3s; }
+    #header-title { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
+    
+    .page-indicator { display: flex; gap: 6px; background: rgba(0,0,0,0.06); padding: 4px 8px; border-radius: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.2); transition: 0.3s; }
     .dot.active { background: var(--accent-primary); width: 20px; border-radius: 10px; }
     
-    /* Menu Button Enhanced */
+    /* Glassy Menu Button */
     .menu-btn { 
         font-size: 24px; color: var(--text-main); cursor: pointer; 
         display: flex; justify-content: center; align-items: center; 
-        height: 44px; width: 44px; border-radius: 50%;
-        background: rgba(255,255,255,0.2); /* Subtle button bg */
-        transition: 0.2s;
+        height: 44px; width: 44px; border-radius: 50%; 
+        background: rgba(255,255,255,0.3); 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.8);
+        transition: 0.2s; border: 1px solid rgba(255,255,255,0.4);
     }
-    .menu-btn:active { background: rgba(255,255,255,0.5); }
+    .menu-btn:active { background: rgba(255,255,255,0.6); }
 
-    /* SIDEBAR: Glass Bead Style */
-    .sidebar-overlay { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: rgba(45, 55, 72, 0.2); /* Slightly darker to emphasize glass */
-        z-index: 9998; display: none; backdrop-filter: blur(4px); 
-    }
+    /* SIDEBAR: LIQUID FLOATING GLASS */
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45, 55, 72, 0.25); z-index: 9998; display: none; backdrop-filter: blur(8px); }
     .sidebar { 
-        position: fixed; top: 0; right: -320px; width: 290px; height: 96%; 
-        top: 2%; bottom: 2%; right: -320px; /* Floating look */
-        border-radius: 40px 0 0 40px; /* Round left side */
-        
-        z-index: 9999; transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring */
+        position: fixed; top: 2%; bottom: 2%; right: -360px; width: 290px; 
+        z-index: 9999; transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         padding: 60px 30px; display: flex; flex-direction: column;
         padding-top: max(60px, env(safe-area-inset-top));
         
-        /* Glass Material */
-        background: rgba(250, 250, 250, 0.75); 
-        backdrop-filter: saturate(180%) blur(40px);
-        -webkit-backdrop-filter: saturate(180%) blur(40px);
+        /* Liquid Glass Texture */
+        background: rgba(255, 255, 255, 0.65); /* High transparency */
+        backdrop-filter: saturate(200%) blur(40px); 
+        -webkit-backdrop-filter: saturate(200%) blur(40px);
+        border-radius: 44px; /* Big round corners */
         
-        /* 3D Edges */
+        /* 3D Glass Edges */
+        border: 1px solid rgba(255,255,255,0.5);
         box-shadow: 
-            -20px 0 60px rgba(0,0,0,0.15),
-            inset 1px 0 0 rgba(255,255,255,0.6), /* Inner light edge */
-            inset 0 1px 0 rgba(255,255,255,0.6);
-            
-        border-left: 1px solid rgba(255,255,255,0.4);
+            -20px 20px 60px rgba(0,0,0,0.2), /* Deep float shadow */
+            inset 1px 1px 2px rgba(255,255,255,0.9), /* Top-Left Highlight */
+            inset -1px -1px 2px rgba(200,200,200,0.2); /* Bottom-Right Depth */
     }
-    .sidebar.active { right: 0; }
+    .sidebar.active { right: 10px; }
     
     .sidebar-avatar { 
         width: 88px; height: 88px; border-radius: 50%; 
-        background: rgba(255,255,255,0.5);
+        background: rgba(255,255,255,0.5); 
         margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; 
         font-size: 42px; cursor: pointer; 
         border: 2px solid rgba(255,255,255,0.8); 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
-        background-size: cover; background-position: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1), inset 0 2px 5px rgba(255,255,255,0.8);
+        background-size: cover; background-position: center; 
     }
-    .sidebar-name { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 40px; color: var(--text-main); }
+    .sidebar-name { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 40px; color: var(--text-main); text-shadow: 0 1px 1px rgba(255,255,255,0.8); }
     .sidebar-item { 
         padding: 18px; border-radius: 22px; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: var(--text-main); 
-        background: rgba(255, 255, 255, 0.4); /* Glassy item */
+        background: rgba(255, 255, 255, 0.4); 
         display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; 
-        border: 1px solid rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.4);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
-    .sidebar-item:active { background: rgba(255, 255, 255, 0.8); transform: scale(0.96); }
+    .sidebar-item:active { background: rgba(255, 255, 255, 0.7); transform: scale(0.96); }
 
     /* LAYOUT */
     #main-viewport { width: 100vw; overflow: hidden; position: relative; z-index: 1; }
     #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
     .page { width: 100vw; flex-shrink: 0; padding: 10px 24px 100px 24px; }
-
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
     #today-title-display, .section-title { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
-    
-    .header-action-btn {
-        height: 40px; padding: 0 20px; border-radius: 20px; font-size: 13px; font-weight: 800;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08); border: none; transition: transform 0.1s;
-    }
+    .header-action-btn { height: 40px; padding: 0 20px; border-radius: 20px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border: none; transition: transform 0.1s; }
     .btn-style-main { background: var(--text-main); color: #FFF; border: 2px solid var(--text-main); }
-
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-card); border: 1px solid rgba(0,0,0,0.02); }
 
     .asset-card {
@@ -172,7 +159,6 @@
         border-radius: 32px; padding: 32px 28px; margin-bottom: 30px;
         color: #FFF; position: relative; overflow: hidden; box-shadow: var(--shadow-float); z-index: 1;
     }
-
     .asset-label { font-size: 14px; font-weight: 700; opacity: 0.8; margin-bottom: 8px; letter-spacing: 1px; }
     .asset-amount { font-size: 48px; font-weight: 800; color: #FFF; line-height: 1; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
 
@@ -183,7 +169,8 @@
     .btn-group { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
     .btn-bank { padding: 8px 16px; background: #F7FAFC; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); white-space: nowrap; }
 
-    .est-income-val { font-size: 16px; font-weight: 500; color: #CBD5E0; margin-bottom: 0px; text-align: center; }
+    .est-income-val { font-family: 'Urbanist', sans-serif !important; font-size: 16px; font-weight: 700; color: #CBD5E0; margin-bottom: 0px; text-align: center; }
+    #month-total { font-family: 'Urbanist', sans-serif !important; font-size:36px; font-weight:900; color:var(--text-main); }
 
     /* SCHEDULE PAGE */
     .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 5px 5px 20px 5px; scrollbar-width: none; }
@@ -194,13 +181,9 @@
     .delete-x { position: absolute; top: 0; right: 0; width: 24px; height: 24px; background: var(--money-red); color: #FFF; border-radius: 50%; display: none; justify-content: center; align-items: center; font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; }
     .is-editing .delete-x { display: flex; }
     .is-editing .student-chip { animation: shake 0.3s infinite; }
-    @keyframes shake { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
 
-    /* SOLID 3D CARDS (V282 Style) */
-    #today-schedule-list {
-        display: flex; gap: 20px; overflow-x: auto; padding: 20px 24px 40px 24px; 
-        scroll-snap-type: x mandatory; scrollbar-width: none; margin-left: -24px; margin-right: -24px; 
-    }
+    /* SOLID 3D CARDS */
+    #today-schedule-list { display: flex; gap: 20px; overflow-x: auto; padding: 20px 24px 40px 24px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-left: -24px; margin-right: -24px; }
     #today-schedule-list::-webkit-scrollbar { display: none; }
 
     .schedule-card { 
@@ -212,14 +195,18 @@
     }
     .schedule-card:active { transform: scale(0.98); }
 
-    .card-theme-1 { background-color: var(--theme-black); color: #FFFFFF; } /* Black Card */
-    .card-theme-2 { background-color: var(--theme-green); color: var(--text-main); } /* Green Card */
-    .card-theme-3 { background-color: var(--theme-purple); color: #FFFFFF; } /* Purple Card */
+    .card-theme-1 { background-color: var(--theme-black); color: #FFFFFF; }
+    .card-theme-2 { background-color: var(--theme-green); color: var(--text-main); }
+    .card-theme-3 { background-color: var(--theme-purple); color: #FFFFFF; }
     
     .schedule-card.paid { 
-        background: #FFFFFF; color: var(--text-main);
-        border: 2px solid var(--money-green); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        background: #EDF2F7; /* Light Gray */
+        color: #A0AEC0; /* Dimmed Text */
+        border: none; box-shadow: none; 
     }
+    .schedule-card.paid .sch-title { color: #718096; }
+    .schedule-card.paid .sch-badge { background: #E2E8F0; color: #A0AEC0; }
+    .schedule-card.paid .inline-note { background: #E2E8F0; color: #718096; }
 
     .sch-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .sch-title { font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 6px; }
@@ -274,6 +261,9 @@
     input, select, textarea { width: 100%; padding: 0 16px; border: 2px solid var(--input-border); font-size: 16px; font-weight: 700; outline: none; background: var(--input-bg); color: var(--text-main); -webkit-appearance: none; margin-bottom: 0; display: flex; align-items: center; }
     textarea { padding: 14px; line-height: 1.4; height: auto; min-height: 80px; }
     input:focus, textarea:focus { border-color: var(--text-main); background: #FFF; }
+
+    #bank-amount { border: none; background: transparent; font-size: 48px; text-align: center; height: auto; border-radius: 0; padding: 20px 0; font-family: 'Urbanist', sans-serif; }
+    #bank-amount::placeholder { color: #E2E8F0; }
 
     .btn-options { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; align-items: center; width: 100%; }
     .opt-btn { padding: 0 16px; background: #EDF2F7; font-size: 13px; font-weight: 700; color: var(--text-sub); cursor: pointer; border: 2px solid transparent; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
@@ -464,17 +454,9 @@
             </div>
             <input type="hidden" id="new-grade">
         </div>
-
-        <div class="setup-group">
-            <div class="setup-label">科目</div>
-            <div class="btn-options">
-                <div class="opt-btn" onclick="selectOptionGroup('new-subject-def', '數學', this)">數學</div>
-                <div class="opt-btn" onclick="selectOptionGroup('new-subject-def', '英文', this)">英文</div>
-                <div class="opt-btn" onclick="selectOptionGroup('new-subject-def', '理化', this)">理化</div>
-                <div class="opt-btn" onclick="selectOptionGroup('new-subject-def', '生物', this)">生物</div>
-            </div>
-            <input type="hidden" id="new-subject-def">
-        </div>
+        
+        <!-- V285/V286: Subject Removed from Setup -->
+        <input type="hidden" id="new-subject-def" value="">
         
         <button onclick="addStudent()" class="modal-btn btn-confirm btn-bubble">確認新增</button>
         <button onclick="closeModal('setup-modal')" class="modal-btn btn-cancel">取消</button>
@@ -585,8 +567,14 @@
 <div id="bank-input-modal" class="modal">
     <div class="modal-content">
         <h3 class="modal-title" id="bank-title">存入</h3>
-        <input type="date" id="bank-date" style="text-align:center;">
-        <input id="bank-amount" type="number" inputmode="decimal" placeholder="$0" style="font-size:32px; text-align:center;">
+        <div class="setup-group">
+            <div class="setup-label">日期</div>
+            <input type="date" id="bank-date" style="text-align:center;">
+        </div>
+        <div class="setup-group" style="margin-top:20px;">
+             <div class="setup-label">金額</div>
+             <input id="bank-amount" type="number" inputmode="decimal" placeholder="$0">
+        </div>
         <button onclick="submitBankTransaction()" class="modal-btn btn-confirm btn-bubble">確認</button>
         <button onclick="closeModal('bank-input-modal')" class="modal-btn btn-cancel">取消</button>
     </div>
@@ -758,7 +746,7 @@
         document.getElementById('month-est').innerText = estTotal.toLocaleString();
     }
 
-    /* HISTORY ITEM RENDER - V282 FIXED */
+    /* HISTORY ITEM RENDER - V287 FIXED */
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null) {
         let actionBtn = '';
         const clickYM = specificYM || l.date.slice(0, 7);
@@ -914,7 +902,7 @@
         draw();
     }
 
-    /* --- V282: SOLID 3D CARDS STYLE --- */
+    /* --- V286: SOLID 3D CARDS STYLE (GRAY PAID FIX) --- */
     function renderSchedule() {
         const div = document.getElementById('today-schedule-list');
         const now = new Date();
@@ -949,7 +937,7 @@
             if(l.status !== 'paid') {
                 costOverlay = `<div class="sch-cost-overlay">${l.hours}h • $${Math.round(l.rate * l.hours)}</div>`;
             } else {
-                costOverlay = `<div class="sch-cost-overlay" style="color:var(--money-green);">已入帳 +$${l.income}</div>`;
+                costOverlay = `<div class="sch-cost-overlay" style="color:var(--money-green); opacity:1;">已入帳 +$${l.income}</div>`;
             }
 
             let mainAction = '';
@@ -1072,21 +1060,21 @@ END:VCALENDAR`;
     
     function renderStudents() { const div = document.getElementById('student-scroll'); div.innerHTML = window.students.map((s, idx) => `<div class="student-wrapper" onclick="openBatchPlanModal(${idx})" onmousedown="startLongPress(this)" ontouchstart="startLongPress(this)"><div class="student-chip" style="background:${s.color || '#FFF'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div><div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div><div class="chip-name">${s.name}</div></div>`).join(''); }
     
+    // V286: FIXED ADD STUDENT (Removed Subject check)
     function addStudent() { 
         const name = document.getElementById('new-name').value; 
         const rate = document.getElementById('new-rate').value; 
         const grade = document.getElementById('new-grade').value; 
-        const subject = document.getElementById('new-subject-def').value; 
         const color = document.getElementById('new-color-val').value; 
 
-        if(!name || !rate || !grade || !subject) {
+        if(!name || !rate || !grade) {
             const m = document.querySelector('#setup-modal .modal-content');
             m.classList.add('shake-error');
             setTimeout(() => m.classList.remove('shake-error'), 300);
             return;
         }
 
-        window.students.push({name, rate, grade, subject, color}); 
+        window.students.push({name, rate, grade, color}); 
         localStorage.setItem(DB_STU, JSON.stringify(window.students)); 
         renderStudents(); closeModal('setup-modal'); 
     }
