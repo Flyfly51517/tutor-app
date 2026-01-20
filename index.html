@@ -8,14 +8,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V297 (Glass & Fixes)</title>
+<title>家教小本本 V299 (Add Subject)</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V297 STYLE: Thick Glass & Fixes --- */
+    /* --- V299 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -259,10 +259,12 @@
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-avatar" id="sidebar-avatar" onclick="openProfileModal()">🧸</div>
+        <!-- V298 FIX: Toggle sidebar when clicking avatar to open profile -->
+        <div class="sidebar-avatar" id="sidebar-avatar" onclick="toggleSidebar(); openProfileModal()">🧸</div>
         <div class="sidebar-name" id="sidebar-name">Tutor</div>
     </div>
-    <div class="sidebar-item" onclick="openProfileModal()">📒 心情日記</div>
+    <!-- V298 FIX: Toggle sidebar when clicking Mood Diary -->
+    <div class="sidebar-item" onclick="toggleSidebar(); openProfileModal()">📒 心情日記</div>
     <div class="sidebar-item" onclick="switchTab(0)">🗓️ 排課系統</div>
     <div class="sidebar-item" onclick="switchTab(1)">📊 資產報表</div>
     <div class="sidebar-item" onclick="batchExportCalendar()">📅 一鍵匯入行事曆</div>
@@ -556,7 +558,7 @@
     <button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button>
 </div></div>
 
-<div id="student-history-modal" class="modal"><div class="modal-content modal-stats-content"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
+<div id="student-history-modal" class="modal"><div class="modal-content modal-stats-content"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble" style="background:#FED7D7; color:#E53E3E; margin-top:10px;">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 
 <div id="profile-modal" class="modal">
     <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
@@ -577,7 +579,7 @@
     const DB_BANK = 'tutor_v27_bank';
     const DB_PROF = 'tutor_v33_profile'; 
 
-    let currentPlanningStuIdx = null, selectedDates = [], touchStartX = 0, currentPage = 0;
+    let currentPlanningStuIdx = null, selectedDates = [], currentPage = 0;
     let currentBankAction = 'deposit', currentAccountId = 'taiwan_bank';
     let viewDate = new Date();
     viewDate.setDate(1); 
@@ -587,8 +589,7 @@
     let isCalendarView = false;
     
     let settlingLogTs = null;
-    let currentStatsStudent = null;
-    let lastTotalAssets = 0; 
+    let currentStatsStudent = null; // Used for deleting month logs
 
     function safeLoad(key, defaultVal) {
         try { return JSON.parse(localStorage.getItem(key)) || defaultVal; } 
@@ -1089,14 +1090,13 @@
     function deleteLog(e, ts) { if(e) { e.preventDefault(); e.stopPropagation(); } if(confirm('刪除此課程紀錄？')) { const targetLog = window.logs.find(l => String(l.ts) === String(ts)); let targetMonthKey = null; if(targetLog) { const d = new Date(targetLog.date); targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; } window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); if(document.getElementById('all-schedule-modal').classList.contains('active')) { openAllScheduleModal(targetMonthKey); } updateAssets(); renderSchedule(); } }
     
     // V296 FIX: Generate ID with suffix to avoid conflict
+    // V299: Add Subject display
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null, isAssetList = false) { 
         let actionBtn = ''; const clickYM = specificYM || l.date.slice(0, 7); 
-        // V296: Asset list needs unique ID
         const containerId = isAssetList ? `swipe-${l.ts}-asset` : `swipe-${l.ts}`;
         
         const editBtn = `<div class="btn-mini-icon btn-mini-edit btn-bubble" onclick="openEditLogModal('${l.ts}')">✎</div>`; 
         const calBtn = `<div class="btn-mini-icon btn-bubble" onclick="addToCalendar(event, '${l.ts}')">📅</div>`; 
-        // V297 Fix: Settle Button Style
         const settleBtn = `<div class="btn-mini-icon btn-bubble" style="color:var(--money-green); border:1px solid var(--money-green); background:#F0FFF4;" onclick="quickSettle(event, '${l.ts}')">✓</div>`; 
         
         if(l.status === 'paid') { actionBtn = ''; } 
@@ -1104,7 +1104,8 @@
         else if (l.status === 'running') { actionBtn = `<span style="font-size:11px; color:#C95D4E; font-weight:700;">(進行中)</span>`; } 
         else { actionBtn = `${editBtn}${calBtn}${settleBtn}`; } 
         
-        return `<div class="swipe-container" id="${containerId}"><div class="swipe-bg-delete" onclick="deleteLog(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${containerId}')" ontouchmove="handleSwipeMove(event, '${containerId}')" ontouchend="handleSwipeEnd(event, '${containerId}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span></div><div class="list-right"><div class="list-income" style="color:${color}">${l.status === 'paid' ? '+' : ''}$${income}</div>${actionBtn}</div></div></div>`; 
+        // V299: Added Subject below name
+        return `<div class="swipe-container" id="${containerId}"><div class="swipe-bg-delete" onclick="deleteLog(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${containerId}')" ontouchmove="handleSwipeMove(event, '${containerId}')" ontouchend="handleSwipeEnd(event, '${containerId}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span><span style="font-size:12px; color:#A0AEC0; margin-top:2px; font-weight:600;">${l.subject || ''}</span></div><div class="list-right"><div class="list-income" style="color:${color}">${l.status === 'paid' ? '+' : ''}$${income}</div>${actionBtn}</div></div></div>`; 
     }
     
     let listSwipeStartX = 0; let listSwipeCurrentX = 0; let activeSwipeId = null; let isDragging = false;
@@ -1113,7 +1114,71 @@
     function handleSwipeEnd(e, id) { if (!isDragging) return; const diff = listSwipeCurrentX - listSwipeStartX; const el = e.currentTarget; el.style.transition = 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'; if (diff < -60) { el.style.transform = 'translateX(-90px)'; activeSwipeId = id; } else { el.style.transform = 'translateX(0)'; activeSwipeId = null; } listSwipeStartX = 0; listSwipeCurrentX = 0; isDragging = false; }
     function closeAllSwipes() { document.querySelectorAll('.swipe-content').forEach(el => { el.style.transition = 'transform 0.2s ease-out'; el.style.transform = 'translateX(0)'; }); activeSwipeId = null; }
     
-    // --- V297 NEW FUNCTIONS ---
+    // --- V298 FIXED FUNCTIONS (CRITICAL) ---
+
+    function openStudentMonthStats(name, specificYM) {
+        currentStatsStudent = name;
+        const modal = document.getElementById('student-history-modal');
+        const list = document.getElementById('stu-history-list');
+        const title = document.getElementById('stu-history-name');
+        const totalDisplay = document.getElementById('stu-history-total');
+        const delAllBtn = document.getElementById('btn-delete-all-logs');
+
+        title.innerText = `${name} - ${specificYM || '總覽'}`;
+        
+        let targetLogs = window.logs.filter(l => l.name === name);
+        if(specificYM) {
+             targetLogs = targetLogs.filter(l => l.date.startsWith(specificYM));
+        }
+        targetLogs.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        let total = 0;
+        targetLogs.forEach(l => {
+             if(l.status === 'paid' || l.status === 'unpaid') total += (parseInt(l.income) || 0);
+        });
+        totalDisplay.innerText = `$${total.toLocaleString()}`;
+
+        if(targetLogs.length === 0) {
+            list.innerHTML = '<div style="text-align:center;padding:20px;color:#999">無紀錄</div>';
+            delAllBtn.style.display = 'none';
+        } else {
+             delAllBtn.style.display = 'block';
+             delAllBtn.onclick = () => deleteAllStudentLogs(name, specificYM);
+             
+             list.innerHTML = targetLogs.map(l => {
+                 const dObj = new Date(l.date);
+                 const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
+                 const dayStr = l.date.split('-')[2];
+                 const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
+                 
+                 let color = '#AAA'; 
+                 if(l.status === 'paid') color = 'var(--money-green)';
+                 if(l.status === 'unpaid') color = 'var(--accent-primary)';
+                 
+                 return generateSwipeItem(l, dateHTML, color, l.income, specificYM, false); 
+             }).join('');
+        }
+        openModalWithAnim('student-history-modal');
+    }
+
+    function deleteAllStudentLogs(name, specificYM) {
+        const msg = specificYM ? `確定刪除 ${name} 在 ${specificYM} 的所有紀錄嗎？` : `確定刪除 ${name} 的所有紀錄嗎？`;
+        if(confirm(msg)) {
+             window.logs = window.logs.filter(l => {
+                 if(l.name !== name) return true;
+                 if(specificYM && !l.date.startsWith(specificYM)) return true;
+                 return false;
+             });
+             localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
+             closeModal('student-history-modal');
+             updateAssets();
+             renderSchedule();
+             if(document.getElementById('all-schedule-modal').classList.contains('active')) {
+                 openAllScheduleModal();
+             }
+        }
+    }
+
     function quickSettle(e, ts) {
         if(e) e.stopPropagation();
         if(confirm("確認結算此課程？\n(這將把課程標記為「未收款」狀態)")) {
@@ -1226,6 +1291,5 @@
         }
     }
 </script>
-<!-- V297: Fix Settle Button, Animations, Glass UI, Mood Diary -->
 </body>
 </html>
