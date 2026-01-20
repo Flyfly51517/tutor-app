@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+<!-- 家教小本本 V301 (Fix Swipe & Export Select) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -8,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V299 (Add Subject)</title>
+<title>家教小本本 V301</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V299 STYLE --- */
+    /* --- V301 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -55,7 +56,7 @@
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
 
-    /* HEADER - THICK GLASS */
+    /* HEADER */
     header {
         background: rgba(255, 255, 255, 0.65) !important; 
         backdrop-filter: saturate(180%) blur(25px); 
@@ -77,7 +78,7 @@
     .dot.active { background: var(--accent-primary); width: 20px; border-radius: 10px; }
     .menu-btn { font-size: 24px; color: var(--text-main); cursor: pointer; display: flex; justify-content: center; align-items: center; height: 44px; width: 44px; border-radius: 50%; background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6); transition: 0.2s; }
 
-    /* SIDEBAR - THICK GLASS */
+    /* SIDEBAR */
     .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); z-index: 9998; display: none; backdrop-filter: blur(4px); }
     .sidebar { 
         position: fixed; top: 2%; bottom: 2%; right: -360px; width: 290px; 
@@ -246,6 +247,10 @@
     .btn-mini-edit:active { background: #BEE3F8; }
     .btn-mini-pay { padding: 6px 12px; background: var(--money-green); color: #FFF; border: none; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(56, 161, 105, 0.4); white-space: nowrap; flex-shrink: 0; display: inline-block; }
     
+    /* EXPORT MODAL */
+    .export-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #EEE; }
+    .export-check { width: 20px; height: 20px; margin-right: 12px; }
+    
     /* V296 FIX: Month header active state */
     .month-group-header { padding: 16px 16px; background: #EDF2F7; border-radius: 16px; margin-bottom: 10px; margin-top: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 15px; }
     .month-logs { display: none; }
@@ -259,15 +264,14 @@
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <!-- V298 FIX: Toggle sidebar when clicking avatar to open profile -->
         <div class="sidebar-avatar" id="sidebar-avatar" onclick="toggleSidebar(); openProfileModal()">🧸</div>
         <div class="sidebar-name" id="sidebar-name">Tutor</div>
     </div>
-    <!-- V298 FIX: Toggle sidebar when clicking Mood Diary -->
     <div class="sidebar-item" onclick="toggleSidebar(); openProfileModal()">📒 心情日記</div>
     <div class="sidebar-item" onclick="switchTab(0)">🗓️ 排課系統</div>
     <div class="sidebar-item" onclick="switchTab(1)">📊 資產報表</div>
-    <div class="sidebar-item" onclick="batchExportCalendar()">📅 一鍵匯入行事曆</div>
+    <!-- V301: Change to Open Modal -->
+    <div class="sidebar-item" onclick="openExportCalendarModal()">📅 一鍵匯入行事曆</div>
     <div class="sidebar-item" onclick="exportData()">📤 備份資料</div>
     <div class="sidebar-item" onclick="triggerImport()">📥 還原資料</div>
     <div class="sidebar-item" style="color:red; margin-top:auto;" onclick="hardReset()">⚠️ 重置所有資料</div>
@@ -372,7 +376,6 @@
                     <div class="est-income-val">$<span id="month-est">0</span></div>
                     <div style="font-size:36px; font-weight:900; color:var(--text-main);" id="month-total">$0</div>
                 </div>
-                <!-- V296: Ensure this container displays logs -->
                 <div id="all-logs" style="margin-top:20px; border-top:1px dashed #EEE; padding-top:10px;"></div>
             </div>
         </div>
@@ -560,6 +563,20 @@
 
 <div id="student-history-modal" class="modal"><div class="modal-content modal-stats-content"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble" style="background:#FED7D7; color:#E53E3E; margin-top:10px;">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 
+<!-- V301: Export Calendar Modal -->
+<div id="export-calendar-modal" class="modal">
+    <div class="modal-content" style="height:70vh; display:flex; flex-direction:column;">
+        <h3 class="modal-title">匯出行事曆</h3>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+             <button class="opt-btn" onclick="toggleAllExport(true)">全選</button>
+             <button class="opt-btn" onclick="toggleAllExport(false)">取消全選</button>
+        </div>
+        <div id="export-list" style="overflow-y:auto; flex:1; border:1px solid #EEE; border-radius:16px; padding:5px;"></div>
+        <button onclick="performExport()" class="modal-btn btn-confirm btn-bubble">匯出選取項目 (.ics)</button>
+        <button onclick="closeModal('export-calendar-modal')" class="modal-btn btn-cancel">取消</button>
+    </div>
+</div>
+
 <div id="profile-modal" class="modal">
     <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
         <h3 class="modal-title">心情日記</h3>
@@ -589,7 +606,11 @@
     let isCalendarView = false;
     
     let settlingLogTs = null;
-    let currentStatsStudent = null; // Used for deleting month logs
+    let currentStatsStudent = null; 
+
+    // V301: Swipe Variables
+    let pageTouchStartX = 0;
+    let pageTouchStartY = 0;
 
     function safeLoad(key, defaultVal) {
         try { return JSON.parse(localStorage.getItem(key)) || defaultVal; } 
@@ -614,7 +635,43 @@
                 closeAllSwipes();
             }
         });
+
+        // V301: Initialize Page Swipe Listeners
+        const viewport = document.getElementById('main-viewport');
+        viewport.addEventListener('touchstart', handlePageTouchStart, {passive: true});
+        viewport.addEventListener('touchend', handlePageTouchEnd, {passive: true});
     };
+
+    // V301: Page Swipe Logic
+    function handlePageTouchStart(e) {
+        // Ignore if touching a swipeable list item
+        if(e.target.closest('.swipe-content')) return;
+        // Ignore if touching horizontal scroll area (students)
+        if(e.target.closest('.student-scroll')) return;
+        
+        pageTouchStartX = e.touches[0].clientX;
+        pageTouchStartY = e.touches[0].clientY;
+    }
+
+    function handlePageTouchEnd(e) {
+        if(!pageTouchStartX) return;
+        // Ignore if list item swipe is active (dragging)
+        if(isDragging) return;
+
+        const diffX = e.changedTouches[0].clientX - pageTouchStartX;
+        const diffY = e.changedTouches[0].clientY - pageTouchStartY;
+        
+        // Ensure horizontal swipe is dominant and significant
+        if(Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY)) {
+            if(diffX < 0) { // Swipe Left -> Next Page
+                if(currentPage === 0) switchTab(1);
+            } else { // Swipe Right -> Prev Page
+                if(currentPage === 1) switchTab(0);
+            }
+        }
+        pageTouchStartX = 0;
+        pageTouchStartY = 0;
+    }
 
     function hardReset() {
         if(confirm("警告：這將刪除所有資料並重置系統。確定嗎？")) {
@@ -778,7 +835,6 @@
             monthlyLogs.forEach(l => {
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
                  
-                 // Show all classes in asset list (V296 Requirement)
                  if(['paid', 'unpaid', 'prepared', 'running'].includes(l.status)) estTotal += income;
                  if(l.status === 'paid') mTotal += income;
 
@@ -793,13 +849,11 @@
 
                  const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
                  
-                 // V296: Use Unique ID for asset list
                  histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income, null, true); 
             });
         }
 
         const finalTotal = tw + sp;
-        // Animation
         animateValue(document.getElementById('total-assets-val'), 0, finalTotal, 800);
 
         document.getElementById('taiwan-bank-balance').innerText = "$" + tw.toLocaleString();
@@ -809,7 +863,6 @@
         document.getElementById('month-est').innerText = estTotal.toLocaleString();
     }
     
-    // V296 FIX: toggleMonthView Logic
     function openAllScheduleModal(autoExpandKey = null) { 
         const list = document.getElementById('all-schedule-list'); 
         list.innerHTML = ''; 
@@ -837,7 +890,7 @@
                 container.className = 'month-logs'; 
                 
                 if(autoExpandKey && month === autoExpandKey) {
-                    container.classList.add('active'); // V296
+                    container.classList.add('active'); 
                 } 
 
                 const currentYM = items[0].date.slice(0, 7); 
@@ -1024,36 +1077,65 @@
         }).join('');
     }
 
-    function batchExportCalendar() {
+    // --- V301: Export Calendar Logic ---
+    function openExportCalendarModal() {
+        toggleSidebar(); // Close sidebar first
+        
         const futureLogs = window.logs.filter(l => {
             const logDate = new Date(l.date);
             const today = new Date();
             today.setHours(0,0,0,0);
             return logDate >= today && l.status === 'prepared';
-        });
+        }).sort((a,b) => new Date(a.date) - new Date(b.date));
 
+        const listDiv = document.getElementById('export-list');
         if(futureLogs.length === 0) {
-            alert("目前沒有未來的預排課程可匯出！");
+            listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">無可匯出的課程</div>';
+        } else {
+            listDiv.innerHTML = futureLogs.map(l => `
+                <div class="export-item">
+                    <input type="checkbox" class="export-check" value="${l.ts}" checked>
+                    <div style="flex:1;">
+                        <div style="font-weight:700;">${l.date} - ${l.name}</div>
+                        <div style="font-size:12px; color:#718096;">${l.subject || ''} ${l.timeStart ? '@'+l.timeStart : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        openModalWithAnim('export-calendar-modal');
+    }
+
+    function toggleAllExport(check) {
+        document.querySelectorAll('.export-check').forEach(el => el.checked = check);
+    }
+
+    function performExport() {
+        const checks = document.querySelectorAll('.export-check:checked');
+        if(checks.length === 0) {
+            alert("請至少選擇一項！");
             return;
         }
 
         let icsBody = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//TutorApp//EN\n";
+        
+        checks.forEach(chk => {
+            const log = window.logs.find(l => String(l.ts) === String(chk.value));
+            if(log) {
+                let startHour = 9, startMin = 0;
+                if(log.timeStart) {
+                    [startHour, startMin] = log.timeStart.split(':').map(Number);
+                }
+                const d = new Date(log.date);
+                const format = (num) => String(num).padStart(2,'0');
+                const totalStartMin = startHour * 60 + startMin;
+                const totalEndMin = totalStartMin + (parseFloat(log.hours) * 60);
+                const endHour = Math.floor(totalEndMin / 60);
+                const endMin = totalEndMin % 60;
+                const dtStart = `${d.getFullYear()}${format(d.getMonth()+1)}${format(d.getDate())}T${format(startHour)}${format(startMin)}00`;
+                const dtEnd = `${d.getFullYear()}${format(d.getMonth()+1)}${format(d.getDate())}T${format(endHour)}${format(endMin)}00`;
 
-        futureLogs.forEach(log => {
-            let startHour = 9, startMin = 0;
-            if(log.timeStart) {
-                [startHour, startMin] = log.timeStart.split(':').map(Number);
+                icsBody += `BEGIN:VEVENT\nUID:${log.ts}@tutorapp\nDTSTAMP:${dtStart}Z\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nSUMMARY:${log.subject || '家教'} - ${log.name}\nDESCRIPTION:${log.content || ''}\nEND:VEVENT\n`;
             }
-            const d = new Date(log.date);
-            const format = (num) => String(num).padStart(2,'0');
-            const totalStartMin = startHour * 60 + startMin;
-            const totalEndMin = totalStartMin + (parseFloat(log.hours) * 60);
-            const endHour = Math.floor(totalEndMin / 60);
-            const endMin = totalEndMin % 60;
-            const dtStart = `${d.getFullYear()}${format(d.getMonth()+1)}${format(d.getDate())}T${format(startHour)}${format(startMin)}00`;
-            const dtEnd = `${d.getFullYear()}${format(d.getMonth()+1)}${format(d.getDate())}T${format(endHour)}${format(endMin)}00`;
-
-            icsBody += `BEGIN:VEVENT\nUID:${log.ts}@tutorapp\nDTSTAMP:${dtStart}Z\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nSUMMARY:${log.subject || '家教'} - ${log.name}\nDESCRIPTION:${log.content || ''}\nEND:VEVENT\n`;
         });
 
         icsBody += "END:VCALENDAR";
@@ -1061,11 +1143,16 @@
         const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.setAttribute('download', `batch_export.ics`);
+        link.setAttribute('download', `tutor_calendar_${new Date().toISOString().split('T')[0]}.ics`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        closeModal('export-calendar-modal');
     }
+    
+    // Legacy function support
+    function batchExportCalendar() { openExportCalendarModal(); }
 
     function addToCalendar(e, ts) { if(e) e.stopPropagation(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; let startHour=9, startMin=0; if(log.timeStart) { [startHour, startMin] = log.timeStart.split(':').map(Number); } else { if(!confirm("無時間，預設09:00？")) return; } const d = new Date(log.date); const format = (num) => String(num).padStart(2,'0'); const totalStartMin = startHour * 60 + startMin; const totalEndMin = totalStartMin + (parseFloat(log.hours) * 60); const endHour = Math.floor(totalEndMin / 60); const endMin = totalEndMin % 60; const dtStart = `${d.getFullYear()}${format(d.getMonth()+1)}${format(d.getDate())}T${format(startHour)}${format(startMin)}00`; const dtEnd = `${d.getFullYear()}${format(d.getMonth()+1)}${format(d.getDate())}T${format(endHour)}${format(endMin)}00`; const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//TutorApp//EN\nBEGIN:VEVENT\nUID:${log.ts}@tutorapp\nDTSTAMP:${dtStart}Z\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nSUMMARY:${log.subject || '家教'} - ${log.name}\nDESCRIPTION:${log.content || ''}\nEND:VEVENT\nEND:VCALENDAR`; const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' }); const link = document.createElement('a'); link.href = window.URL.createObjectURL(blob); link.setAttribute('download', `${log.name}_${log.date}.ics`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
     function updateContent(ts, val) { const log = window.logs.find(l => String(l.ts) === String(ts)); if(log) { log.content = val; localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); } }
@@ -1089,8 +1176,7 @@
     function saveEditedLog() { const ts = document.getElementById('edit-log-ts').value; const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; const newDate = document.getElementById('edit-log-date').value; const newTime = document.getElementById('edit-log-time').value; const newHours = document.getElementById('edit-log-hours').value; if(!newDate || !newHours) { alert('日期和時數為必填'); return; } log.date = newDate; log.timeStart = newTime; log.hours = newHours; log.subject = document.getElementById('edit-log-subject').value; log.content = document.getElementById('edit-log-content').value; log.income = Math.round(newHours * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('edit-log-modal'); updateAssets(); renderSchedule(); if(document.getElementById('all-schedule-modal').classList.contains('active')) { const d = new Date(newDate); const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; openAllScheduleModal(targetMonthKey); } }
     function deleteLog(e, ts) { if(e) { e.preventDefault(); e.stopPropagation(); } if(confirm('刪除此課程紀錄？')) { const targetLog = window.logs.find(l => String(l.ts) === String(ts)); let targetMonthKey = null; if(targetLog) { const d = new Date(targetLog.date); targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; } window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); if(document.getElementById('all-schedule-modal').classList.contains('active')) { openAllScheduleModal(targetMonthKey); } updateAssets(); renderSchedule(); } }
     
-    // V296 FIX: Generate ID with suffix to avoid conflict
-    // V299: Add Subject display
+    // Generate Swipe Item
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null, isAssetList = false) { 
         let actionBtn = ''; const clickYM = specificYM || l.date.slice(0, 7); 
         const containerId = isAssetList ? `swipe-${l.ts}-asset` : `swipe-${l.ts}`;
@@ -1104,7 +1190,6 @@
         else if (l.status === 'running') { actionBtn = `<span style="font-size:11px; color:#C95D4E; font-weight:700;">(進行中)</span>`; } 
         else { actionBtn = `${editBtn}${calBtn}${settleBtn}`; } 
         
-        // V299: Added Subject below name
         return `<div class="swipe-container" id="${containerId}"><div class="swipe-bg-delete" onclick="deleteLog(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${containerId}')" ontouchmove="handleSwipeMove(event, '${containerId}')" ontouchend="handleSwipeEnd(event, '${containerId}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span><span style="font-size:12px; color:#A0AEC0; margin-top:2px; font-weight:600;">${l.subject || ''}</span></div><div class="list-right"><div class="list-income" style="color:${color}">${l.status === 'paid' ? '+' : ''}$${income}</div>${actionBtn}</div></div></div>`; 
     }
     
@@ -1114,8 +1199,6 @@
     function handleSwipeEnd(e, id) { if (!isDragging) return; const diff = listSwipeCurrentX - listSwipeStartX; const el = e.currentTarget; el.style.transition = 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'; if (diff < -60) { el.style.transform = 'translateX(-90px)'; activeSwipeId = id; } else { el.style.transform = 'translateX(0)'; activeSwipeId = null; } listSwipeStartX = 0; listSwipeCurrentX = 0; isDragging = false; }
     function closeAllSwipes() { document.querySelectorAll('.swipe-content').forEach(el => { el.style.transition = 'transform 0.2s ease-out'; el.style.transform = 'translateX(0)'; }); activeSwipeId = null; }
     
-    // --- V298 FIXED FUNCTIONS (CRITICAL) ---
-
     function openStudentMonthStats(name, specificYM) {
         currentStatsStudent = name;
         const modal = document.getElementById('student-history-modal');
