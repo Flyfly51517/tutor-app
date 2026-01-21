@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V307 (Fix Header Buttons) -->
+<!-- 家教小本本 V311 (Button Polish: Export & Card Icons) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V307</title>
+<title>家教小本本 V311</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V307 STYLE: BUTTON FIX --- */
+    /* --- V311 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -39,6 +39,9 @@
         font-family: "Urbanist", "Noto Sans TC", sans-serif !important; 
     }
 
+    /* V308: Ensure background covers everything including overscroll */
+    html { background-color: var(--bg-color); }
+
     body { 
         background-color: var(--bg-color); margin: 0; padding: 0; 
         padding-bottom: 40px; overflow-x: hidden; width: 100vw; 
@@ -56,7 +59,7 @@
     /* SPLASH SCREEN */
     #splash-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: #FFEFF2;
+        background-color: var(--bg-color);
         z-index: 20000;
         display: flex; justify-content: center; align-items: center;
         flex-direction: column;
@@ -67,7 +70,7 @@
     .splash-logo-img { 
         width: 140px; height: 140px; 
         border-radius: 35px; 
-        box-shadow: 0 15px 35px rgba(224, 122, 95, 0.2);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
         margin-bottom: 20px; 
         animation: float 3s ease-in-out infinite; 
         object-fit: cover;
@@ -85,7 +88,7 @@
         border-bottom-left-radius: 40px;
         border-bottom-right-radius: 40px;
         padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 15px; 
-        padding-left: 20px; padding-right: 20px; /* Slight reduce padding for small screens */
+        padding-left: 20px; padding-right: 20px;
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
         display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
     }
@@ -120,7 +123,6 @@
     #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
     .page { width: 100vw; flex-shrink: 0; padding: 10px 24px 100px 24px; }
     
-    /* V307: Header Layout Fixes */
     .section-header { 
         display: flex; justify-content: space-between; align-items: center; 
         margin-bottom: 20px; padding: 0 4px; gap: 10px; 
@@ -132,7 +134,6 @@
     }
     .section-title { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
     
-    /* V307: UNIFIED BUTTON STYLES (NO WRAPPING) */
     .header-action-btn { 
         height: 42px; padding: 0 16px; 
         border-radius: 21px; 
@@ -140,8 +141,7 @@
         cursor: pointer; display: flex; align-items: center; justify-content: center; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; 
         transition: transform 0.1s; 
-        white-space: nowrap; /* Prevent wrap */
-        flex-shrink: 0; /* Prevent squeeze */
+        white-space: nowrap; flex-shrink: 0; 
     }
     .btn-glass-dark { background: var(--text-main); color: #FFF; }
     .btn-style-main { background: var(--text-main); color: #FFF; }
@@ -150,14 +150,19 @@
         padding: 0 16px; height: 42px; 
         border-radius: 21px; 
         font-size: 14px; font-weight: 700; 
-        background: #FFF; color: var(--text-main); 
-        border: 2px solid #EDF2F7; 
+        background: var(--text-main); 
+        color: #FFF; 
+        border: 2px solid var(--text-main); 
         display: flex; align-items: center; gap: 6px; 
-        cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-        white-space: nowrap; /* Prevent wrap */
-        flex-shrink: 0; /* Prevent squeeze */
+        cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        white-space: nowrap; flex-shrink: 0; 
+        transition: 0.2s;
     }
-    .btn-toggle-cal.active { background: var(--text-main); color: #FFF; border-color: var(--text-main); }
+    .btn-toggle-cal.active { 
+        background: #FFF; 
+        color: var(--text-main); 
+        border-color: #EDF2F7;
+    }
 
     /* ASSETS */
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02); }
@@ -171,7 +176,6 @@
     .btn-group { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
     .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); }
     
-    /* V305: Month Selector & Income Styles */
     .month-nav-container { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
     .month-nav-btn {
         background: transparent; border: none; font-size: 24px;
@@ -234,43 +238,59 @@
     /* CARDS */
     #today-schedule-list { display: flex; gap: 20px; overflow-x: auto; padding: 20px 24px 40px 24px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-left: -24px; margin-right: -24px; }
     #today-schedule-list::-webkit-scrollbar { display: none; }
-    .schedule-card { flex: 0 0 82%; max-width: 320px; height: 420px; scroll-snap-align: center; border-radius: 36px; padding: 28px 24px; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; box-shadow: 0 15px 35px -5px rgba(0,0,0,0.15); border: none; }
+    .schedule-card { flex: 0 0 82%; max-width: 320px; height: 420px; scroll-snap-align: center; border-radius: 36px; padding: 28px 24px; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.03); }
     .schedule-card:active { transform: scale(0.98); }
-    .card-theme-1 { background-color: var(--theme-black); color: #FFFFFF; }
-    .card-theme-2 { background-color: var(--theme-green); color: var(--text-main); }
-    .card-theme-3 { background-color: var(--theme-purple); color: #FFFFFF; }
-    .schedule-card.paid { background: #EDF2F7; color: #A0AEC0; border: none; box-shadow: none; }
-    .schedule-card.paid .sch-title { color: #718096; }
-    .schedule-card.paid .sch-badge { background: #E2E8F0; color: #A0AEC0; }
-    .schedule-card.paid .inline-note { background: #E2E8F0; color: #718096; }
+    .card-theme-1 { background-color: #2D3748; color: #FFFFFF; }
+    .card-theme-2 { background-color: #FDF2E9; color: #4A5568; }
+    .card-theme-3 { background-color: #E2E8F0; color: #2D3748; }
+    .schedule-card.paid { background: #F7FAFC; color: #A0AEC0; border: 1px solid #EDF2F7; box-shadow: none; }
+    .schedule-card.paid .sch-title { color: #A0AEC0; }
+    .schedule-card.paid .sch-badge { background: #EDF2F7; color: #A0AEC0; }
+    .schedule-card.paid .inline-note { background: #EDF2F7; color: #A0AEC0; }
     .sch-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .sch-title { font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 6px; }
     .sch-time-info { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; opacity: 0.7; }
     .sch-badge { font-size: 13px; padding: 6px 14px; border-radius: 20px; font-weight: 800; display: inline-block; }
     .card-theme-1 .sch-badge { background: rgba(255,255,255,0.2); color: #FFF; }
-    .card-theme-2 .sch-badge { background: #FFF; color: var(--text-main); }
-    .card-theme-3 .sch-badge { background: rgba(255,255,255,0.25); color: #FFF; }
-    .cal-top-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
-    .card-theme-1 .cal-top-btn { background: #3A3D45; color: #FFF; }
-    .card-theme-2 .cal-top-btn { background: #FFF; color: var(--text-main); }
-    .card-theme-3 .cal-top-btn { background: rgba(255,255,255,0.25); color: #FFF; }
+    .card-theme-2 .sch-badge { background: #FFF; color: #2D3748; }
+    .card-theme-3 .sch-badge { background: #FFF; color: #2D3748; }
+    
+    /* V311: Glassmorphic Calendar Button */
+    .cal-top-btn { 
+        width: 44px; height: 44px; 
+        border-radius: 16px; 
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 20px; cursor: pointer; 
+        transition: 0.2s;
+    }
+    .card-theme-1 .cal-top-btn { 
+        background: rgba(255,255,255,0.15); 
+        color: #FFF; 
+        backdrop-filter: blur(4px); 
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .card-theme-2 .cal-top-btn { background: rgba(0,0,0,0.05); color: #2D3748; }
+    .card-theme-3 .cal-top-btn { background: #FFF; color: #2D3748; }
+    
+    .schedule-card.paid .cal-top-btn { background: transparent !important; color: #CBD5E0 !important; border: 1px solid #EDF2F7; }
+    
     .note-wrapper { position: relative; flex: 1; margin: 15px 0; }
     .inline-note { width: 100%; height: 100%; padding: 20px; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; outline: none; resize: none; box-sizing: border-box; }
-    .card-theme-1 .inline-note { background: #3A3D45; color: #FFF; }
-    .card-theme-2 .inline-note { background: #FFF; color: var(--text-main); }
-    .card-theme-3 .inline-note { background: rgba(255,255,255,0.2); color: #FFF; }
-    .schedule-card.paid .inline-note { background: #F7FAFC; color: var(--text-main); }
+    .card-theme-1 .inline-note { background: rgba(255,255,255,0.1); color: #FFF; }
+    .card-theme-2 .inline-note { background: #FFF; color: #2D3748; }
+    .card-theme-3 .inline-note { background: #FFF; color: #2D3748; }
+    .schedule-card.paid .inline-note { background: #F7FAFC; color: #A0AEC0; }
     .sch-cost-overlay { position: absolute; bottom: 16px; right: 20px; font-size: 13px; font-weight: 800; pointer-events: none; opacity: 0.6; }
     .card-footer { display: flex; gap: 12px; align-items: center; height: 60px; }
     .btn-trash-card { width: 60px; height: 60px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: none; cursor: pointer; }
-    .card-theme-1 .btn-trash-card { background: #3A3D45; color: #FF6B6B; }
+    .card-theme-1 .btn-trash-card { background: rgba(255,255,255,0.1); color: #FF6B6B; }
     .card-theme-2 .btn-trash-card { background: #FFF; color: #FF6B6B; }
-    .card-theme-3 .btn-trash-card { background: rgba(255,255,255,0.2); color: #FFD1D1; }
+    .card-theme-3 .btn-trash-card { background: #FFF; color: #FF6B6B; }
     .btn-main-action { flex: 1; height: 60px; border-radius: 24px; font-size: 16px; font-weight: 800; border: none; display: flex; align-items: center; justify-content: center; transition: transform 0.1s; }
     .btn-main-action:active { transform: scale(0.95); }
     .card-theme-1 .btn-main-action { background: #FFFFFF; color: #2B2E35; }
     .card-theme-2 .btn-main-action { background: #2B2E35; color: #FFFFFF; }
-    .card-theme-3 .btn-main-action { background: #FFFFFF; color: #5E5B9E; }
+    .card-theme-3 .btn-main-action { background: #2B2E35; color: #FFFFFF; }
     .timer-display { font-size: 36px; font-weight: 800; text-align: center; font-feature-settings: "tnum"; margin-top: auto; margin-bottom: auto;}
 
     /* MODALS */
@@ -309,6 +329,17 @@
     .btn-options { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; align-items: center; width: 100%; }
     .opt-btn { padding: 0 16px; background: #FFF; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer; border: 2px solid #EDF2F7; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .opt-btn.selected { background: var(--text-main); color: #FFF; border-color: var(--text-main); }
+    
+    /* V311: Better "Select All" Pills */
+    .btn-pill-gray {
+        flex: 1; height: 40px; border-radius: 20px; 
+        background: #EDF2F7; color: #4A5568; 
+        border: none; font-size: 14px; font-weight: 700;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: 0.1s;
+    }
+    .btn-pill-gray:active { background: #CBD5E0; transform: scale(0.98); }
+
     .vertical-stack { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .date-row { display: flex; gap: 8px; width: 100%; }
     .date-input-wrapper { flex: 1; }
@@ -467,7 +498,7 @@
                 <div style="display:flex; align-items:center; gap:10px;">
                     <!-- V303: Date Display (English) -->
                     <div id="today-title-display">TODAY</div>
-                    <!-- V307: Fixed Button -->
+                    <!-- V310: Inverted Logic Button -->
                     <div id="view-toggle" class="btn-toggle-cal" onclick="toggleViewMode()">
                         <span>📅 月曆</span>
                     </div>
@@ -731,9 +762,10 @@
 <div id="export-calendar-modal" class="modal">
     <div class="modal-content" style="height:70vh; display:flex; flex-direction:column;">
         <h3 class="modal-title">匯出行事曆</h3>
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-             <button class="opt-btn" onclick="toggleAllExport(true)">全選</button>
-             <button class="opt-btn" onclick="toggleAllExport(false)">取消全選</button>
+        <!-- V311: Better Select All Buttons -->
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; gap:12px;">
+             <button class="btn-pill-gray" onclick="toggleAllExport(true)">全選</button>
+             <button class="btn-pill-gray" onclick="toggleAllExport(false)">取消全選</button>
         </div>
         <div id="export-list" style="overflow-y:auto; flex:1; border:1px solid #EEE; border-radius:16px; padding:5px;"></div>
         <button onclick="performExport()" class="modal-btn btn-confirm btn-bubble">匯出選取項目 (.ics)</button>
@@ -1126,11 +1158,13 @@
         btn.classList.toggle('active', isCalendarView);
         
         if(isCalendarView) {
+            btn.innerHTML = '<span>📄 今日課卡</span>';
             listView.style.display = 'none';
             emptyHint.style.display = 'none';
             calView.style.display = 'block';
             renderCalendar();
         } else {
+            btn.innerHTML = '<span>📅 月曆</span>';
             listView.style.display = 'flex';
             calView.style.display = 'none';
             renderSchedule(); 
@@ -1172,7 +1206,6 @@
             const cell = document.createElement('div');
             cell.className = `cal-cell ${isToday?'today':''}`;
             cell.innerHTML = `<span>${d}</span><div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center;">${dotsHtml}</div>`;
-            // V302: Open Detail Modal instead of alert
             cell.onclick = () => {
                 openCalendarDayModal(dateStr);
             };
@@ -1180,7 +1213,6 @@
         }
     }
 
-    // V302: Calendar Day Detail Modal Logic
     function openCalendarDayModal(dateStr) {
         const listDiv = document.getElementById('cal-day-list');
         const title = document.getElementById('cal-day-title');
@@ -1210,7 +1242,6 @@
         const now = new Date();
         const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         
-        // V303: English Date Display
         const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
         document.getElementById('today-title-display').innerText = now.toLocaleDateString('en-US', dateOptions).toUpperCase();
         
@@ -1294,7 +1325,6 @@
         }).join('');
     }
 
-    // --- V301: Export Calendar Logic (Fixed in V303) ---
     function openExportCalendarModal() {
         toggleSidebar(); 
         
@@ -1309,7 +1339,6 @@
         if(futureLogs.length === 0) {
             listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">無可匯出的課程</div>';
         } else {
-            // V303 Fix: Make the whole row clickable
             listDiv.innerHTML = futureLogs.map(l => `
                 <div class="export-item" onclick="toggleExportItem(this)">
                     <input type="checkbox" class="export-check" value="${l.ts}" checked onclick="event.stopPropagation()">
@@ -1323,7 +1352,6 @@
         openModalWithAnim('export-calendar-modal');
     }
 
-    // V303 Helper: Toggle checkbox when row is clicked
     function toggleExportItem(div) {
         const checkbox = div.querySelector('.export-check');
         if(checkbox) {
@@ -1429,99 +1457,6 @@
     function handleSwipeEnd(e, id) { if (!isDragging) return; const diff = listSwipeCurrentX - listSwipeStartX; const el = e.currentTarget; el.style.transition = 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'; if (diff < -60) { el.style.transform = 'translateX(-90px)'; activeSwipeId = id; } else { el.style.transform = 'translateX(0)'; activeSwipeId = null; } listSwipeStartX = 0; listSwipeCurrentX = 0; isDragging = false; }
     function closeAllSwipes() { document.querySelectorAll('.swipe-content').forEach(el => { el.style.transition = 'transform 0.2s ease-out'; el.style.transform = 'translateX(0)'; }); activeSwipeId = null; }
     
-    function openStudentMonthStats(name, specificYM) {
-        currentStatsStudent = name;
-        const modal = document.getElementById('student-history-modal');
-        const list = document.getElementById('stu-history-list');
-        const title = document.getElementById('stu-history-name');
-        const totalDisplay = document.getElementById('stu-history-total');
-        const delAllBtn = document.getElementById('btn-delete-all-logs');
-
-        title.innerText = `${name} - ${specificYM || '總覽'}`;
-        
-        let targetLogs = window.logs.filter(l => l.name === name);
-        if(specificYM) {
-             targetLogs = targetLogs.filter(l => l.date.startsWith(specificYM));
-        }
-        targetLogs.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        let total = 0;
-        targetLogs.forEach(l => {
-             if(l.status === 'paid' || l.status === 'unpaid') total += (parseInt(l.income) || 0);
-        });
-        totalDisplay.innerText = `$${total.toLocaleString()}`;
-
-        if(targetLogs.length === 0) {
-            list.innerHTML = '<div style="text-align:center;padding:20px;color:#999">無紀錄</div>';
-            delAllBtn.style.display = 'none';
-        } else {
-             delAllBtn.style.display = 'block';
-             delAllBtn.onclick = () => deleteAllStudentLogs(name, specificYM);
-             
-             list.innerHTML = targetLogs.map(l => {
-                 const dObj = new Date(l.date);
-                 const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
-                 const dayStr = l.date.split('-')[2];
-                 const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
-                 
-                 let color = '#AAA'; 
-                 if(l.status === 'paid') color = 'var(--money-green)';
-                 if(l.status === 'unpaid') color = 'var(--accent-primary)';
-                 
-                 return generateSwipeItem(l, dateHTML, color, l.income, specificYM, false); 
-             }).join('');
-        }
-        openModalWithAnim('student-history-modal');
-    }
-
-    function deleteAllStudentLogs(name, specificYM) {
-        const msg = specificYM ? `確定刪除 ${name} 在 ${specificYM} 的所有紀錄嗎？` : `確定刪除 ${name} 的所有紀錄嗎？`;
-        if(confirm(msg)) {
-             window.logs = window.logs.filter(l => {
-                 if(l.name !== name) return true;
-                 if(specificYM && !l.date.startsWith(specificYM)) return true;
-                 return false;
-             });
-             localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
-             closeModal('student-history-modal');
-             updateAssets();
-             renderSchedule();
-             if(document.getElementById('all-schedule-modal').classList.contains('active')) {
-                 openAllScheduleModal();
-             }
-        }
-    }
-
-    // V302: Open Settle Confirm Modal
-    function openSettleConfirmModal(e, ts) {
-        if(e) e.stopPropagation();
-        closeAllSwipes();
-        const log = window.logs.find(l => String(l.ts) === String(ts));
-        if(log) {
-            document.getElementById('settle-target-ts').value = ts;
-            document.getElementById('settle-confirm-name').innerText = log.name;
-            document.getElementById('settle-confirm-detail').innerText = `${log.hours}hr • ${log.subject || '課程'}`;
-            openModalWithAnim('settle-confirm-modal');
-        }
-    }
-
-    // V302: Perform Settle Action
-    function performSettle() {
-        const ts = document.getElementById('settle-target-ts').value;
-        const log = window.logs.find(l => String(l.ts) === String(ts));
-        if(log) {
-            log.status = 'unpaid';
-            localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
-            updateAssets();
-            closeModal('settle-confirm-modal');
-            if(document.getElementById('all-schedule-modal').classList.contains('active')) {
-                 const d = new Date(log.date);
-                 const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`;
-                 openAllScheduleModal(targetMonthKey);
-            }
-        }
-    }
-
     // V303: Edit Name
     function editProfileName() {
         const newName = prompt("請輸入您的名字 (例如: Tutor)", profileData.name || "Tutor");
