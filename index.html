@@ -747,24 +747,24 @@
     // V331: iOS-style Delete Mode Logic
     let isEditMode = false; // 標記是否處於編輯(抖動)模式
 
-    function startLongPress() {
-        if (isEditMode) return; // 已經在編輯模式就不用再計時了
+    // [修復] 長按邏輯
+    function startLongPress(el) {
+        if (isEditMode) return; 
         
+        isLongPress = false; // 先重置
         longPressTimer = setTimeout(() => {
-            // Vibrate if supported
             if (navigator.vibrate) navigator.vibrate(50);
             
-            // 觸發全域編輯模式
             isEditMode = true;
-            isLongPress = true; // 標記這次點擊是長按觸發的，避免觸發 click
+            isLongPress = true; // 標記為長按觸發
             document.getElementById('student-scroll').classList.add('edit-mode');
         }, 800);
     }
     
     function cancelLongPress() {
-        // 只有在還沒進入編輯模式前，手指放開才需要清除計時器
-        // 如果已經進入編輯模式，手指放開不應該取消模式
         clearTimeout(longPressTimer); 
+        // 這裡不重置 isLongPress，因為 click 事件會在 touchend 之後觸發
+        // click 事件處理器會負責消耗掉 isLongPress 狀態
     }
 
     // 點擊空白處取消編輯模式 (這部分原本就在 window.onload 的 listener 裡，這裡加強判斷)
@@ -1108,7 +1108,8 @@
         renderCalendar();
     }
 
-    function renderCalendar() {
+    // [修復] 渲染月曆 (改用 HTML onclick 確保事件觸發)
+   function renderCalendar() {
         const grid = document.getElementById('cal-grid');
         const title = document.getElementById('cal-month-title');
         grid.innerHTML = '';
@@ -1129,12 +1130,11 @@
             const dayLogs = window.logs.filter(l => l.date === dateStr);
             const isToday = new Date().toDateString() === new Date(y, m, d).toDateString();
             
-            // V326: Holiday Logic
             let cellContent = `<span>${d}</span><div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center;">`;
             let cellClass = `cal-cell ${isToday?'today':''}`;
             
             if(dayLogs.length === 0) {
-                cellClass += ' holiday'; // Add Holiday Class
+                cellClass += ' holiday'; 
                 cellContent += `<div class="holiday-label">假</div>`;
             } else {
                 dayLogs.forEach(l => {
@@ -1144,21 +1144,20 @@
             }
             cellContent += `</div>`;
 
+            // 建立 DOM 元素並直接綁定 onclick，避免 HTML 字串找不到函式
             const cell = document.createElement('div');
             cell.className = cellClass;
             cell.innerHTML = cellContent;
-            // V302: Open Detail Modal instead of alert
-            cell.onclick = () => {
+            cell.onclick = function() {
                 openCalendarDayModal(dateStr);
             };
             grid.appendChild(cell);
         }
         
-        // [新增] 渲染完月曆後，同步更新下方的排課通知列表
         renderMonthlySummary();
-    }
+    
 
-    // V328: New Day Detail Logic
+    // [修復] 開啟單日詳情 (增加錯誤保護)
     function openCalendarDayModal(dateStr) {
         const listDiv = document.getElementById('cal-day-list');
         const title = document.getElementById('cal-day-title');
@@ -1170,22 +1169,22 @@
             listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#E53E3E; font-weight:700;">🌴 今日休假</div>';
         } else {
             listDiv.innerHTML = dayLogs.map(l => {
-                // V328: Calculate End Time
                 let timeDisplay = '--:--';
+                // 安全的時間計算
                 if (l.timeStart && l.hours) {
-                    const [h, m] = l.timeStart.split(':').map(Number);
-                    const totalMin = h * 60 + m + (parseFloat(l.hours) * 60);
-                    const endH = Math.floor(totalMin / 60) % 24;
-                    const endM = Math.floor(totalMin % 60);
-                    const endTime = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
-                    timeDisplay = `${l.timeStart} — ${endTime}`;
+                    try {
+                        const [h, m] = l.timeStart.split(':').map(Number);
+                        const totalMin = h * 60 + m + (parseFloat(l.hours) * 60);
+                        const endH = Math.floor(totalMin / 60) % 24;
+                        const endM = Math.floor(totalMin % 60);
+                        const endTime = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+                        timeDisplay = `${l.timeStart} — ${endTime}`;
+                    } catch(e) { console.error(e); }
                 }
                 
-                // Get Student Info for Grade
                 const stu = window.students.find(s => s.name === l.name);
                 const gradeStr = stu ? (stu.grade || '') : '';
                 const subjectStr = l.subject || '';
-                // V329: Display Format Student Name | GradeSubject (Light Gray + Bold)
                 const fullSubject = `${gradeStr}${subjectStr}`;
 
                 return `
@@ -1196,7 +1195,7 @@
                     </div>
                     <div class="day-detail-right">
                         <button class="btn-modal-action" onclick="openEditLogModal('${l.ts}')">✎</button>
-                        <button class="btn-modal-action btn-modal-delete" onclick="deleteLog(null, '${l.ts}')">🗑</button>
+                        <button class="btn-modal-action btn-modal-delete" onclick="deleteLog(event, '${l.ts}')">🗑</button>
                     </div>
                 </div>
             `;
@@ -1204,7 +1203,6 @@
         }
         openModalWithAnim('calendar-day-modal');
     }
-
     function renderSchedule() {
         const div = document.getElementById('today-schedule-list');
         const now = new Date();
@@ -1418,13 +1416,14 @@
     function deleteStudent(idx) { if(confirm('刪除這位學生？')) { window.students.splice(idx, 1); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); } }
     
     // [修復] 排課視窗：加入防止與長按編輯模式衝突的邏輯
-    function openBatchPlanModal(idx) { 
+  function openBatchPlanModal(idx) { 
+        // 如果是編輯模式，完全禁止點擊 (只能點叉叉)
+        if (isEditMode) return;
+
+        // 如果這次點擊是由長按觸發的，禁止開啟視窗，並重置狀態
         if (isLongPress) {
             isLongPress = false;
             return;
-        }
-        if (isEditMode) {
-            return; // 編輯模式下點擊無效(只能點X)
         }
        
         currentPlanningStuIdx = idx; 
