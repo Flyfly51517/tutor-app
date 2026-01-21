@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V329 (Calendar Detail Update: Light Gray Subtext) -->
+<!-- 家教小本本 V331 (Fixed: iOS Delete Mode, LINE Notify, No White Screen) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V329</title>
+<title>家教小本本 V331</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
@@ -207,7 +207,7 @@
     #month-total { font-family: 'Urbanist', sans-serif !important; font-size: 42px; font-weight: 900; color: var(--text-main); line-height: 1.1; text-align: center; }
 
     /* SCHEDULE PAGE */
-    .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 15px 5px 20px 5px; scrollbar-width: none; }
+    .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 15px 20px 20px 20px; scrollbar-width: none; }
     .student-wrapper { 
         display: flex; flex-direction: column; align-items: center; width: 72px; flex-shrink: 0; user-select:none; 
         position: relative; /* Fixed: Add relative for delete btn */
@@ -233,8 +233,9 @@
         font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; 
         box-shadow: 0 4px 10px rgba(229,62,62,0.4);
     }
-    .is-editing .delete-x { display: flex; animation: popIn 0.2s; }
-    .is-editing .student-chip { animation: shake 0.25s infinite; }
+    /* V331: Global Edit Mode Styles */
+    .student-scroll.edit-mode .delete-x { display: flex; animation: popIn 0.2s; }
+    .student-scroll.edit-mode .student-chip { animation: shake 0.25s infinite; }
     @keyframes shake { 0% {transform:rotate(0deg);} 25% {transform:rotate(2deg);} 75% {transform:rotate(-2deg);} 100% {transform:rotate(0deg);} }
     @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
 
@@ -528,7 +529,8 @@
     }
     .month-logs { display: none; }
     .month-logs.active { display: block; }
-/* V330: Monthly Summary & LINE Button */
+
+    /* V330: Monthly Summary & LINE Button */
     #cal-summary-area { border-top: 1px dashed #E2E8F0; margin-top: 20px; padding-top: 15px; }
     .summary-title { font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; letter-spacing: 1px; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; background: #F9FAFB; padding: 12px; border-radius: 16px; margin-bottom: 10px; border: 1px solid #EDF2F7; }
@@ -593,7 +595,7 @@
             </div>
             
             <div class="card" style="padding: 20px 0;">
-                <div class="student-scroll" id="student-scroll" style="padding: 15px 5px 20px 5px;"></div>
+                <div class="student-scroll" id="student-scroll" style="padding: 15px 24px 20px 24px;"></div>
             </div>
             
             <div class="section-header" style="margin-top: 30px;">
@@ -677,240 +679,6 @@
     </div>
 </div>
 
-<!-- MODALS -->
-<div id="setup-modal" class="modal">
-    <div class="modal-content">
-        <h3 class="modal-title">新增學生</h3>
-        
-        <div class="color-picker" id="new-color-picker">
-            <div class="color-opt selected" style="background:#D58694;" onclick="selectColor('#D58694', this)"></div> 
-            <div class="color-opt" style="background:#E2B268;" onclick="selectColor('#E2B268', this)"></div> 
-            <div class="color-opt" style="background:#81B29A;" onclick="selectColor('#81B29A', this)"></div> 
-            <div class="color-opt" style="background:#5E7C8D;" onclick="selectColor('#5E7C8D', this)"></div> 
-            <div class="color-opt" style="background:#9B8EA9;" onclick="selectColor('#9B8EA9', this)"></div> 
-        </div>
-        <input type="hidden" id="new-color-val" value="#D58694">
-
-        <div class="setup-group">
-            <div class="setup-label">姓名</div>
-            <input id="new-name" placeholder="輸入姓名">
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">時薪</div>
-            <div class="vertical-stack">
-                <input type="number" id="new-rate" placeholder="$" inputmode="decimal">
-                <div class="btn-options">
-                    <div class="opt-btn" onclick="setInputValue('new-rate', 650, this)">650</div>
-                    <div class="opt-btn" onclick="setInputValue('new-rate', 750, this)">750</div>
-                    <div class="opt-btn" onclick="setInputValue('new-rate', 800, this)">800</div>
-                    <div class="opt-btn" onclick="setInputValue('new-rate', 1000, this)">1000</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">年級</div>
-            <div class="btn-options" style="flex-wrap: nowrap; overflow-x: auto;">
-                <div class="opt-btn" onclick="selectOptionGroup('new-grade', '國小', this)">國小</div>
-                <div class="opt-btn" onclick="selectOptionGroup('new-grade', '國一', this)">國一</div>
-                <div class="opt-btn" onclick="selectOptionGroup('new-grade', '國二', this)">國二</div>
-                <div class="opt-btn" onclick="selectOptionGroup('new-grade', '國三', this)">國三</div>
-            </div>
-            <input type="hidden" id="new-grade">
-        </div>
-        
-        <input type="hidden" id="new-subject-def" value="">
-        
-        <button onclick="addStudent()" class="modal-btn btn-confirm btn-bubble">確認新增</button>
-        <button onclick="closeModal('setup-modal')" class="modal-btn btn-cancel">取消</button>
-    </div>
-</div>
-
-<!-- V328: New Day Detail Modal -->
-<div id="calendar-day-modal" class="modal">
-    <div class="modal-content" style="height:60vh; display:flex; flex-direction:column;">
-        <h3 class="modal-title" id="cal-day-title">2026-01-21</h3>
-        <div id="cal-day-list" style="overflow-y:auto; flex:1; padding-bottom:10px;"></div>
-        <button onclick="closeModal('calendar-day-modal')" class="modal-btn btn-cancel">關閉</button>
-    </div>
-</div>
-
-<div id="log-modal" class="modal">
-    <div class="modal-content">
-        <h3 id="log-name-display" class="modal-title">排課設定</h3>
-        
-        <div class="setup-group">
-            <div class="setup-label">時數</div>
-            <div class="vertical-stack">
-                <input type="number" id="log-hours" placeholder="hr" inputmode="decimal">
-                <div class="btn-options">
-                    <div class="opt-btn" onclick="setInputValue('log-hours', 1.5, this)">1.5</div>
-                    <div class="opt-btn" onclick="setInputValue('log-hours', 2.0, this)">2.0</div>
-                    <div class="opt-btn" onclick="setInputValue('log-hours', 2.5, this)">2.5</div>
-                    <div class="opt-btn" onclick="setInputValue('log-hours', 3.0, this)">3.0</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">科目</div>
-            <div class="btn-options" id="log-subject-group">
-                <div class="opt-btn" onclick="selectOptionGroup('log-subject', '數學', this)">數學</div>
-                <div class="opt-btn" onclick="selectOptionGroup('log-subject', '英文', this)">英文</div>
-                <div class="opt-btn" onclick="selectOptionGroup('log-subject', '理化', this)">理化</div>
-                <div class="opt-btn" onclick="selectOptionGroup('log-subject', '生物', this)">生物</div>
-            </div>
-            <input type="hidden" id="log-subject">
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">時間與日期</div>
-            <div class="vertical-stack">
-                <input type="time" id="log-time" style="width:100%;">
-                <div class="date-row">
-                    <div class="date-input-wrapper">
-                        <input type="date" id="log-date">
-                    </div>
-                    <button onclick="addDateTag()" class="add-date-btn btn-bubble">+</button>
-                </div>
-            </div>
-            <div id="date-tags" class="tag-container" style="margin-top:10px;"></div>
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">備註</div>
-            <textarea id="log-content-modal" placeholder="備註..." style="height:70px;"></textarea>
-        </div>
-        
-        <button onclick="saveBatchPlan()" class="modal-btn btn-confirm btn-bubble">儲存行程</button>
-        <button onclick="closeModal('log-modal')" class="modal-btn btn-cancel">取消</button>
-    </div>
-</div>
-
-<div id="edit-log-modal" class="modal">
-    <div class="modal-content">
-        <h3 class="modal-title">修改課程</h3>
-        <input type="hidden" id="edit-log-ts">
-        
-        <div class="setup-group">
-            <div class="setup-label">日期與時間</div>
-            <div class="vertical-stack">
-                 <input type="time" id="edit-log-time">
-                 <input type="date" id="edit-log-date">
-            </div>
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">時數</div>
-            <div class="vertical-stack">
-                <input type="number" id="edit-log-hours" inputmode="decimal">
-                <div class="btn-options">
-                    <div class="opt-btn" onclick="setInputValue('edit-log-hours', 1.5, this)">1.5</div>
-                    <div class="opt-btn" onclick="setInputValue('edit-log-hours', 2.0, this)">2.0</div>
-                    <div class="opt-btn" onclick="setInputValue('edit-log-hours', 2.5, this)">2.5</div>
-                    <div class="opt-btn" onclick="setInputValue('edit-log-hours', 3.0, this)">3.0</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">科目</div>
-            <div class="vertical-stack">
-                <input type="text" id="edit-log-subject">
-                <div class="btn-options" id="edit-subject-group">
-                    <div class="opt-btn" onclick="selectOptionGroup('edit-log-subject', '數學', this)">數學</div>
-                    <div class="opt-btn" onclick="selectOptionGroup('edit-log-subject', '英文', this)">英文</div>
-                    <div class="opt-btn" onclick="selectOptionGroup('edit-log-subject', '理化', this)">理化</div>
-                    <div class="opt-btn" onclick="selectOptionGroup('edit-log-subject', '生物', this)">生物</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="setup-group">
-            <div class="setup-label">備註</div>
-            <textarea id="edit-log-content" style="height:70px;"></textarea>
-        </div>
-
-        <button onclick="saveEditedLog()" class="modal-btn btn-confirm btn-bubble">保存修改</button>
-        <button onclick="closeModal('edit-log-modal')" class="modal-btn btn-cancel">取消</button>
-    </div>
-</div>
-
-<div id="bank-input-modal" class="modal">
-    <div class="modal-content">
-        <h3 class="modal-title" id="bank-title">存入</h3>
-        <div class="setup-group">
-            <div class="setup-label">日期</div>
-            <input type="date" id="bank-date" style="text-align:center;">
-        </div>
-        <div class="setup-group" style="margin-top:20px;">
-             <div class="setup-label">金額</div>
-             <input id="bank-amount" type="number" inputmode="decimal" placeholder="$0">
-        </div>
-        <button onclick="submitBankTransaction()" class="modal-btn btn-confirm btn-bubble">確認</button>
-        <button onclick="closeModal('bank-input-modal')" class="modal-btn btn-cancel">取消</button>
-    </div>
-</div>
-
-<div id="bank-history-modal" class="modal"><div class="modal-content" style="height:60vh; display:flex; flex-direction:column;"><h3 class="modal-title">交易明細</h3><div id="bank-history-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('bank-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
-<div id="all-schedule-modal" class="modal"><div class="modal-content" style="height:70vh; display:flex; flex-direction:column;"><h3 class="modal-title">歷史紀錄</h3><div id="all-schedule-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('all-schedule-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
-<div id="settlement-modal" class="modal"><div class="modal-content"><h3 class="modal-title">結算</h3><div style="text-align:center; font-size:36px; font-weight:800; margin-bottom:20px; color:var(--text-main);" id="settlement-timer-display">00:00:00</div>
-    <div class="setup-label">時數</div>
-    <div class="vertical-stack" style="margin-bottom:15px;">
-        <input id="settlement-manual-hours" type="number" inputmode="decimal" placeholder="確認時數">
-        <div class="btn-options"><div class="opt-btn" onclick="setInputValue('settlement-manual-hours', 1.5, this)">1.5</div><div class="opt-btn" onclick="setInputValue('settlement-manual-hours', 2.0, this)">2.0</div><div class="opt-btn" onclick="setInputValue('settlement-manual-hours', 2.5, this)">2.5</div></div>
-    </div>
-    <button onclick="confirmSettlement()" class="modal-btn btn-confirm btn-bubble">確認</button>
-    <button onclick="closeModal('settlement-modal')" class="modal-btn btn-cancel">返回</button>
-</div></div>
-
-<div id="student-history-modal" class="modal"><div class="modal-content modal-stats-content"><h3 id="stu-history-name" class="modal-title"></h3><div style="text-align:center; font-size:36px; font-weight:900; color:var(--accent-primary); margin-bottom:20px;" id="stu-history-total">$0</div><div id="stu-history-list" style="flex:1; overflow-y:auto; margin-bottom:10px; border-top:1px solid #EEE; padding-top:10px;"></div><button id="btn-delete-all-logs" class="modal-btn btn-delete-all btn-bubble" style="background:#FED7D7; color:#E53E3E; margin-top:10px;">🗑 刪除本月所有紀錄</button><button onclick="closeModal('student-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
-
-<!-- V301: Export Calendar Modal -->
-<div id="export-calendar-modal" class="modal">
-    <div class="modal-content" style="height:70vh; display:flex; flex-direction:column;">
-        <h3 class="modal-title">匯出行事曆</h3>
-        <!-- V311: Better Select All Buttons -->
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; gap:12px;">
-             <button class="btn-pill-gray" onclick="toggleAllExport(true)">全選</button>
-             <button class="btn-pill-gray" onclick="toggleAllExport(false)">取消全選</button>
-        </div>
-        <div id="export-list" style="overflow-y:auto; flex:1; border:1px solid #EEE; border-radius:16px; padding:5px;"></div>
-        <button onclick="performExport()" class="modal-btn btn-confirm btn-bubble">匯出選取項目 (.ics)</button>
-        <button onclick="closeModal('export-calendar-modal')" class="modal-btn btn-cancel">取消</button>
-    </div>
-</div>
-
-<!-- V302: Settle Confirm Modal -->
-<div id="settle-confirm-modal" class="modal">
-    <div class="modal-content">
-        <h3 class="modal-title">結算確認</h3>
-        <div style="text-align:center; font-weight:700; color:var(--text-main); margin-bottom:15px; font-size:18px;">上完課了嗎？</div>
-        <div class="settle-info-box">
-            <div id="settle-confirm-name" class="settle-info-big"></div>
-            <div id="settle-confirm-detail" class="settle-info-sub"></div>
-        </div>
-        <div style="text-align:center; color:#E53E3E; font-size:13px; font-weight:700; margin-bottom:20px;">⚠️ 結算後將鎖定編輯</div>
-        <input type="hidden" id="settle-target-ts">
-        <button onclick="performSettle()" class="modal-btn btn-confirm btn-bubble">確認結算 (未收款)</button>
-        <button onclick="closeModal('settle-confirm-modal')" class="modal-btn btn-cancel">取消</button>
-    </div>
-</div>
-
-<div id="profile-modal" class="modal">
-    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-        <h3 class="modal-title">心情日記</h3>
-        <input type="file" id="avatar-upload" style="display:none" onchange="handleAvatarUpload(this)">
-        <div class="sidebar-avatar" id="profile-avatar" onclick="triggerUpload()" style="margin-bottom:10px; margin-left:auto; margin-right:auto;">🧸</div>
-        <div style="text-align:center; margin-bottom:15px; color:#999; font-size:12px;">點擊頭像更換照片</div>
-        <textarea id="mood-input" placeholder="今天發生了什麼好玩的事？" style="height:80px;"></textarea>
-        <button onclick="saveMood()" class="modal-btn btn-confirm btn-bubble">記錄心情</button>
-        <div id="mood-list" style="margin-top:20px; max-height:200px; overflow-y:auto;"></div>
-        <button onclick="closeModal('profile-modal')" class="modal-btn btn-cancel">關閉</button>
-    </div>
-</div>
-
 <script>
     const DB_STU = 'tutor_v10_students';
     const DB_LOG = 'tutor_v15_logs';
@@ -954,20 +722,17 @@
         updateProfileDisplay();
         
         setInterval(updateRunningTimers, 1000);
-        
-        // V326: Global click to cancel edit mode
+
         document.addEventListener('click', (e) => {
-            if(!e.target.closest('.student-wrapper')) {
-                document.querySelectorAll('.student-wrapper.is-editing').forEach(el => {
-                    el.classList.remove('is-editing');
-                });
+            // 如果點擊的地方不是學生頭像，且目前是編輯模式，就解除
+            if(!e.target.closest('.student-wrapper') && !e.target.closest('.delete-x')) {
+                exitEditMode();
             }
             if(!e.target.closest('.swipe-content')) {
                 closeAllSwipes();
             }
         });
-
-        // V301: Initialize Page Swipe Listeners
+               // V301: Initialize Page Swipe Listeners
         const viewport = document.getElementById('main-viewport');
         viewport.addEventListener('touchstart', handlePageTouchStart, {passive: true});
         viewport.addEventListener('touchend', handlePageTouchEnd, {passive: true});
@@ -979,21 +744,57 @@
         }, 1000); // 1 second delay
     };
 
-    // V326: Long Press Logic for Student Deletion
-    function startLongPress(el) {
-        isLongPress = false; // 每次按下去先重置
+    // V331: iOS-style Delete Mode Logic
+    let isEditMode = false; // 標記是否處於編輯(抖動)模式
+
+    function startLongPress() {
+        if (isEditMode) return; // 已經在編輯模式就不用再計時了
+        
         longPressTimer = setTimeout(() => {
             // Vibrate if supported
             if (navigator.vibrate) navigator.vibrate(50);
-            el.classList.add('is-editing');
-            isLongPress = true; // 標記長按已觸發
+            
+            // 觸發全域編輯模式
+            isEditMode = true;
+            isLongPress = true; // 標記這次點擊是長按觸發的，避免觸發 click
+            document.getElementById('student-scroll').classList.add('edit-mode');
         }, 800);
     }
     
     function cancelLongPress() {
-        clearTimeout(longPressTimer); // 手指提早放開，清除計時器
+        // 只有在還沒進入編輯模式前，手指放開才需要清除計時器
+        // 如果已經進入編輯模式，手指放開不應該取消模式
+        clearTimeout(longPressTimer); 
     }
 
+    // 點擊空白處取消編輯模式 (這部分原本就在 window.onload 的 listener 裡，這裡加強判斷)
+    function exitEditMode() {
+        if (isEditMode) {
+            isEditMode = false;
+            document.getElementById('student-scroll').classList.remove('edit-mode');
+        }
+    }
+
+    function renderStudents() { 
+        const div = document.getElementById('student-scroll'); 
+        // 保持 edit-mode 狀態，避免重新渲染後抖動消失
+        if(isEditMode) div.classList.add('edit-mode');
+        else div.classList.remove('edit-mode');
+
+        div.innerHTML = window.students.map((s, idx) => `
+            <div class="student-wrapper" 
+                 onclick="openBatchPlanModal(${idx})" 
+                 onmousedown="startLongPress()" 
+                 ontouchstart="startLongPress()"
+                 onmouseup="cancelLongPress()"
+                 onmouseleave="cancelLongPress()"
+                 ontouchend="cancelLongPress()">
+                <div class="student-chip" style="background:${s.color || '#FFF'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div>
+                <div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div>
+                <div class="chip-name">${s.name}</div>
+            </div>
+        `).join(''); 
+    }  
     // V301: Page Swipe Logic
     function handlePageTouchStart(e) {
         if(e.target.closest('.swipe-content')) return;
@@ -1607,23 +1408,6 @@
     function updateRunningTimers() { window.logs.filter(l => l.status === 'running').forEach(l => { const el = document.getElementById(`timer-${l.ts}`); if (el) { const diff = Date.now() - l.startTime; const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000); el.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; } }); }
     function openSettlementModal(ts) { settlingLogTs = ts; const timerEl = document.getElementById(`timer-${ts}`); document.getElementById('settlement-timer-display').innerText = timerEl ? timerEl.innerText : "00:00:00"; openModalWithAnim('settlement-modal'); }
     function confirmSettlement() { const h = document.getElementById('settlement-manual-hours').value; const log = window.logs.find(l => String(l.ts) === String(settlingLogTs)); if(h && log) { log.status = 'unpaid'; log.hours = h; log.income = Math.round(h * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('settlement-modal'); renderSchedule(); updateAssets(); } }
-   function renderStudents() { 
-        const div = document.getElementById('student-scroll'); 
-        // [修改] 補上 onmouseup, onmouseleave, ontouchend 以便取消長按計時
-        div.innerHTML = window.students.map((s, idx) => `
-            <div class="student-wrapper" 
-                 onclick="openBatchPlanModal(${idx})" 
-                 onmousedown="startLongPress(this)" 
-                 ontouchstart="startLongPress(this)"
-                 onmouseup="cancelLongPress()"
-                 onmouseleave="cancelLongPress()"
-                 ontouchend="cancelLongPress()">
-                <div class="student-chip" style="background:${s.color || '#FFF'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div>
-                <div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div>
-                <div class="chip-name">${s.name}</div>
-            </div>
-        `).join(''); 
-    }
     function addStudent() { const name = document.getElementById('new-name').value; const rate = document.getElementById('new-rate').value; const grade = document.getElementById('new-grade').value; const color = document.getElementById('new-color-val').value; if(!name || !rate || !grade) { const m = document.querySelector('#setup-modal .modal-content'); m.classList.add('shake-error'); setTimeout(() => m.classList.remove('shake-error'), 300); return; } window.students.push({name, rate, grade, color}); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); closeModal('setup-modal'); }
     function selectColor(color, el) { document.getElementById('new-color-val').value = color; document.querySelectorAll('.color-opt').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); }
     function setInputValue(inputId, val, btn) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
@@ -1635,12 +1419,11 @@
             isLongPress = false;
             return;
         }
-        // [新增] 如果該學生正處於編輯模式(抖動中)，點擊也不要開視窗(除非點X)
-        const wrappers = document.querySelectorAll('.student-wrapper');
-        if (wrappers[idx] && wrappers[idx].classList.contains('is-editing')) {
+        // [新增] 如果處於編輯模式(全體抖動中)，點擊頭像不應打開視窗，只能點X刪除
+        if (isEditMode) {
             return;
         }
-
+       
         currentPlanningStuIdx = idx; 
         const s = window.students[idx]; 
         document.getElementById('log-name-display').innerText = s.name; 
@@ -1664,7 +1447,8 @@
     function saveBatchPlan() { const h = document.getElementById('log-hours').value; const subj = document.getElementById('log-subject').value; const note = document.getElementById('log-content-modal').value; const timeVal = document.getElementById('log-time').value; const s = window.students[currentPlanningStuIdx]; if (selectedDates.length === 0) { const pickerDate = document.getElementById('log-date').value; if (pickerDate) selectedDates.push(pickerDate); } if (!h || !subj || selectedDates.length === 0 || !timeVal) { const modalContent = document.querySelector('#log-modal .modal-content'); modalContent.classList.add('shake-error'); setTimeout(() => modalContent.classList.remove('shake-error'), 300); return; } const duplicateDates = selectedDates.filter(date => window.logs.some(l => l.date === date && l.name === s.name)); if(duplicateDates.length > 0) { alert(`⚠️ 注意：${duplicateDates.join(', ')} 已經排過 ${s.name} 的課了！`); selectedDates = selectedDates.filter(date => !duplicateDates.includes(date)); if(selectedDates.length === 0) return; } selectedDates.forEach(date => { window.logs.push({ ts: Date.now() + Math.random(), name: s.name, rate: s.rate, hours: h, subject: subj, content: note, date: date, timeStart: timeVal, status: 'prepared', income: Math.round(h * s.rate) }); }); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); closeModal('log-modal'); updateAssets(); }
     function openEditLogModal(ts) { closeAllSwipes(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; document.getElementById('edit-log-ts').value = log.ts; document.getElementById('edit-log-date').value = log.date; document.getElementById('edit-log-time').value = log.timeStart || ''; document.getElementById('edit-log-hours').value = log.hours; document.getElementById('edit-log-subject').value = log.subject; document.getElementById('edit-log-content').value = log.content || ''; const hoursContainer = document.querySelector('#edit-log-modal .btn-options'); if(hoursContainer) { Array.from(hoursContainer.children).forEach(btn => { if(btn.innerText === String(log.hours)) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } const subjContainer = document.getElementById('edit-subject-group'); if(subjContainer) { Array.from(subjContainer.children).forEach(btn => { if(btn.innerText === log.subject) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } openModalWithAnim('edit-log-modal'); }
     function saveEditedLog() { const ts = document.getElementById('edit-log-ts').value; const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; const newDate = document.getElementById('edit-log-date').value; const newTime = document.getElementById('edit-log-time').value; const newHours = document.getElementById('edit-log-hours').value; if(!newDate || !newHours) { alert('日期和時數為必填'); return; } log.date = newDate; log.timeStart = newTime; log.hours = newHours; log.subject = document.getElementById('edit-log-subject').value; log.content = document.getElementById('edit-log-content').value; log.income = Math.round(newHours * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('edit-log-modal'); updateAssets(); renderSchedule(); if(document.getElementById('all-schedule-modal').classList.contains('active')) { const d = new Date(newDate); const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; openAllScheduleModal(targetMonthKey); } }
- function deleteLog(e, ts) { 
+    
+    function deleteLog(e, ts) { 
         if(e) { e.preventDefault(); e.stopPropagation(); } 
         
         if(confirm('刪除此課程紀錄？')) { 
@@ -2025,4 +1809,3 @@
 </script>
 </body>
 </html>
-```
