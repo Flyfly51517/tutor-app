@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V322 (Restore Mini Green Buttons) -->
+<!-- 家教小本本 V323 (Wider Layout, Maximized Spacing) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V322</title>
+<title>家教小本本 V323</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V322 STYLE --- */
+    /* --- V323 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -33,9 +33,8 @@
         --std-height: 52px; 
         --radius-std: 16px;
         
-        /* V322: Restore Green for List Buttons */
-        --btn-list-bg: #F0FFF4;   /* Pale Green */
-        --btn-list-text: #059669; /* Money Green */
+        --btn-uniform-bg: #F0FFF4;
+        --btn-uniform-text: #059669;
     }
 
     /* Force Fonts everywhere */
@@ -91,7 +90,7 @@
         border-bottom-left-radius: 40px;
         border-bottom-right-radius: 40px;
         padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 15px; 
-        padding-left: 20px; padding-right: 20px;
+        padding-left: 16px; padding-right: 16px; /* Reduced Padding */
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
         display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
     }
@@ -124,7 +123,12 @@
     /* LAYOUT */
     #main-viewport { width: 100vw; overflow: hidden; position: relative; z-index: 1; }
     #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
-    .page { width: 100vw; flex-shrink: 0; padding: 10px 24px 100px 24px; }
+    
+    /* V323: Reduced Page Padding for Wider Content */
+    .page { 
+        width: 100vw; flex-shrink: 0; 
+        padding: 10px 16px 100px 16px; /* 16px side padding */
+    }
     
     .section-header { 
         display: flex; justify-content: space-between; align-items: center; 
@@ -135,7 +139,6 @@
         letter-spacing: 0.5px; text-transform: uppercase; 
         white-space: nowrap; 
     }
-    .section-title { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
     
     .header-action-btn { 
         height: 42px; padding: 0 16px; 
@@ -168,7 +171,15 @@
     }
 
     /* ASSETS */
-    .card { background: var(--card-bg); border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02); }
+    /* V323: Reduced Card Internal Padding for List */
+    .card { 
+        background: var(--card-bg); 
+        border-radius: 28px; 
+        padding: 24px 12px; /* Less side padding (12px) for wider list */
+        margin-bottom: 24px; 
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); 
+        border: 1px solid rgba(0,0,0,0.02); 
+    }
     .asset-card { 
         background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.15) 0%, transparent 60%),
                     linear-gradient(135deg, #2D3748 0%, #E07A5F 100%);
@@ -181,7 +192,8 @@
     .asset-card::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
     .asset-label { font-size: 14px; font-weight: 700; opacity: 0.9; margin-bottom: 8px; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .asset-amount { font-size: 48px; font-weight: 800; color: #FFF; line-height: 1; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    .account-item { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid #EDF2F7; align-items: center; }
+    
+    .account-item { display: flex; justify-content: space-between; padding: 20px 6px; border-bottom: 1px solid #EDF2F7; align-items: center; } /* Adjusted padding */
     .acc-name { font-size: 16px; font-weight: 800; color: var(--text-main); white-space: nowrap; margin-right: 15px; }
     .acc-right { display: flex; flex-direction: column; align-items: flex-end; width: 100%; }
     .acc-val { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
@@ -189,33 +201,10 @@
     .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); }
     
     .month-nav-container { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
-    .month-nav-btn {
-        background: transparent; border: none; font-size: 24px;
-        color: #A0AEC0; cursor: pointer; padding: 0 10px;
-        font-family: 'Urbanist', sans-serif !important;
-        font-weight: 800;
-    }
-    .month-label {
-        font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important;
-        font-size: 18px; font-weight: 800; color: var(--text-main);
-        min-width: 100px; text-align: center;
-    }
-    .est-income-val {
-        font-family: 'Urbanist', sans-serif !important;
-        font-size: 15px;
-        font-weight: 700;
-        color: #A0AEC0 !important;
-        margin-bottom: 4px;
-        text-align: center;
-    }
-    #month-total {
-        font-family: 'Urbanist', sans-serif !important;
-        font-size: 42px;
-        font-weight: 900;
-        color: var(--text-main);
-        line-height: 1.1;
-        text-align: center;
-    }
+    .month-nav-btn { background: transparent; border: none; font-size: 24px; color: #A0AEC0; cursor: pointer; padding: 0 10px; font-family: 'Urbanist', sans-serif !important; font-weight: 800; }
+    .month-label { font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important; font-size: 18px; font-weight: 800; color: var(--text-main); min-width: 100px; text-align: center; }
+    .est-income-val { font-family: 'Urbanist', sans-serif !important; font-size: 15px; font-weight: 700; color: #A0AEC0 !important; margin-bottom: 4px; text-align: center; }
+    #month-total { font-family: 'Urbanist', sans-serif !important; font-size: 42px; font-weight: 900; color: var(--text-main); line-height: 1.1; text-align: center; }
 
     /* SCHEDULE PAGE */
     .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 5px 5px 20px 5px; scrollbar-width: none; }
@@ -389,7 +378,8 @@
     .color-opt { width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.15s; position: relative; }
     .color-opt.selected { transform: scale(1.15); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .color-opt.selected::after { content:'✓'; color:#FFF; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:16px; font-weight:800; }
-    .modal-btn { width: 100%; border: none; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 20px; }
+    .modal-btn { width: 100%; border: none; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 20px; transition:0.2s;}
+    .modal-btn:active { transform: scale(0.98); }
     .btn-confirm { background: var(--text-main); color: #FFF; box-shadow: 0 8px 20px -5px rgba(45, 55, 72, 0.3); }
     .btn-cancel { background: #EDF2F7; color: var(--text-sub); margin-top: 8px; }
     .tag-container { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; margin-bottom: 10px; }
@@ -398,7 +388,7 @@
     /* V321: REFINED LIST LAYOUT FIX (ALIGNED) */
     .swipe-container { 
         position: relative; overflow: hidden; width: 100%; 
-        height: 70px; /* Adjusted height for alignment */
+        height: 70px; /* Adjusted height */
         border-bottom: 1px solid #F0F0F0; 
         background: #FFF; margin-bottom: 0; 
     }
@@ -411,7 +401,9 @@
     .swipe-content { 
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: #FFF; z-index: 2; 
-        display: flex; align-items: center; padding: 0 16px; 
+        display: flex; align-items: center; 
+        /* V323: Maximized side padding */
+        padding: 0 4px; 
         transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28); 
         will-change: transform; 
     }
@@ -458,8 +450,8 @@
     .btn-action-uniform {
         width: 30px; height: 30px; /* Mini Size */
         border-radius: 8px;
-        background: var(--btn-list-bg);
-        color: var(--btn-list-text);
+        background: var(--btn-uniform-bg);
+        color: var(--btn-uniform-text);
         display: flex; align-items: center; justify-content: center;
         font-size: 14px; cursor: pointer; flex-shrink: 0;
         border: none;
@@ -470,8 +462,8 @@
     /* Special fix for the text button to look similar */
     .btn-mini-pay { 
         padding: 0 10px; height: 30px;
-        background: var(--btn-list-bg);
-        color: var(--btn-list-text); 
+        background: var(--btn-uniform-bg);
+        color: var(--btn-uniform-text); 
         border: none; border-radius: 8px; 
         font-size: 12px; font-weight: 800; cursor: pointer; 
         white-space: nowrap; flex-shrink: 0; 
