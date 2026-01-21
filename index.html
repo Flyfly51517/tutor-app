@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V318 (Textarea Focus, Grade Display, Shake Fix, Export Fix) -->
+<!-- 家教小本本 V321 (Green Buttons, Light Gray Income, Aligned Rows) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V318</title>
+<title>家教小本本 V321</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V318 STYLE --- */
+    /* --- V321 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -32,6 +32,10 @@
         --input-border: #E2E8F0;
         --std-height: 52px; 
         --radius-std: 16px;
+        
+        /* V321: Uniform Green Buttons */
+        --btn-uniform-bg: #F0FFF4;  /* Pale Green */
+        --btn-uniform-text: #059669; /* Money Green */
     }
 
     /* Force Fonts everywhere */
@@ -54,13 +58,6 @@
     
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
-    
-    /* V318: SHAKE ANIMATION RESTORED */
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-        20%, 40%, 60%, 80% { transform: translateX(5px); }
-    }
 
     /* SPLASH SCREEN */
     #splash-screen {
@@ -192,10 +189,33 @@
     .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); }
     
     .month-nav-container { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
-    .month-nav-btn { background: transparent; border: none; font-size: 24px; color: #A0AEC0; cursor: pointer; padding: 0 10px; font-family: 'Urbanist', sans-serif !important; font-weight: 800; }
-    .month-label { font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important; font-size: 18px; font-weight: 800; color: var(--text-main); min-width: 100px; text-align: center; }
-    .est-income-val { font-family: 'Urbanist', sans-serif !important; font-size: 15px; font-weight: 700; color: #A0AEC0 !important; margin-bottom: 4px; text-align: center; }
-    #month-total { font-family: 'Urbanist', sans-serif !important; font-size: 42px; font-weight: 900; color: var(--text-main); line-height: 1.1; text-align: center; }
+    .month-nav-btn {
+        background: transparent; border: none; font-size: 24px;
+        color: #A0AEC0; cursor: pointer; padding: 0 10px;
+        font-family: 'Urbanist', sans-serif !important;
+        font-weight: 800;
+    }
+    .month-label {
+        font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important;
+        font-size: 18px; font-weight: 800; color: var(--text-main);
+        min-width: 100px; text-align: center;
+    }
+    .est-income-val {
+        font-family: 'Urbanist', sans-serif !important;
+        font-size: 15px;
+        font-weight: 700;
+        color: #A0AEC0 !important;
+        margin-bottom: 4px;
+        text-align: center;
+    }
+    #month-total {
+        font-family: 'Urbanist', sans-serif !important;
+        font-size: 42px;
+        font-weight: 900;
+        color: var(--text-main);
+        line-height: 1.1;
+        text-align: center;
+    }
 
     /* SCHEDULE PAGE */
     .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 5px 5px 20px 5px; scrollbar-width: none; }
@@ -276,7 +296,6 @@
     .schedule-card.paid .cal-top-btn { background: transparent !important; color: #CBD5E0 !important; border: 1px solid #EDF2F7; }
 
     .note-wrapper { position: relative; flex: 1; margin: 15px 0; }
-    /* V318 FIX: Textarea Focus */
     .inline-note { 
         width: 100%; height: 100%; padding: 20px; border: none; 
         border-radius: 28px; font-size: 16px; font-weight: 500; 
@@ -284,7 +303,7 @@
         background: rgba(255,255,255,0.1); color: #FFF;
     }
     .inline-note:focus {
-        background: rgba(255,255,255,0.2); /* Slight highlight */
+        background: rgba(255,255,255,0.2);
         color: #FFF;
     }
     .inline-note::placeholder { color: rgba(255,255,255,0.6); }
@@ -319,7 +338,6 @@
     .modal.active { opacity: 1; }
     .modal-content { background: #FFF; width: 90%; max-width: 380px; border-radius: 32px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; transition: 0.1s; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
     .modal.active .modal-content { transform: scale(1); }
-    /* V318: SHAKE CLASS */
     .modal-content.shake-error { animation: shake 0.3s ease-in-out; border: 2px solid var(--money-red); }
     .modal-title { font-size: 18px; font-weight: 800; color: var(--text-sub); text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
     #edit-log-modal { z-index: 9100 !important; }
@@ -377,10 +395,11 @@
     .tag-container { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; margin-bottom: 10px; }
     .date-tag-item { background: var(--text-main); color: #FFF; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
 
-    /* SWIPE LIST LAYOUT FIX */
+    /* V321: REFINED LIST LAYOUT FIX (ALIGNED) */
     .swipe-container { 
         position: relative; overflow: hidden; width: 100%; 
-        height: 80px; border-bottom: 1px solid #F0F0F0; 
+        height: 70px; /* Adjusted height for alignment */
+        border-bottom: 1px solid #F0F0F0; 
         background: #FFF; margin-bottom: 0; 
     }
     .swipe-bg-delete { 
@@ -392,56 +411,75 @@
     .swipe-content { 
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: #FFF; z-index: 2; 
-        display: flex; align-items: center; padding: 0 10px; 
+        display: flex; align-items: center; padding: 0 16px; /* More side padding */
         transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28); 
         will-change: transform; 
     }
+    
+    /* V321: Layout Grid for Alignment */
     .list-date { 
-        width: 45px; font-weight: 800; color: #A0AEC0; font-size: 13px; 
-        white-space: nowrap; flex-shrink: 0; text-align: center;
-        display: flex; flex-direction: column; justify-content: center;
-        line-height: 1.3;
+        width: 40px; 
+        display: flex; flex-direction: column; 
+        justify-content: center; align-items: center;
+        margin-right: 15px; /* Spacing between date and name */
+        flex-shrink: 0;
     }
+    .date-num { font-size: 18px; font-weight: 800; color: #A0AEC0; line-height: 1; }
+    .date-week { font-size: 13px; font-weight: 600; color: #CBD5E0; line-height: 1; margin-top: 4px; }
+    
     .list-info { 
         flex: 1; min-width: 0; 
         display: flex; flex-direction: column; 
-        justify-content: center; align-items: flex-start;
-        padding: 0 10px; 
+        justify-content: center;
     }
+    .row-top { display: flex; align-items: center; margin-bottom: 4px; }
+    .row-btm { display: flex; align-items: center; }
+
     .history-name-link { 
         font-size: 16px; font-weight: 800; color: var(--text-main) !important; 
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        display: block; width: 100%; text-align: left;
     }
     .subject-tag {
-        font-size: 12px; color: #718096; background: #EDF2F7;
-        padding: 2px 8px; border-radius: 6px; margin-top: 4px;
-        font-weight: 700; white-space: nowrap; display: inline-block;
-    }
-    .list-right { 
-        display: flex; align-items: center; justify-content: flex-end; 
-        gap: 6px; flex-shrink: 0; 
-    }
-    .list-income { 
-        font-weight: 800; white-space: nowrap; font-size: 15px; 
-        text-align: right; margin-right: 6px; 
-    }
-    .btn-mini-icon { 
-        width: 30px; height: 30px; border-radius: 8px; 
-        background: #EDF2F7; color: var(--text-sub); 
-        display: flex; align-items: center; justify-content: center; 
-        font-size: 14px; cursor: pointer; flex-shrink: 0; 
-    }
-    .btn-mini-icon:active { background: #CBD5E0; }
-    .btn-mini-edit { background: #EBF8FF; color: #4299E1; }
-    .btn-mini-pay { 
-        padding: 6px 12px; background: var(--money-green); 
-        color: #FFF; border: none; border-radius: 10px; 
-        font-size: 12px; font-weight: 800; cursor: pointer; 
-        box-shadow: 0 2px 8px rgba(56, 161, 105, 0.4); 
-        white-space: nowrap; flex-shrink: 0; 
+        font-size: 13px; color: #718096;
+        font-weight: 600; white-space: nowrap;
     }
     
+    .list-right { 
+        display: flex; align-items: center; justify-content: flex-end; 
+        gap: 8px; flex-shrink: 0; margin-left: 10px;
+    }
+    
+    /* V321: Light Gray Income */
+    .list-income { 
+        font-weight: 800; white-space: nowrap; font-size: 15px; 
+        text-align: right; margin-right: 8px; 
+        color: #A0AEC0 !important; /* LIGHT GRAY */
+    }
+    
+    /* V321: Uniform Green Buttons */
+    .btn-action-uniform {
+        width: 36px; height: 36px; 
+        border-radius: 12px;
+        background: var(--btn-uniform-bg);
+        color: var(--btn-uniform-text);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px; cursor: pointer; flex-shrink: 0;
+        border: none;
+    }
+    .btn-action-uniform:active { transform: scale(0.9); background: #C6F6D5; }
+    
+    /* Special fix for the text button to look similar */
+    .btn-mini-pay { 
+        padding: 0 12px; height: 36px;
+        background: var(--btn-uniform-bg);
+        color: var(--btn-uniform-text); 
+        border: none; border-radius: 12px; 
+        font-size: 13px; font-weight: 800; cursor: pointer; 
+        white-space: nowrap; flex-shrink: 0; 
+        display: flex; align-items: center; justify-content: center;
+    }
+    .btn-mini-pay:active { transform: scale(0.95); }
+
     /* V296 FIX: Month header active state */
     .month-group-header { 
         padding: 18px 20px; 
@@ -1087,7 +1125,8 @@
                  if(l.status === 'unpaid') color = 'var(--accent-primary)';
                  if(l.status === 'running') color = '#C95D4E';
 
-                 const dateHTML = `${dayStr}日 <span style="font-size:10px;font-weight:400;color:#CBD5E0;display:block;">${dayName}</span>`;
+                 // V321: Clean Date Format
+                 const dateHTML = `<div class="date-num">${dayStr}</div><div class="date-week">${dayName}</div>`;
                  
                  // V313: Updated Swipe Item Call
                  histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income, null, true); 
@@ -1139,7 +1178,8 @@
                     const dObj = new Date(l.date); 
                     const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()]; 
                     const dayStr = l.date.split('-')[2]; 
-                    const dateHTML = `${dayStr}日 <span style="font-size:10px;font-weight:400;color:#CBD5E0;display:block;">${dayName}</span>`; 
+                    // V321: Clean Date Format
+                    const dateHTML = `<div class="date-num">${dayStr}</div><div class="date-week">${dayName}</div>`;
                     
                     let color = '#AAA'; 
                     if(l.status === 'paid') color = 'var(--money-green)';
@@ -1471,59 +1511,7 @@
     function renderDateTags() { const container = document.getElementById('date-tags'); container.innerHTML = selectedDates.map(date => `<div class="date-tag-item" onclick="removeDateTag('${date}')"><span>${date.slice(5)}</span><span style="font-size:16px;">✕</span></div>`).join(''); }
     function addDateTag() { const d = document.getElementById('log-date').value; if(d && !selectedDates.includes(d)) { selectedDates.push(d); renderDateTags(); } }
     function removeDateTag(date) { selectedDates = selectedDates.filter(d => d !== date); renderDateTags(); }
-    
-    // V318: Updated saveBatchPlan with Validation Shake & Alert
-    function saveBatchPlan() { 
-        const h = document.getElementById('log-hours').value; 
-        const subj = document.getElementById('log-subject').value; 
-        const note = document.getElementById('log-content-modal').value; 
-        const timeVal = document.getElementById('log-time').value; 
-        const s = window.students[currentPlanningStuIdx]; 
-        
-        if (selectedDates.length === 0) { 
-            const pickerDate = document.getElementById('log-date').value; 
-            if (pickerDate) selectedDates.push(pickerDate); 
-        } 
-        
-        // Validation Shake
-        if (!h || !subj || selectedDates.length === 0 || !timeVal) { 
-            const modalContent = document.querySelector('#log-modal .modal-content'); 
-            modalContent.classList.add('shake-error'); 
-            setTimeout(() => modalContent.classList.remove('shake-error'), 500); // Remove class after animation
-            return; 
-        } 
-        
-        const duplicateDates = selectedDates.filter(date => window.logs.some(l => l.date === date && l.name === s.name)); 
-        
-        if(duplicateDates.length > 0) { 
-            // Specific Alert
-            alert(`⚠️ 無法排課！\n\n學生：${s.name}\n日期：${duplicateDates.join(', ')}\n原因：該時段已有課程`); 
-            
-            selectedDates = selectedDates.filter(date => !duplicateDates.includes(date)); 
-            if(selectedDates.length === 0) return; 
-        } 
-        
-        selectedDates.forEach(date => { 
-            window.logs.push({ 
-                ts: Date.now() + Math.random(), 
-                name: s.name, 
-                rate: s.rate, 
-                hours: h, 
-                subject: subj, 
-                content: note, 
-                date: date, 
-                timeStart: timeVal, 
-                status: 'prepared', 
-                income: Math.round(h * s.rate) 
-            }); 
-        }); 
-        
-        localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
-        renderSchedule(); 
-        closeModal('log-modal'); 
-        updateAssets(); 
-    }
-
+    function saveBatchPlan() { const h = document.getElementById('log-hours').value; const subj = document.getElementById('log-subject').value; const note = document.getElementById('log-content-modal').value; const timeVal = document.getElementById('log-time').value; const s = window.students[currentPlanningStuIdx]; if (selectedDates.length === 0) { const pickerDate = document.getElementById('log-date').value; if (pickerDate) selectedDates.push(pickerDate); } if (!h || !subj || selectedDates.length === 0 || !timeVal) { const modalContent = document.querySelector('#log-modal .modal-content'); modalContent.classList.add('shake-error'); setTimeout(() => modalContent.classList.remove('shake-error'), 300); return; } const duplicateDates = selectedDates.filter(date => window.logs.some(l => l.date === date && l.name === s.name)); if(duplicateDates.length > 0) { alert(`⚠️ 注意：${duplicateDates.join(', ')} 已經排過 ${s.name} 的課了！`); selectedDates = selectedDates.filter(date => !duplicateDates.includes(date)); if(selectedDates.length === 0) return; } selectedDates.forEach(date => { window.logs.push({ ts: Date.now() + Math.random(), name: s.name, rate: s.rate, hours: h, subject: subj, content: note, date: date, timeStart: timeVal, status: 'prepared', income: Math.round(h * s.rate) }); }); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); closeModal('log-modal'); updateAssets(); }
     function openEditLogModal(ts) { closeAllSwipes(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; document.getElementById('edit-log-ts').value = log.ts; document.getElementById('edit-log-date').value = log.date; document.getElementById('edit-log-time').value = log.timeStart || ''; document.getElementById('edit-log-hours').value = log.hours; document.getElementById('edit-log-subject').value = log.subject; document.getElementById('edit-log-content').value = log.content || ''; const hoursContainer = document.querySelector('#edit-log-modal .btn-options'); if(hoursContainer) { Array.from(hoursContainer.children).forEach(btn => { if(btn.innerText === String(log.hours)) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } const subjContainer = document.getElementById('edit-subject-group'); if(subjContainer) { Array.from(subjContainer.children).forEach(btn => { if(btn.innerText === log.subject) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } openModalWithAnim('edit-log-modal'); }
     function saveEditedLog() { const ts = document.getElementById('edit-log-ts').value; const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; const newDate = document.getElementById('edit-log-date').value; const newTime = document.getElementById('edit-log-time').value; const newHours = document.getElementById('edit-log-hours').value; if(!newDate || !newHours) { alert('日期和時數為必填'); return; } log.date = newDate; log.timeStart = newTime; log.hours = newHours; log.subject = document.getElementById('edit-log-subject').value; log.content = document.getElementById('edit-log-content').value; log.income = Math.round(newHours * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('edit-log-modal'); updateAssets(); renderSchedule(); if(document.getElementById('all-schedule-modal').classList.contains('active')) { const d = new Date(newDate); const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; openAllScheduleModal(targetMonthKey); } }
     function deleteLog(e, ts) { if(e) { e.preventDefault(); e.stopPropagation(); } if(confirm('刪除此課程紀錄？')) { const targetLog = window.logs.find(l => String(l.ts) === String(ts)); let targetMonthKey = null; if(targetLog) { const d = new Date(targetLog.date); targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; } window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); if(document.getElementById('all-schedule-modal').classList.contains('active')) { openAllScheduleModal(targetMonthKey); } updateAssets(); renderSchedule(); } }
@@ -1533,20 +1521,18 @@
         let actionBtn = ''; const clickYM = specificYM || l.date.slice(0, 7); 
         const containerId = isAssetList ? `swipe-${l.ts}-asset` : `swipe-${l.ts}`;
         
-        const editBtn = `<div class="btn-mini-icon btn-mini-edit btn-bubble" onclick="openEditLogModal('${l.ts}')">✎</div>`; 
-        const calBtn = `<div class="btn-mini-icon btn-bubble" onclick="addToCalendar(event, '${l.ts}')">📅</div>`; 
-        // V302: Trigger Smart Settle Modal
-        const settleBtn = `<div class="btn-mini-icon btn-bubble" style="color:var(--money-green); border:1px solid var(--money-green); background:#F0FFF4;" onclick="openSettleConfirmModal(event, '${l.ts}')">✓</div>`; 
+        const editBtn = `<div class="btn-action-uniform btn-bubble" onclick="openEditLogModal('${l.ts}')">✎</div>`; 
+        const calBtn = `<div class="btn-action-uniform btn-bubble" onclick="addToCalendar(event, '${l.ts}')">📅</div>`; 
+        const settleBtn = `<div class="btn-action-uniform btn-bubble" style="background:#EBF8FF; color:#4299E1; border:none;" onclick="openSettleConfirmModal(event, '${l.ts}')">✔</div>`; 
         
         if(l.status === 'paid') { actionBtn = ''; } 
         else if (l.status === 'unpaid') { 
-            // V302 Requirement: No edit button for settled items
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`; 
         } 
         else if (l.status === 'running') { actionBtn = `<span style="font-size:11px; color:#C95D4E; font-weight:700;">(進行中)</span>`; } 
         else { actionBtn = `${editBtn}${calBtn}${settleBtn}`; } 
         
-        return `<div class="swipe-container" id="${containerId}"><div class="swipe-bg-delete" onclick="deleteLog(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${containerId}')" ontouchmove="handleSwipeMove(event, '${containerId}')" ontouchend="handleSwipeEnd(event, '${containerId}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span><span style="font-size:12px; color:#A0AEC0; margin-top:2px; font-weight:600;">${l.subject || ''}</span></div><div class="list-right"><div class="list-income" style="color:${color}">${l.status === 'paid' ? '+' : ''}$${income}</div>${actionBtn}</div></div></div>`; 
+        return `<div class="swipe-container" id="${containerId}"><div class="swipe-bg-delete" onclick="deleteLog(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${containerId}')" ontouchmove="handleSwipeMove(event, '${containerId}')" ontouchend="handleSwipeEnd(event, '${containerId}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span><span class="subject-tag">${l.subject || '課程'}</span></div><div class="list-right"><div class="list-income" style="color:${color}">${l.status === 'paid' ? '+' : ''}$${income}</div>${actionBtn}</div></div></div>`; 
     }
     
     let listSwipeStartX = 0; let listSwipeCurrentX = 0; let activeSwipeId = null; let isDragging = false;
@@ -1588,7 +1574,7 @@
                  const dObj = new Date(l.date);
                  const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
                  const dayStr = l.date.split('-')[2];
-                 const dateHTML = `${dayStr}日 <span style="font-size:11px;font-weight:400">(${dayName})</span>`;
+                 const dateHTML = `${dayStr} <span class="list-date-day">${dayName}</span>`; 
                  
                  let color = '#AAA'; 
                  if(l.status === 'paid') color = 'var(--money-green)';
