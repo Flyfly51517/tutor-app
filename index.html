@@ -1408,20 +1408,23 @@
     function updateRunningTimers() { window.logs.filter(l => l.status === 'running').forEach(l => { const el = document.getElementById(`timer-${l.ts}`); if (el) { const diff = Date.now() - l.startTime; const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000); el.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; } }); }
     function openSettlementModal(ts) { settlingLogTs = ts; const timerEl = document.getElementById(`timer-${ts}`); document.getElementById('settlement-timer-display').innerText = timerEl ? timerEl.innerText : "00:00:00"; openModalWithAnim('settlement-modal'); }
     function confirmSettlement() { const h = document.getElementById('settlement-manual-hours').value; const log = window.logs.find(l => String(l.ts) === String(settlingLogTs)); if(h && log) { log.status = 'unpaid'; log.hours = h; log.income = Math.round(h * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('settlement-modal'); renderSchedule(); updateAssets(); } }
+    
+    // --- 以下為修復與整理後的輔助函式 (移除重複定義) ---
+
     function addStudent() { const name = document.getElementById('new-name').value; const rate = document.getElementById('new-rate').value; const grade = document.getElementById('new-grade').value; const color = document.getElementById('new-color-val').value; if(!name || !rate || !grade) { const m = document.querySelector('#setup-modal .modal-content'); m.classList.add('shake-error'); setTimeout(() => m.classList.remove('shake-error'), 300); return; } window.students.push({name, rate, grade, color}); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); closeModal('setup-modal'); }
     function selectColor(color, el) { document.getElementById('new-color-val').value = color; document.querySelectorAll('.color-opt').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); }
     function setInputValue(inputId, val, btn) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
     function selectOptionGroup(inputId, val, btn) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
     function deleteStudent(idx) { if(confirm('刪除這位學生？')) { window.students.splice(idx, 1); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); } }
+    
+    // [修復] 排課視窗：加入防止與長按編輯模式衝突的邏輯
     function openBatchPlanModal(idx) { 
-        // [新增] 如果是長按觸發的，消耗掉這個標記並阻止彈窗
         if (isLongPress) {
             isLongPress = false;
             return;
         }
-        // [新增] 如果處於編輯模式(全體抖動中)，點擊頭像不應打開視窗，只能點X刪除
         if (isEditMode) {
-            return;
+            return; // 編輯模式下點擊無效(只能點X)
         }
        
         currentPlanningStuIdx = idx; 
@@ -1441,6 +1444,7 @@
         document.getElementById('log-time').value = ''; 
         openModalWithAnim('log-modal'); 
     }
+
     function renderDateTags() { const container = document.getElementById('date-tags'); container.innerHTML = selectedDates.map(date => `<div class="date-tag-item" onclick="removeDateTag('${date}')"><span>${date.slice(5)}</span><span style="font-size:16px;">✕</span></div>`).join(''); }
     function addDateTag() { const d = document.getElementById('log-date').value; if(d && !selectedDates.includes(d)) { selectedDates.push(d); renderDateTags(); } }
     function removeDateTag(date) { selectedDates = selectedDates.filter(d => d !== date); renderDateTags(); }
@@ -1448,75 +1452,42 @@
     function openEditLogModal(ts) { closeAllSwipes(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; document.getElementById('edit-log-ts').value = log.ts; document.getElementById('edit-log-date').value = log.date; document.getElementById('edit-log-time').value = log.timeStart || ''; document.getElementById('edit-log-hours').value = log.hours; document.getElementById('edit-log-subject').value = log.subject; document.getElementById('edit-log-content').value = log.content || ''; const hoursContainer = document.querySelector('#edit-log-modal .btn-options'); if(hoursContainer) { Array.from(hoursContainer.children).forEach(btn => { if(btn.innerText === String(log.hours)) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } const subjContainer = document.getElementById('edit-subject-group'); if(subjContainer) { Array.from(subjContainer.children).forEach(btn => { if(btn.innerText === log.subject) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } openModalWithAnim('edit-log-modal'); }
     function saveEditedLog() { const ts = document.getElementById('edit-log-ts').value; const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; const newDate = document.getElementById('edit-log-date').value; const newTime = document.getElementById('edit-log-time').value; const newHours = document.getElementById('edit-log-hours').value; if(!newDate || !newHours) { alert('日期和時數為必填'); return; } log.date = newDate; log.timeStart = newTime; log.hours = newHours; log.subject = document.getElementById('edit-log-subject').value; log.content = document.getElementById('edit-log-content').value; log.income = Math.round(newHours * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('edit-log-modal'); updateAssets(); renderSchedule(); if(document.getElementById('all-schedule-modal').classList.contains('active')) { const d = new Date(newDate); const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; openAllScheduleModal(targetMonthKey); } }
     
+    // [修復] 刪除課程邏輯
     function deleteLog(e, ts) { 
         if(e) { e.preventDefault(); e.stopPropagation(); } 
-        
         if(confirm('刪除此課程紀錄？')) { 
-            // 1. 先取得要刪除的資料備份 (為了刷新對應 UI)
             const targetLog = window.logs.find(l => String(l.ts) === String(ts)); 
-            let targetMonthKey = null; 
-            let targetDateStr = null;
-            let targetName = null;
-
+            let targetMonthKey = null, targetDateStr = null, targetName = null;
             if(targetLog) { 
                 const d = new Date(targetLog.date); 
                 targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; 
                 targetDateStr = targetLog.date;
                 targetName = targetLog.name;
             } 
-
-            // 2. 執行刪除
             window.logs = window.logs.filter(l => String(l.ts) !== String(ts)); 
             localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
-
-            // 3. 基礎刷新 (今日列表 & 資產報表 & 側邊欄金額)
-            updateAssets(); 
-            renderSchedule(); 
-
-            // 4. [修復] 若歷史紀錄 Modal 開啟中，刷新該月份
-            if(document.getElementById('all-schedule-modal').classList.contains('active')) { 
-                openAllScheduleModal(targetMonthKey); 
-            } 
-
-            // 5. [修復] 若月曆「當日詳情」Modal 開啟中，刷新該日清單 & 背景月曆點點
-            if(document.getElementById('calendar-day-modal').classList.contains('active') && targetDateStr) {
-                openCalendarDayModal(targetDateStr);
-                renderCalendar();
-            }
-
-            // 6. [修復] 若學生個人統計 Modal 開啟中，刷新列表
+            updateAssets(); renderSchedule(); 
+            if(document.getElementById('all-schedule-modal').classList.contains('active')) openAllScheduleModal(targetMonthKey); 
+            if(document.getElementById('calendar-day-modal').classList.contains('active') && targetDateStr) { openCalendarDayModal(targetDateStr); renderCalendar(); }
             if(document.getElementById('student-history-modal').classList.contains('active') && targetName) {
-                // 判斷當下是否為特定月份檢視 (透過標題判斷)
                 const titleText = document.getElementById('stu-history-name').innerText;
                 const specificYM = titleText.includes('-') ? targetDateStr.slice(0, 7) : null;
                 openStudentMonthStats(targetName, specificYM);
             }
-            
-            // 7. [修復] 若目前在月曆模式，確保紅點即時更新
-            if(isCalendarView) {
-                renderCalendar();
-            }
+            if(isCalendarView) renderCalendar();
         } 
     }
     
-    // Generate Swipe Item
     function generateSwipeItem(l, dateHTML, color, income, specificYM = null, isAssetList = false) { 
         let actionBtn = ''; const clickYM = specificYM || l.date.slice(0, 7); 
         const containerId = isAssetList ? `swipe-${l.ts}-asset` : `swipe-${l.ts}`;
-        
         const editBtn = `<div class="btn-action-uniform btn-bubble" onclick="openEditLogModal('${l.ts}')">✎</div>`; 
         const calBtn = `<div class="btn-action-uniform btn-bubble" onclick="addToCalendar(event, '${l.ts}')">📅</div>`; 
-        // V302: Trigger Smart Settle Modal
         const settleBtn = `<div class="btn-action-uniform btn-bubble" style="background:#EBF8FF; color:#4299E1; border:none;" onclick="openSettleConfirmModal(event, '${l.ts}')">✔</div>`; 
-        
         if(l.status === 'paid') { actionBtn = ''; } 
-        else if (l.status === 'unpaid') { 
-            // V302 Requirement: No edit button for settled items
-            actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`; 
-        } 
+        else if (l.status === 'unpaid') { actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`; } 
         else if (l.status === 'running') { actionBtn = `<span style="font-size:11px; color:#C95D4E; font-weight:700;">(進行中)</span>`; } 
         else { actionBtn = `${editBtn}${calBtn}${settleBtn}`; } 
-        
         return `<div class="swipe-container" id="${containerId}"><div class="swipe-bg-delete" onclick="deleteLog(event, '${l.ts}')">刪除</div><div class="swipe-content" ontouchstart="handleSwipeStart(event, '${containerId}')" ontouchmove="handleSwipeMove(event, '${containerId}')" ontouchend="handleSwipeEnd(event, '${containerId}')"><div class="list-date">${dateHTML}</div><div class="list-info"><span class="history-name-link" onclick="event.stopPropagation(); openStudentMonthStats('${l.name}', '${clickYM}')">${l.name}</span><span class="subject-tag">${l.subject || '課程'}</span></div><div class="list-right"><div class="list-income" style="color:${color}">${l.status === 'paid' ? '+' : ''}$${income}</div>${actionBtn}</div></div></div>`; 
     }
     
@@ -1533,197 +1504,36 @@
         const title = document.getElementById('stu-history-name');
         const totalDisplay = document.getElementById('stu-history-total');
         const delAllBtn = document.getElementById('btn-delete-all-logs');
-
         title.innerText = `${name} - ${specificYM || '總覽'}`;
-        
         let targetLogs = window.logs.filter(l => l.name === name);
-        if(specificYM) {
-             targetLogs = targetLogs.filter(l => l.date.startsWith(specificYM));
-        }
+        if(specificYM) { targetLogs = targetLogs.filter(l => l.date.startsWith(specificYM)); }
         targetLogs.sort((a,b) => new Date(b.date) - new Date(a.date));
-
         let total = 0;
-        targetLogs.forEach(l => {
-             if(l.status === 'paid' || l.status === 'unpaid') total += (parseInt(l.income) || 0);
-        });
+        targetLogs.forEach(l => { if(l.status === 'paid' || l.status === 'unpaid') total += (parseInt(l.income) || 0); });
         totalDisplay.innerText = `$${total.toLocaleString()}`;
-
-        if(targetLogs.length === 0) {
-            list.innerHTML = '<div style="text-align:center;padding:20px;color:#999">無紀錄</div>';
-            delAllBtn.style.display = 'none';
-        } else {
-             delAllBtn.style.display = 'block';
-             delAllBtn.onclick = () => deleteAllStudentLogs(name, specificYM);
-             
-             list.innerHTML = targetLogs.map(l => {
-                 const dObj = new Date(l.date);
-                 const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
-                 const dayStr = l.date.split('-')[2];
-                 const dateHTML = `${dayStr} <span class="list-date-day">${dayName}</span>`; 
-                 
-                 let color = '#AAA'; 
-                 if(l.status === 'paid') color = 'var(--money-green)';
-                 if(l.status === 'unpaid') color = 'var(--accent-primary)';
-                 
-                 return generateSwipeItem(l, dateHTML, color, l.income, specificYM, false); 
-             }).join('');
-        }
+        if(targetLogs.length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#999">無紀錄</div>'; delAllBtn.style.display = 'none'; } 
+        else { delAllBtn.style.display = 'block'; delAllBtn.onclick = () => deleteAllStudentLogs(name, specificYM); list.innerHTML = targetLogs.map(l => { const dObj = new Date(l.date); const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()]; const dayStr = l.date.split('-')[2]; const dateHTML = `${dayStr} <span class="list-date-day">${dayName}</span>`; let color = '#AAA'; if(l.status === 'paid') color = 'var(--money-green)'; if(l.status === 'unpaid') color = 'var(--accent-primary)'; return generateSwipeItem(l, dateHTML, color, l.income, specificYM, false); }).join(''); }
         openModalWithAnim('student-history-modal');
     }
 
     function deleteAllStudentLogs(name, specificYM) {
         const msg = specificYM ? `確定刪除 ${name} 在 ${specificYM} 的所有紀錄嗎？` : `確定刪除 ${name} 的所有紀錄嗎？`;
-        if(confirm(msg)) {
-             window.logs = window.logs.filter(l => {
-                 if(l.name !== name) return true;
-                 if(specificYM && !l.date.startsWith(specificYM)) return true;
-                 return false;
-             });
-             localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
-             closeModal('student-history-modal');
-             updateAssets();
-             renderSchedule();
-             if(document.getElementById('all-schedule-modal').classList.contains('active')) {
-                 openAllScheduleModal();
-             }
-        }
+        if(confirm(msg)) { window.logs = window.logs.filter(l => { if(l.name !== name) return true; if(specificYM && !l.date.startsWith(specificYM)) return true; return false; }); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('student-history-modal'); updateAssets(); renderSchedule(); if(document.getElementById('all-schedule-modal').classList.contains('active')) { openAllScheduleModal(); } }
     }
 
-    // V313 FIX: Ensure Modal Opens
-    function openSettleConfirmModal(e, ts) {
-        if(e) e.stopPropagation();
-        closeAllSwipes();
-        const log = window.logs.find(l => String(l.ts) === String(ts));
-        if(log) {
-            document.getElementById('settle-target-ts').value = ts;
-            document.getElementById('settle-confirm-name').innerText = log.name;
-            document.getElementById('settle-confirm-detail').innerText = `${log.hours}hr • ${log.subject || '課程'}`;
-            openModalWithAnim('settle-confirm-modal');
-        }
-    }
-
-    function performSettle() {
-        const ts = document.getElementById('settle-target-ts').value;
-        const log = window.logs.find(l => String(l.ts) === String(ts));
-        if(log) {
-            log.status = 'unpaid';
-            localStorage.setItem(DB_LOG, JSON.stringify(window.logs));
-            updateAssets();
-            closeModal('settle-confirm-modal');
-            if(document.getElementById('all-schedule-modal').classList.contains('active')) {
-                 const d = new Date(log.date);
-                 const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`;
-                 openAllScheduleModal(targetMonthKey);
-            }
-        }
-    }
-
-    // V303: Edit Name
-    function editProfileName() {
-        const newName = prompt("請輸入您的名字 (例如: Tutor)", profileData.name || "Tutor");
-        if(newName) {
-            profileData.name = newName;
-            localStorage.setItem(DB_PROF, JSON.stringify(profileData));
-            updateProfileDisplay();
-        }
-    }
-
+    function openSettleConfirmModal(e, ts) { if(e) e.stopPropagation(); closeAllSwipes(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(log) { document.getElementById('settle-target-ts').value = ts; document.getElementById('settle-confirm-name').innerText = log.name; document.getElementById('settle-confirm-detail').innerText = `${log.hours}hr • ${log.subject || '課程'}`; openModalWithAnim('settle-confirm-modal'); } }
+    function performSettle() { const ts = document.getElementById('settle-target-ts').value; const log = window.logs.find(l => String(l.ts) === String(ts)); if(log) { log.status = 'unpaid'; localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); updateAssets(); closeModal('settle-confirm-modal'); if(document.getElementById('all-schedule-modal').classList.contains('active')) { const d = new Date(log.date); const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; openAllScheduleModal(targetMonthKey); } } }
+    function editProfileName() { const newName = prompt("請輸入您的名字 (例如: Tutor)", profileData.name || "Tutor"); if(newName) { profileData.name = newName; localStorage.setItem(DB_PROF, JSON.stringify(profileData)); updateProfileDisplay(); } }
     function triggerUpload() { document.getElementById('avatar-upload').click(); }
-    
-    function handleAvatarUpload(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                profileData.avatar = `url(${e.target.result})`;
-                localStorage.setItem(DB_PROF, JSON.stringify(profileData));
-                updateProfileDisplay();
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function updateProfileDisplay() {
-        const avatars = [document.getElementById('sidebar-avatar'), document.getElementById('profile-avatar')];
-        avatars.forEach(el => {
-            if(el) {
-                if(profileData.avatar.startsWith('url')) {
-                    el.style.backgroundImage = profileData.avatar;
-                    el.innerText = '';
-                } else {
-                    el.style.backgroundImage = 'none';
-                    el.innerText = profileData.avatar;
-                }
-            }
-        });
-        document.getElementById('sidebar-name').innerText = profileData.name || "Tutor";
-    }
-
-    function saveMood() {
-        const txt = document.getElementById('mood-input').value;
-        if(!txt) return;
-        const now = new Date();
-        const entry = {
-            date: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`,
-            text: txt,
-            ts: Date.now()
-        };
-        profileData.moods.unshift(entry);
-        localStorage.setItem(DB_PROF, JSON.stringify(profileData));
-        document.getElementById('mood-input').value = '';
-        renderMoods();
-    }
-
-    function renderMoods() {
-        const list = document.getElementById('mood-list');
-        list.innerHTML = (profileData.moods || []).map(m => `
-            <div style="padding:10px; border-bottom:1px solid #EEE;">
-                <div style="font-size:12px; color:#999; margin-bottom:4px;">${m.date}</div>
-                <div style="font-size:14px; color:var(--text-main); font-weight:700;">${m.text}</div>
-            </div>
-        `).join('');
-    }
-
-    function exportData() {
-        const data = {
-            students: window.students,
-            logs: window.logs,
-            bank: window.bankLogs,
-            profile: profileData
-        };
-        const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `tutor_backup_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-
+    function handleAvatarUpload(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { profileData.avatar = `url(${e.target.result})`; localStorage.setItem(DB_PROF, JSON.stringify(profileData)); updateProfileDisplay(); }; reader.readAsDataURL(input.files[0]); } }
+    function updateProfileDisplay() { const avatars = [document.getElementById('sidebar-avatar'), document.getElementById('profile-avatar')]; avatars.forEach(el => { if(el) { if(profileData.avatar.startsWith('url')) { el.style.backgroundImage = profileData.avatar; el.innerText = ''; } else { el.style.backgroundImage = 'none'; el.innerText = profileData.avatar; } } }); document.getElementById('sidebar-name').innerText = profileData.name || "Tutor"; }
+    function saveMood() { const txt = document.getElementById('mood-input').value; if(!txt) return; const now = new Date(); const entry = { date: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`, text: txt, ts: Date.now() }; profileData.moods.unshift(entry); localStorage.setItem(DB_PROF, JSON.stringify(profileData)); document.getElementById('mood-input').value = ''; renderMoods(); }
+    function renderMoods() { const list = document.getElementById('mood-list'); list.innerHTML = (profileData.moods || []).map(m => ` <div style="padding:10px; border-bottom:1px solid #EEE;"> <div style="font-size:12px; color:#999; margin-bottom:4px;">${m.date}</div> <div style="font-size:14px; color:var(--text-main); font-weight:700;">${m.text}</div> </div> `).join(''); }
+    function exportData() { const data = { students: window.students, logs: window.logs, bank: window.bankLogs, profile: profileData }; const blob = new Blob([JSON.stringify(data)], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `tutor_backup_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
     function triggerImport() { document.getElementById('import-file').click(); }
+    function importData(input) { if(input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if(confirm("確定要還原備份資料嗎？現有資料將被覆蓋！")) { if(data.students) localStorage.setItem(DB_STU, JSON.stringify(data.students)); if(data.logs) localStorage.setItem(DB_LOG, JSON.stringify(data.logs)); if(data.bank) localStorage.setItem(DB_BANK, JSON.stringify(data.bank)); if(data.profile) localStorage.setItem(DB_PROF, JSON.stringify(data.profile)); alert("還原成功！"); location.reload(); } } catch(err) { alert("檔案格式錯誤"); } }; reader.readAsText(input.files[0]); } }
     
-    function importData(input) {
-        if(input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if(confirm("確定要還原備份資料嗎？現有資料將被覆蓋！")) {
-                        if(data.students) localStorage.setItem(DB_STU, JSON.stringify(data.students));
-                        if(data.logs) localStorage.setItem(DB_LOG, JSON.stringify(data.logs));
-                        if(data.bank) localStorage.setItem(DB_BANK, JSON.stringify(data.bank));
-                        if(data.profile) localStorage.setItem(DB_PROF, JSON.stringify(data.profile));
-                        alert("還原成功！");
-                        location.reload();
-                    }
-                } catch(err) {
-                    alert("檔案格式錯誤");
-                }
-            };
-            reader.readAsText(input.files[0]);
-        }
-    }
-       // V330: Render Monthly Summary & LINE Button (Fix Time Display)
+    // V330: Render Monthly Summary & LINE Button
     function renderMonthlySummary() {
         const container = document.getElementById('cal-summary-area');
         const y = calViewDate.getFullYear();
@@ -1734,56 +1544,33 @@
         let hasData = false;
 
         window.students.forEach(s => {
-            // 搜尋該學生本月的課程 (prepared=已排課, paid=已付款, unpaid=未付款, running=進行中)
-            // 排除被刪除的紀錄
             const stuLogs = window.logs
                 .filter(l => l.name === s.name && l.date.startsWith(monthPrefix))
                 .sort((a,b) => new Date(a.date) - new Date(b.date));
             
             if(stuLogs.length > 0) {
                 hasData = true;
-                
-                // 顯示日期摘要 (介面用)
-                const dateDisplay = stuLogs.map(l => {
-                    const d = new Date(l.date);
-                    return `${d.getMonth()+1}/${d.getDate()}`;
-                }).join(', ');
-
-                // --- 產生 LINE 訊息內容 ---
+                const dateDisplay = stuLogs.map(l => { const d = new Date(l.date); return `${d.getMonth()+1}/${d.getDate()}`; }).join(', ');
                 let lineMsg = `${s.name}媽媽你好，這個月幫${s.name}排課了，以下是${s.name}這個月的課程：\n`;
                 
                 stuLogs.forEach(l => {
-                    // 計算時間範圍
                     let timeRange = "";
-                    
                     if (l.timeStart) {
                         if (l.hours) {
-                            // 有開始時間 也有 時數 -> 計算結束時間
                             const [h, min] = l.timeStart.split(':').map(Number);
                             const totalMin = h * 60 + min + (parseFloat(l.hours) * 60);
                             const endH = Math.floor(totalMin / 60) % 24;
                             const endM = Math.floor(totalMin % 60);
                             const endTime = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
                             timeRange = `${l.timeStart}-${endTime}`;
-                        } else {
-                            // 只有開始時間
-                            timeRange = `${l.timeStart}`;
-                        }
-                    } else {
-                        timeRange = ""; // 無時間資料
+                        } else { timeRange = `${l.timeStart}`; }
                     }
-                    
-                    // 日期處理 1/10
                     const d = new Date(l.date);
                     const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-                    
-                    // 組合單行: "1/10 數學 17:00-18:00"
                     lineMsg += `${dateStr} ${l.subject || '課程'} ${timeRange}\n`;
                 });
                 
                 lineMsg += `麻煩媽媽再幫我確認一下，課程時間方不方便、有沒有錯誤、或者需要異動的，謝謝。`;
-                
-                // LINE 連結 (使用 encodeURIComponent 確保換行符號正常)
                 const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineMsg)}`;
 
                 summaryHTML += `
