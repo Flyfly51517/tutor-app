@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V320 (Uniform Buttons, Gray Income, Clean Date) -->
+<!-- 家教小本本 V322 (Restore Mini Green Buttons) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V320</title>
+<title>家教小本本 V322</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V320 STYLE --- */
+    /* --- V322 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -33,9 +33,9 @@
         --std-height: 52px; 
         --radius-std: 16px;
         
-        /* V320: Uniform Button Colors */
-        --btn-uniform-bg: #EBF8FF;
-        --btn-uniform-text: #4299E1; /* Blue */
+        /* V322: Restore Green for List Buttons */
+        --btn-list-bg: #F0FFF4;   /* Pale Green */
+        --btn-list-text: #059669; /* Money Green */
     }
 
     /* Force Fonts everywhere */
@@ -377,7 +377,7 @@
     #bank-amount { border: none; background: transparent; font-size: 48px; text-align: center; height: auto; border-radius: 0; padding: 20px 0; font-family: 'Urbanist', sans-serif; }
     #bank-amount::placeholder { color: #E2E8F0; }
     .btn-options { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; align-items: center; width: 100%; }
-    .opt-btn { padding: 0 16px; background: #FFF; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer; border: 2px solid #EDF2F7; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .opt-btn { padding: 0 16px; background: #FFF; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer; border: 2px solid #EDF2F7; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
     .opt-btn.selected { background: var(--text-main); color: #FFF; border-color: var(--text-main); }
     .btn-pill-gray { flex: 1; height: 40px; border-radius: 20px; background: #EDF2F7; color: #4A5568; border: none; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
     .btn-pill-gray:active { background: #CBD5E0; transform: scale(0.98); }
@@ -395,10 +395,11 @@
     .tag-container { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; margin-bottom: 10px; }
     .date-tag-item { background: var(--text-main); color: #FFF; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
 
-    /* V320: UNIFIED BUTTON STYLES FOR LIST ITEMS */
+    /* V321: REFINED LIST LAYOUT FIX (ALIGNED) */
     .swipe-container { 
         position: relative; overflow: hidden; width: 100%; 
-        height: 80px; border-bottom: 1px solid #F0F0F0; 
+        height: 70px; /* Adjusted height for alignment */
+        border-bottom: 1px solid #F0F0F0; 
         background: #FFF; margin-bottom: 0; 
     }
     .swipe-bg-delete { 
@@ -410,75 +411,69 @@
     .swipe-content { 
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: #FFF; z-index: 2; 
-        display: flex; align-items: center; padding: 0 10px; 
+        display: flex; align-items: center; padding: 0 16px; 
         transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28); 
         will-change: transform; 
     }
     
-    /* V320: Clean Date Format */
+    /* V321: Layout Grid for Alignment */
     .list-date { 
-        width: 45px; 
-        font-weight: 800; color: #A0AEC0; 
-        font-size: 16px; /* Larger day number */
-        white-space: nowrap; flex-shrink: 0; text-align: center;
-        display: flex; flex-direction: column; justify-content: center;
-        line-height: 1.1;
+        width: 40px; 
+        display: flex; flex-direction: column; 
+        justify-content: center; align-items: center;
+        margin-right: 15px; 
+        flex-shrink: 0;
     }
-    .list-date-day {
-        font-size: 12px;
-        color: #CBD5E0;
-        font-weight: 600;
-        margin-top: 2px;
-    }
+    .date-num { font-size: 18px; font-weight: 800; color: #A0AEC0; line-height: 1; }
+    .date-week { font-size: 13px; font-weight: 600; color: #CBD5E0; line-height: 1; margin-top: 4px; }
     
     .list-info { 
         flex: 1; min-width: 0; 
         display: flex; flex-direction: column; 
-        justify-content: center; align-items: flex-start;
-        padding: 0 10px; 
+        justify-content: center;
     }
+    
     .history-name-link { 
         font-size: 16px; font-weight: 800; color: var(--text-main) !important; 
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        display: block; width: 100%; text-align: left;
     }
     .subject-tag {
-        font-size: 12px; color: #718096; background: #EDF2F7;
-        padding: 2px 8px; border-radius: 6px; margin-top: 4px;
-        font-weight: 700; white-space: nowrap; display: inline-block;
+        font-size: 13px; color: #718096;
+        font-weight: 600; white-space: nowrap; margin-top: 2px;
     }
+    
     .list-right { 
         display: flex; align-items: center; justify-content: flex-end; 
-        gap: 8px; /* Increased gap */
-        flex-shrink: 0; 
+        gap: 8px; flex-shrink: 0; margin-left: 10px;
     }
     
-    /* V320: Unified Gray Income */
+    /* V321: Light Gray Income */
     .list-income { 
         font-weight: 800; white-space: nowrap; font-size: 15px; 
-        text-align: right; margin-right: 6px; 
-        color: var(--text-main) !important; /* Force Gray */
+        text-align: right; margin-right: 8px; 
+        color: #A0AEC0 !important; /* LIGHT GRAY */
     }
     
-    /* V320: Unified Button Styles */
+    /* V322: MINI GREEN BUTTONS (30px) */
     .btn-action-uniform {
-        width: 36px; height: 36px; /* Standard size */
-        border-radius: 12px;
-        background: var(--btn-uniform-bg);
-        color: var(--btn-uniform-text);
+        width: 30px; height: 30px; /* Mini Size */
+        border-radius: 8px;
+        background: var(--btn-list-bg);
+        color: var(--btn-list-text);
         display: flex; align-items: center; justify-content: center;
-        font-size: 16px; cursor: pointer; flex-shrink: 0;
+        font-size: 14px; cursor: pointer; flex-shrink: 0;
         border: none;
+        transition: 0.1s;
     }
-    .btn-action-uniform:active { transform: scale(0.9); background: #CBD5E0; }
+    .btn-action-uniform:active { transform: scale(0.9); background: #C6F6D5; }
     
     /* Special fix for the text button to look similar */
     .btn-mini-pay { 
-        padding: 0 12px; height: 36px;
-        background: var(--btn-uniform-bg);
-        color: var(--btn-uniform-text); 
-        border: none; border-radius: 12px; 
-        font-size: 13px; font-weight: 800; cursor: pointer; 
+        padding: 0 10px; height: 30px;
+        background: var(--btn-list-bg);
+        color: var(--btn-list-text); 
+        border: none; border-radius: 8px; 
+        font-size: 12px; font-weight: 800; cursor: pointer; 
         white-space: nowrap; flex-shrink: 0; 
         display: flex; align-items: center; justify-content: center;
     }
@@ -1129,9 +1124,10 @@
                  if(l.status === 'unpaid') color = 'var(--accent-primary)';
                  if(l.status === 'running') color = '#C95D4E';
 
-                 const dateHTML = `${dayStr} <span class="list-date-day">${dayName}</span>`; // V320: Clean Date
+                 // V321: Clean Date Format
+                 const dateHTML = `<div class="date-num">${dayStr}</div><div class="date-week">${dayName}</div>`;
                  
-                 // V313: Updated Swipe Item Call
+                 // V322: Restore Mini Buttons for Asset List
                  histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income, null, true); 
             });
         }
@@ -1181,7 +1177,8 @@
                     const dObj = new Date(l.date); 
                     const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()]; 
                     const dayStr = l.date.split('-')[2]; 
-                    const dateHTML = `${dayStr} <span class="list-date-day">${dayName}</span>`; 
+                    // V321: Clean Date Format
+                    const dateHTML = `<div class="date-num">${dayStr}</div><div class="date-week">${dayName}</div>`;
                     
                     let color = '#AAA'; 
                     if(l.status === 'paid') color = 'var(--money-green)';
@@ -1523,13 +1520,14 @@
         let actionBtn = ''; const clickYM = specificYM || l.date.slice(0, 7); 
         const containerId = isAssetList ? `swipe-${l.ts}-asset` : `swipe-${l.ts}`;
         
-        // V320: Uniform Blue Buttons
         const editBtn = `<div class="btn-action-uniform btn-bubble" onclick="openEditLogModal('${l.ts}')">✎</div>`; 
         const calBtn = `<div class="btn-action-uniform btn-bubble" onclick="addToCalendar(event, '${l.ts}')">📅</div>`; 
+        // V302: Trigger Smart Settle Modal
         const settleBtn = `<div class="btn-action-uniform btn-bubble" style="background:#EBF8FF; color:#4299E1; border:none;" onclick="openSettleConfirmModal(event, '${l.ts}')">✔</div>`; 
         
         if(l.status === 'paid') { actionBtn = ''; } 
         else if (l.status === 'unpaid') { 
+            // V302 Requirement: No edit button for settled items
             actionBtn = `<button class="btn-mini-pay btn-bubble" onclick="markAsPaid(event, '${l.ts}')">💰 收款</button>`; 
         } 
         else if (l.status === 'running') { actionBtn = `<span style="font-size:11px; color:#C95D4E; font-weight:700;">(進行中)</span>`; } 
@@ -1607,7 +1605,7 @@
         }
     }
 
-    // V302: Open Settle Confirm Modal
+    // V313 FIX: Ensure Modal Opens
     function openSettleConfirmModal(e, ts) {
         if(e) e.stopPropagation();
         closeAllSwipes();
@@ -1620,7 +1618,6 @@
         }
     }
 
-    // V302: Perform Settle Action
     function performSettle() {
         const ts = document.getElementById('settle-target-ts').value;
         const log = window.logs.find(l => String(l.ts) === String(ts));
