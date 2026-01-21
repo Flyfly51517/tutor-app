@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V325 (Font Enforcement & Layout Stabilization) -->
+<!-- 家教小本本 V326 (Holiday Mode, Long Press Fix, Text Select) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V325</title>
+<title>家教小本本 V326</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V325 STYLE --- */
+    /* --- V326 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -35,11 +35,21 @@
         
         --btn-list-bg: #F0FFF4;
         --btn-list-text: #059669;
+        
+        /* V326: Holiday Colors */
+        --holiday-bg: #FFF5F5;
+        --holiday-text: #E53E3E;
     }
 
-    /* V325: STRICT FONT ENFORCEMENT */
-    html, body, button, input, textarea, select, div, span, h1, h2, h3, li, ul { 
+    /* V326: Allow text selection in inputs, disable elsewhere */
+    html, body, div, span, button { 
         font-family: "Urbanist", "Noto Sans TC", sans-serif !important; 
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    input, textarea {
+        user-select: text !important;
+        -webkit-user-select: text !important;
     }
 
     html { background-color: var(--bg-color); }
@@ -208,18 +218,44 @@
     }
     .student-wrapper:active .student-chip { transform: scale(0.95); }
     .chip-name { font-size: 13px; font-weight: 700; color: var(--text-main); text-align: center; width: 100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .delete-x { position: absolute; top: 0; right: 0; width: 24px; height: 24px; background: var(--money-red); color: #FFF; border-radius: 50%; display: none; justify-content: center; align-items: center; font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; }
+    
+    /* V326: Delete Button & Animation */
+    .delete-x { 
+        position: absolute; top: 0; right: 0; 
+        width: 24px; height: 24px; 
+        background: var(--money-red); color: #FFF; 
+        border-radius: 50%; 
+        display: none; /* Hidden by default */
+        justify-content: center; align-items: center; 
+        font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; 
+    }
     .is-editing .delete-x { display: flex; }
-    .is-editing .student-chip { animation: shake 0.3s infinite; }
+    .is-editing .student-chip { animation: shake 0.2s infinite; }
+    @keyframes shake {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(2deg); }
+        75% { transform: rotate(-2deg); }
+        100% { transform: rotate(0deg); }
+    }
 
     /* CALENDAR */
     #calendar-container { display: none; background: #FFF; border-radius: 32px; padding: 20px; box-shadow: var(--shadow-card); }
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 800; font-size: 18px; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
     .cal-day-label { font-size: 12px; color: #CBD5E0; font-weight: 700; margin-bottom: 10px; }
+    
+    /* V326: Holiday Styling */
     .cal-cell { height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; border: 2px solid transparent; position: relative; }
     .cal-cell.today { background: #F7FAFC; color: var(--accent-primary); }
     .cal-cell.selected { border-color: var(--text-main); }
+    .cal-cell.holiday { background-color: var(--holiday-bg); color: var(--holiday-text); } /* Holiday Style */
+    
+    .holiday-label {
+        position: absolute; bottom: 2px; right: 4px;
+        font-size: 10px; color: var(--holiday-text); font-weight: 800;
+        opacity: 0.6;
+    }
+
     .cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); margin-top: 4px; }
     .cal-dot.paid { background: var(--money-green); }
 
@@ -787,14 +823,7 @@
     </div>
 </div>
 
-<div id="bank-history-modal" class="modal">
-    <div class="modal-content" style="height:60vh; display:flex; flex-direction:column;">
-        <h3 class="modal-title">交易明細</h3>
-        <div id="bank-history-list" style="overflow-y:auto; flex:1;"></div>
-        <button onclick="closeModal('bank-history-modal')" class="modal-btn btn-cancel">關閉</button>
-    </div>
-</div>
-
+<div id="bank-history-modal" class="modal"><div class="modal-content" style="height:60vh; display:flex; flex-direction:column;"><h3 class="modal-title">交易明細</h3><div id="bank-history-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('bank-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 <div id="all-schedule-modal" class="modal"><div class="modal-content" style="height:70vh; display:flex; flex-direction:column;"><h3 class="modal-title">歷史紀錄</h3><div id="all-schedule-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('all-schedule-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 <div id="settlement-modal" class="modal"><div class="modal-content"><h3 class="modal-title">結算</h3><div style="text-align:center; font-size:36px; font-weight:800; margin-bottom:20px; color:var(--text-main);" id="settlement-timer-display">00:00:00</div>
     <div class="setup-label">時數</div>
@@ -882,6 +911,7 @@
     // V301: Swipe Variables
     let pageTouchStartX = 0;
     let pageTouchStartY = 0;
+    let longPressTimer; // V326: Timer variable
 
     function safeLoad(key, defaultVal) {
         try { return JSON.parse(localStorage.getItem(key)) || defaultVal; } 
@@ -901,7 +931,13 @@
         
         setInterval(updateRunningTimers, 1000);
         
+        // V326: Global click to cancel edit mode
         document.addEventListener('click', (e) => {
+            if(!e.target.closest('.student-wrapper')) {
+                document.querySelectorAll('.student-wrapper.is-editing').forEach(el => {
+                    el.classList.remove('is-editing');
+                });
+            }
             if(!e.target.closest('.swipe-content')) {
                 closeAllSwipes();
             }
@@ -918,6 +954,19 @@
             splash.classList.add('hidden');
         }, 1000); // 1 second delay
     };
+
+    // V326: Long Press Logic for Student Deletion
+    function startLongPress(el) {
+        longPressTimer = setTimeout(() => {
+            // Vibrate if supported
+            if (navigator.vibrate) navigator.vibrate(50);
+            el.classList.add('is-editing');
+        }, 800);
+    }
+    
+    function cancelLongPress() {
+        clearTimeout(longPressTimer);
+    }
 
     // V301: Page Swipe Logic
     function handlePageTouchStart(e) {
@@ -1255,15 +1304,24 @@
             const dayLogs = window.logs.filter(l => l.date === dateStr);
             const isToday = new Date().toDateString() === new Date(y, m, d).toDateString();
             
-            let dotsHtml = '';
-            dayLogs.forEach(l => {
-                const dotClass = l.status === 'paid' ? 'cal-dot paid' : 'cal-dot';
-                dotsHtml += `<div class="${dotClass}"></div>`;
-            });
+            // V326: Holiday Logic
+            let cellContent = `<span>${d}</span><div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center;">`;
+            let cellClass = `cal-cell ${isToday?'today':''}`;
+            
+            if(dayLogs.length === 0) {
+                cellClass += ' holiday'; // Add Holiday Class
+                cellContent += `<div class="holiday-label">假</div>`;
+            } else {
+                dayLogs.forEach(l => {
+                    const dotClass = l.status === 'paid' ? 'cal-dot paid' : 'cal-dot';
+                    cellContent += `<div class="${dotClass}"></div>`;
+                });
+            }
+            cellContent += `</div>`;
 
             const cell = document.createElement('div');
-            cell.className = `cal-cell ${isToday?'today':''}`;
-            cell.innerHTML = `<span>${d}</span><div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center;">${dotsHtml}</div>`;
+            cell.className = cellClass;
+            cell.innerHTML = cellContent;
             // V302: Open Detail Modal instead of alert
             cell.onclick = () => {
                 openCalendarDayModal(dateStr);
@@ -1281,7 +1339,7 @@
         const dayLogs = window.logs.filter(l => l.date === dateStr).sort((a,b) => (a.timeStart||'').localeCompare(b.timeStart||''));
         
         if(dayLogs.length === 0) {
-            listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">無課程</div>';
+            listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#E53E3E; font-weight:700;">🌴 今日休假</div>';
         } else {
             listDiv.innerHTML = dayLogs.map(l => `
                 <div class="day-detail-card">
@@ -1500,7 +1558,7 @@
     function updateRunningTimers() { window.logs.filter(l => l.status === 'running').forEach(l => { const el = document.getElementById(`timer-${l.ts}`); if (el) { const diff = Date.now() - l.startTime; const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000); el.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; } }); }
     function openSettlementModal(ts) { settlingLogTs = ts; const timerEl = document.getElementById(`timer-${ts}`); document.getElementById('settlement-timer-display').innerText = timerEl ? timerEl.innerText : "00:00:00"; openModalWithAnim('settlement-modal'); }
     function confirmSettlement() { const h = document.getElementById('settlement-manual-hours').value; const log = window.logs.find(l => String(l.ts) === String(settlingLogTs)); if(h && log) { log.status = 'unpaid'; log.hours = h; log.income = Math.round(h * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('settlement-modal'); renderSchedule(); updateAssets(); } }
-    function renderStudents() { const div = document.getElementById('student-scroll'); div.innerHTML = window.students.map((s, idx) => `<div class="student-wrapper" onclick="openBatchPlanModal(${idx})" onmousedown="startLongPress(this)" ontouchstart="startLongPress(this)"><div class="student-chip" style="background:${s.color || '#FFF'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div><div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div><div class="chip-name">${s.name}</div></div>`).join(''); }
+    function renderStudents() { const div = document.getElementById('student-scroll'); div.innerHTML = window.students.map((s, idx) => `<div class="student-wrapper" onclick="openBatchPlanModal(${idx})" onmousedown="startLongPress(this)" ontouchstart="startLongPress(this)" onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()" ontouchend="cancelLongPress()"><div class="student-chip" style="background:${s.color || '#FFF'}; border-color:${s.color || '#FFF'}">${s.name[0]}</div><div class="delete-x" onclick="event.stopPropagation(); deleteStudent(${idx})">×</div><div class="chip-name">${s.name}</div></div>`).join(''); }
     function addStudent() { const name = document.getElementById('new-name').value; const rate = document.getElementById('new-rate').value; const grade = document.getElementById('new-grade').value; const color = document.getElementById('new-color-val').value; if(!name || !rate || !grade) { const m = document.querySelector('#setup-modal .modal-content'); m.classList.add('shake-error'); setTimeout(() => m.classList.remove('shake-error'), 300); return; } window.students.push({name, rate, grade, color}); localStorage.setItem(DB_STU, JSON.stringify(window.students)); renderStudents(); closeModal('setup-modal'); }
     function selectColor(color, el) { document.getElementById('new-color-val').value = color; document.querySelectorAll('.color-opt').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); }
     function setInputValue(inputId, val, btn) { document.getElementById(inputId).value = val; Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); }
