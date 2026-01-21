@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V324 (Fix Slider Ghosting & Fonts) -->
+<!-- 家教小本本 V325 (Font Enforcement & Layout Stabilization) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +9,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V324</title>
+<title>家教小本本 V325</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- V324 STYLE --- */
+    /* --- V325 STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -33,12 +33,12 @@
         --std-height: 52px; 
         --radius-std: 16px;
         
-        --btn-uniform-bg: #F0FFF4;
-        --btn-uniform-text: #059669;
+        --btn-list-bg: #F0FFF4;
+        --btn-list-text: #059669;
     }
 
-    /* Force Fonts everywhere */
-    html, body, button, input, textarea, select, div, span, h1, h2, h3, h4, h5, h6 { 
+    /* V325: STRICT FONT ENFORCEMENT */
+    html, body, button, input, textarea, select, div, span, h1, h2, h3, li, ul { 
         font-family: "Urbanist", "Noto Sans TC", sans-serif !important; 
     }
 
@@ -46,9 +46,10 @@
 
     body { 
         background-color: var(--bg-color); margin: 0; padding: 0; 
-        padding-bottom: 40px; overflow-x: hidden; width: 100%; 
+        padding-bottom: 40px; overflow-x: hidden; width: 100vw; 
         color: var(--text-main); min-height: 100vh;
         overscroll-behavior-y: none;
+        -webkit-font-smoothing: antialiased;
         padding-top: 140px !important;
     }
 
@@ -119,35 +120,21 @@
     .sidebar-item { padding: 18px; border-radius: 22px; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: var(--text-main); background: rgba(255, 255, 255, 0.6); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.6); }
     .sidebar-item:active { transform: scale(0.98); background: #FFF; }
 
-    /* LAYOUT - V324 Fix: Percentage based to avoid ghosting */
-    #main-viewport { width: 100%; overflow: hidden; position: relative; z-index: 1; }
-    #page-slider { 
-        display: flex; 
-        width: 200%; /* Changed from 200vw for stability */
-        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
-        transform: translateX(0); 
-    }
-    .page { 
-        width: 50%; /* 50% of 200% = 100% of viewport */
-        flex-shrink: 0; 
-        padding: 10px 16px 100px 16px; 
-    }
+    /* LAYOUT */
+    #main-viewport { width: 100vw; overflow: hidden; position: relative; z-index: 1; }
+    #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
+    .page { width: 100vw; flex-shrink: 0; padding: 10px 16px 100px 16px; }
     
     .section-header { 
         display: flex; justify-content: space-between; align-items: center; 
         margin-bottom: 20px; padding: 0 4px; gap: 10px; 
     }
-    
-    /* V324: Fixed Font & Weight */
-    #today-title-display, .section-title { 
-        font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important;
-        font-size: 13px; 
-        font-weight: 800 !important; 
-        color: var(--text-sub); 
-        letter-spacing: 1.5px; 
-        text-transform: uppercase; 
+    #today-title-display { 
+        font-size: 13px; font-weight: 800; color: var(--text-sub); 
+        letter-spacing: 0.5px; text-transform: uppercase; 
         white-space: nowrap; 
     }
+    .section-title { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
     
     .header-action-btn { 
         height: 42px; padding: 0 16px; 
@@ -201,33 +188,10 @@
     .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); }
     
     .month-nav-container { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
-    .month-nav-btn {
-        background: transparent; border: none; font-size: 24px;
-        color: #A0AEC0; cursor: pointer; padding: 0 10px;
-        font-family: 'Urbanist', sans-serif !important;
-        font-weight: 800;
-    }
-    .month-label {
-        font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important;
-        font-size: 18px; font-weight: 800; color: var(--text-main);
-        min-width: 100px; text-align: center;
-    }
-    .est-income-val {
-        font-family: 'Urbanist', sans-serif !important;
-        font-size: 15px;
-        font-weight: 700;
-        color: #A0AEC0 !important;
-        margin-bottom: 4px;
-        text-align: center;
-    }
-    #month-total {
-        font-family: 'Urbanist', sans-serif !important;
-        font-size: 42px;
-        font-weight: 900;
-        color: var(--text-main);
-        line-height: 1.1;
-        text-align: center;
-    }
+    .month-nav-btn { background: transparent; border: none; font-size: 24px; color: #A0AEC0; cursor: pointer; padding: 0 10px; font-family: 'Urbanist', sans-serif !important; font-weight: 800; }
+    .month-label { font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important; font-size: 18px; font-weight: 800; color: var(--text-main); min-width: 100px; text-align: center; }
+    .est-income-val { font-family: 'Urbanist', sans-serif !important; font-size: 15px; font-weight: 700; color: #A0AEC0 !important; margin-bottom: 4px; text-align: center; }
+    #month-total { font-family: 'Urbanist', sans-serif !important; font-size: 42px; font-weight: 900; color: var(--text-main); line-height: 1.1; text-align: center; }
 
     /* SCHEDULE PAGE */
     .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 5px 5px 20px 5px; scrollbar-width: none; }
@@ -471,8 +435,8 @@
     .btn-action-uniform {
         width: 30px; height: 30px; /* Mini Size */
         border-radius: 8px;
-        background: var(--btn-uniform-bg);
-        color: var(--btn-uniform-text);
+        background: var(--btn-list-bg);
+        color: var(--btn-list-text);
         display: flex; align-items: center; justify-content: center;
         font-size: 14px; cursor: pointer; flex-shrink: 0;
         border: none;
@@ -483,14 +447,28 @@
     /* Special fix for the text button to look similar */
     .btn-mini-pay { 
         padding: 0 10px; height: 30px;
-        background: var(--btn-uniform-bg);
-        color: var(--btn-uniform-text); 
+        background: var(--btn-list-bg);
+        color: var(--btn-list-text); 
         border: none; border-radius: 8px; 
         font-size: 12px; font-weight: 800; cursor: pointer; 
         white-space: nowrap; flex-shrink: 0; 
         display: flex; align-items: center; justify-content: center;
     }
     .btn-mini-pay:active { transform: scale(0.95); }
+    
+    /* V325: TRANSACTION MODAL FIX */
+    .trans-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 0; border-bottom: 1px solid #F0F0F0;
+    }
+    .trans-date {
+        font-size: 15px; font-weight: 700; color: #718096;
+        white-space: nowrap; font-family: 'Urbanist', sans-serif !important;
+    }
+    .trans-amount {
+        font-size: 16px; font-weight: 800; text-align: right;
+        font-family: 'Urbanist', sans-serif !important;
+    }
 
     /* V296 FIX: Month header active state */
     .month-group-header { 
@@ -809,7 +787,14 @@
     </div>
 </div>
 
-<div id="bank-history-modal" class="modal"><div class="modal-content" style="height:60vh; display:flex; flex-direction:column;"><h3 class="modal-title">交易明細</h3><div id="bank-history-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('bank-history-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
+<div id="bank-history-modal" class="modal">
+    <div class="modal-content" style="height:60vh; display:flex; flex-direction:column;">
+        <h3 class="modal-title">交易明細</h3>
+        <div id="bank-history-list" style="overflow-y:auto; flex:1;"></div>
+        <button onclick="closeModal('bank-history-modal')" class="modal-btn btn-cancel">關閉</button>
+    </div>
+</div>
+
 <div id="all-schedule-modal" class="modal"><div class="modal-content" style="height:70vh; display:flex; flex-direction:column;"><h3 class="modal-title">歷史紀錄</h3><div id="all-schedule-list" style="overflow-y:auto; flex:1;"></div><button onclick="closeModal('all-schedule-modal')" class="modal-btn btn-cancel">關閉</button></div></div>
 <div id="settlement-modal" class="modal"><div class="modal-content"><h3 class="modal-title">結算</h3><div style="text-align:center; font-size:36px; font-weight:800; margin-bottom:20px; color:var(--text-main);" id="settlement-timer-display">00:00:00</div>
     <div class="setup-label">時數</div>
@@ -972,7 +957,7 @@
         const slider = document.getElementById('page-slider');
         const titles = ["排課系統", "資產報表"];
         document.getElementById('header-title').innerText = titles[idx];
-        slider.style.transform = `translateX(-${idx * 100}vw)`; // 100vw is safe for translation
+        slider.style.transform = `translateX(-${idx * 100}vw)`;
         const dots = document.querySelectorAll('.dot');
         dots.forEach((d, i) => d.classList.toggle('active', i === idx));
         if(idx === 1) {
@@ -1052,6 +1037,7 @@
         }
     }
     
+    // V325: Bank History Logic Fix
     function openBankHistory(id) { 
         const sortedLogs = window.bankLogs.filter(b => b.accountId === id).sort((a,b) => new Date(b.date) - new Date(a.date)); 
         const listDiv = document.getElementById('bank-history-list');
@@ -1059,10 +1045,11 @@
         if(sortedLogs.length === 0) {
             listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">無交易紀錄</div>';
         } else {
+            // V325: Updated HTML structure for nice font and layout
             listDiv.innerHTML = sortedLogs.map(b => `
-                <div class="list-item">
-                    <div class="list-date" style="width:80px;">${b.date}</div>
-                    <div style="flex:1; text-align:right; font-weight:700; color:${b.type==='deposit'?'var(--money-green)':'var(--money-red)'}">
+                <div class="trans-item">
+                    <div class="trans-date">${b.date}</div>
+                    <div class="trans-amount" style="color:${b.type==='deposit'?'var(--money-green)':'var(--money-red)'}">
                         ${b.type==='deposit'?'+':'-'}$${b.amount}
                     </div>
                 </div>`).join('');
