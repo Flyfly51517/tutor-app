@@ -1,6 +1,9 @@
+這是一個 **CSS 版面配置衝突** 的問題。
+
+
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V338 (Ultimate: Grade Tracker, Charts, & Profile Fixes) -->
+<!-- 家教小本本 V339 (Layout Fix: Card Overflow & Profile Scroll) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,7 +12,7 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V338</title>
+<title>家教小本本 V339</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
@@ -176,11 +179,30 @@
     .cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); margin-top: 4px; }
     .cal-dot.paid { background: var(--money-green); }
 
-    /* CARDS */
+    /* CARDS - V339 Layout Fix */
     #today-schedule-list { display: flex; gap: 20px; overflow-x: auto; padding: 20px 24px 40px 24px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-left: -24px; margin-right: -24px; }
     #today-schedule-list::-webkit-scrollbar { display: none; }
-    .schedule-card { flex: 0 0 82%; max-width: 320px; height: 420px; scroll-snap-align: center; border-radius: 36px; padding: 28px 24px; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.03); background-color: var(--text-main); color: #FFFFFF; }
+    
+    .schedule-card { 
+        flex: 0 0 82%; 
+        max-width: 320px; 
+        height: 420px; 
+        scroll-snap-align: center; 
+        border-radius: 36px; 
+        padding: 28px 24px; 
+        position: relative; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between; 
+        transition: transform 0.2s; 
+        box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1); 
+        border: 1px solid rgba(0,0,0,0.03); 
+        background-color: var(--text-main); 
+        color: #FFFFFF; 
+        overflow: hidden; /* Fix: Prevent overflow */
+    }
     .schedule-card:active { transform: scale(0.98); }
+    
     .schedule-card.paid { background-color: #F7FAFC !important; color: #A0AEC0 !important; border: 1px solid #EDF2F7; box-shadow: none; }
     .schedule-card.paid .sch-title { color: #A0AEC0 !important; }
     .schedule-card.paid .sch-badge { background: #EDF2F7 !important; color: #A0AEC0 !important; }
@@ -189,25 +211,31 @@
     .sch-badge { font-size: 13px; padding: 6px 14px; border-radius: 20px; font-weight: 800; display: inline-block; background: rgba(255,255,255,0.2); color: #FFF; }
     .cal-top-btn { width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.15); color: #FFF; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); }
     .schedule-card.paid .cal-top-btn { background: transparent !important; color: #CBD5E0 !important; border: 1px solid #EDF2F7; }
-    .note-wrapper { position: relative; flex: 1; margin: 15px 0; }
-    .inline-note { width: 100%; height: 100%; padding: 20px; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; outline: none; resize: none; box-sizing: border-box; background: rgba(255,255,255,0.1); color: #FFF; }
+    
+    /* V339: Note Wrapper Flex Fix */
+    .note-wrapper { position: relative; flex: 1; margin: 15px 0; min-height: 0; display: flex; flex-direction: column; }
+    .inline-note { width: 100%; flex: 1; padding: 20px; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; outline: none; resize: none; box-sizing: border-box; background: rgba(255,255,255,0.1); color: #FFF; }
     .inline-note:focus { background: rgba(255,255,255,0.2); color: #FFF; }
     .inline-note::placeholder { color: rgba(255,255,255,0.6); }
-    .sch-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    
+    .sch-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-shrink: 0; }
     .sch-title { font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 6px; }
     .sch-time-info { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; opacity: 0.8; }
     .sch-cost-overlay { position: absolute; bottom: 16px; right: 20px; font-size: 13px; font-weight: 800; pointer-events: none; opacity: 0.8; }
-    .card-footer { display: flex; gap: 12px; align-items: center; height: 60px; }
-    .btn-trash-card { width: 60px; height: 60px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: none; cursor: pointer; background: rgba(255,255,255,0.15); color: #FFD1D1; }
+    
+    /* V339: Card Footer Fix */
+    .card-footer { display: flex; gap: 12px; align-items: center; height: 60px; flex-shrink: 0; margin-top: auto; }
+    .btn-trash-card { width: 60px; height: 60px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: none; cursor: pointer; background: rgba(255,255,255,0.15); color: #FFD1D1; flex-shrink: 0; }
     /* Glassmorphism Buttons */
-    .btn-main-action { flex: 1; height: 60px; border-radius: 24px; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: transform 0.1s; background: rgba(255, 255, 255, 0.2); color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); }
+    .btn-main-action { flex: 1; height: 60px; border-radius: 24px; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: transform 0.1s; background: rgba(255, 255, 255, 0.2); color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); white-space: nowrap; }
     .btn-main-action:active { transform: scale(0.95); }
     .timer-display { font-size: 36px; font-weight: 800; text-align: center; font-feature-settings: "tnum"; margin-top: auto; margin-bottom: auto;}
 
     /* MODALS */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9000; justify-content: center; align-items: center; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
     .modal.active { opacity: 1; }
-    .modal-content { background: #FFF; width: 90%; max-width: 380px; border-radius: 32px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; transition: 0.1s; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
+    /* V339 Fix: Hidden overflow-x */
+    .modal-content { background: #FFF; width: 90%; max-width: 380px; border-radius: 32px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; overflow-x: hidden; transition: 0.1s; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
     .modal.active .modal-content { transform: scale(1); }
     .modal-content.shake-error { animation: shake 0.3s ease-in-out; border: 2px solid var(--money-red); }
     .modal-title { font-size: 18px; font-weight: 800; color: var(--text-sub); text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
@@ -295,12 +323,12 @@
     .cal-nav-btn { background: transparent; border: none; font-size: 20px; color: #A0AEC0; cursor: pointer; padding: 0 10px; transition: color 0.2s; }
     .cal-nav-btn:active { color: var(--text-main); }
 
-    /* V336: Student Profile Modal & Exam Tracker */
+    /* V339 FIX: Profile Header & Layout */
     .profile-header-bg {
         background: linear-gradient(135deg, #E07A5F, #F2CC8F);
         padding: 40px 20px 80px 20px;
         border-radius: 0 0 40px 40px;
-        margin: -30px -30px 20px -30px;
+        margin: 0; /* V339 FIX: Removed negative margins */
         color: #FFF;
         text-align: center;
         position: relative;
@@ -604,7 +632,7 @@
     </div>
 </div>
 
-<!-- V338: Student Profile Modal (Fixed Close Button) -->
+<!-- V339: Student Profile Modal (Fix: Close Button & Layout) -->
 <div id="student-profile-modal" class="modal" style="z-index:9200;">
     <div class="modal-content" style="padding:0; max-height:85vh; overflow-y:auto; background:#F7F6F2;">
         
@@ -2246,4 +2274,3 @@
 </script>
 </body>
 </html>
-```
