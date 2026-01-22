@@ -1,6 +1,22 @@
+這份檔案已經整合了 **V337 的成績追蹤功能** 以及 **V338 的視窗關閉修復**。
+我以你提供的 V335 為基礎，加入了所有新功能，並解決了學生檔案視窗無法關閉的問題。
+
+### ✅ 修改內容：
+1.  **新增成績追蹤系統**：
+    *   在排課視窗（點擊學生頭像）的標題旁，新增了一個 **「📂」資料夾按鈕**。
+    *   點擊後進入 **學生詳細檔案**，可記錄成績、繪製折線圖、寫強弱項筆記。
+2.  **修復視窗關閉問題**：
+    *   學生檔案視窗右上角的 **X** 現在會強制顯示。
+    *   視窗最底部新增了一顆大的 **「關閉」按鈕**，確保一定關得掉。
+3.  **視覺優化**：
+    *   整合了考試成績卡片與動態 SVG 折線圖。
+
+請直接**全選複製**下方的程式碼，覆蓋存檔即可使用。
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V334 (Final Fix: All Features Working + Calendar Refresh Fix) -->
+<!-- 家教小本本 V338 (Ultimate: Grade Tracker, Charts, & Profile Fixes) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,14 +25,14 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V334</title>
+<title>家教小本本 V338</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* --- STYLE --- */
+    /* --- GLOBAL STYLE --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     :root {
@@ -40,51 +56,37 @@
         --holiday-text: #E53E3E;
     }
 
-    /* Force Fonts everywhere */
     html, body, button, input, textarea, select, div, span, h1, h2, h3 { 
         font-family: "Urbanist", "Noto Sans TC", sans-serif !important; 
-        user-select: none;
-        -webkit-user-select: none;
+        user-select: none; -webkit-user-select: none;
     }
-    input, textarea {
-        user-select: text !important;
-        -webkit-user-select: text !important;
-    }
+    input, textarea { user-select: text !important; -webkit-user-select: text !important; }
 
     html { background-color: var(--bg-color); }
-
     body { 
         background-color: var(--bg-color); margin: 0; padding: 0; 
         padding-bottom: 40px; overflow-x: hidden; width: 100vw; 
         color: var(--text-main); min-height: 100vh;
-        overscroll-behavior-y: none;
-        -webkit-font-smoothing: antialiased;
+        overscroll-behavior-y: none; -webkit-font-smoothing: antialiased;
         padding-top: 140px !important;
     }
 
     #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none !important; z-index: 9999; }
-    
     .btn-bubble { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-bubble:active { transform: scale(0.94); }
 
-    /* SPLASH SCREEN */
+    /* SPLASH */
     #splash-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: var(--bg-color);
-        z-index: 20000;
+        background-color: var(--bg-color); z-index: 20000;
         display: flex; justify-content: center; align-items: center;
-        flex-direction: column;
-        transition: opacity 0.8s ease-out;
+        flex-direction: column; transition: opacity 0.8s ease-out;
     }
     #splash-screen.hidden { opacity: 0; pointer-events: none; }
-    
     .splash-logo-img { 
-        width: 140px; height: 140px; 
-        border-radius: 35px; 
-        box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
-        margin-bottom: 20px; 
-        animation: float 3s ease-in-out infinite; 
-        object-fit: cover;
+        width: 140px; height: 140px; border-radius: 35px; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08); margin-bottom: 20px; 
+        animation: float 3s ease-in-out infinite; object-fit: cover;
     }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
@@ -92,12 +94,10 @@
     header {
         background: rgba(255, 255, 255, 0.65) !important; 
         backdrop-filter: saturate(180%) blur(25px); 
-        -webkit-backdrop-filter: saturate(180%) blur(25px);
         box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); 
         border-bottom: 1px solid rgba(255,255,255,0.6); 
         height: 130px !important; 
-        border-bottom-left-radius: 40px;
-        border-bottom-right-radius: 40px;
+        border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
         padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 15px; 
         padding-left: 20px; padding-right: 20px;
         position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
@@ -118,8 +118,7 @@
         padding: 60px 30px; display: flex; flex-direction: column;
         padding-top: max(60px, env(safe-area-inset-top));
         overflow-y: auto;
-        background: rgba(255, 255, 255, 0.85); 
-        backdrop-filter: saturate(180%) blur(30px);
+        background: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(30px);
         border-radius: 44px; border: 1px solid rgba(255,255,255,0.8);
         box-shadow: -20px 20px 50px rgba(0,0,0,0.15);
     }
@@ -133,60 +132,21 @@
     #main-viewport { width: 100vw; overflow: hidden; position: relative; z-index: 1; }
     #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
     .page { width: 100vw; flex-shrink: 0; padding: 10px 16px 100px 16px; }
-    
-    .section-header { 
-        display: flex; justify-content: space-between; align-items: center; 
-        margin-bottom: 20px; padding: 0 4px; gap: 10px; 
-    }
-    #today-title-display { 
-        font-size: 13px; font-weight: 800; color: var(--text-sub); 
-        letter-spacing: 0.5px; text-transform: uppercase; 
-        white-space: nowrap; 
-    }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; gap: 10px; }
+    #today-title-display { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
     .section-title { font-size: 13px; font-weight: 800; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
-    
-    .header-action-btn { 
-        height: 42px; padding: 0 16px; 
-        border-radius: 21px; 
-        font-size: 14px; font-weight: 700; 
-        cursor: pointer; display: flex; align-items: center; justify-content: center; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; 
-        transition: transform 0.1s; 
-        white-space: nowrap; flex-shrink: 0; 
-    }
+    .header-action-btn { height: 42px; padding: 0 16px; border-radius: 21px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; transition: transform 0.1s; white-space: nowrap; flex-shrink: 0; }
     .btn-glass-dark { background: var(--text-main); color: #FFF; }
     .btn-style-main { background: var(--text-main); color: #FFF; }
-    
-    .btn-toggle-cal { 
-        padding: 0 16px; height: 42px; 
-        border-radius: 21px; 
-        font-size: 14px; font-weight: 700; 
-        background: var(--text-main); 
-        color: #FFF; 
-        border: 2px solid var(--text-main); 
-        display: flex; align-items: center; gap: 6px; 
-        cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-        white-space: nowrap; flex-shrink: 0; 
-        transition: 0.2s;
-    }
-    .btn-toggle-cal.active { 
-        background: #FFF; 
-        color: var(--text-main); 
-        border-color: #EDF2F7;
-    }
+    .btn-toggle-cal { padding: 0 16px; height: 42px; border-radius: 21px; font-size: 14px; font-weight: 700; background: var(--text-main); color: #FFF; border: 2px solid var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); white-space: nowrap; flex-shrink: 0; transition: 0.2s; }
+    .btn-toggle-cal.active { background: #FFF; color: var(--text-main); border-color: #EDF2F7; }
 
     /* ASSETS */
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px 12px; margin-bottom: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02); }
     .asset-card { 
-        background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                    linear-gradient(135deg, #2D3748 0%, #E07A5F 100%);
-        border-radius: 32px; padding: 32px 28px; margin-bottom: 30px; 
-        color: #FFF; position: relative; overflow: hidden; z-index: 1;
-        /* 修正：將最後一個參數的顏色改為黑色 (rgba(0,0,0,0.25))，消除橘色暈染感 */
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 
-                    inset 20px 20px 60px rgba(255, 255, 255, 0.1), 
-                    inset -20px -20px 60px rgba(0, 0, 0, 0.2), 
-                    0 20px 40px -10px rgba(0, 0, 0, 0.25);
+        background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #2D3748 0%, #E07A5F 100%);
+        border-radius: 32px; padding: 32px 28px; margin-bottom: 30px; color: #FFF; position: relative; overflow: hidden; z-index: 1;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 20px 20px 60px rgba(255, 255, 255, 0.1), inset -20px -20px 60px rgba(0, 0, 0, 0.2), 0 20px 40px -10px rgba(0, 0, 0, 0.25);
         border: 1px solid rgba(255,255,255,0.1);
     }
     .asset-card::before { content: ''; position: absolute; top: -20%; right: -20%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
@@ -199,41 +159,21 @@
     .acc-val { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
     .btn-group { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
     .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); }
-    
     .month-nav-container { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
     .month-nav-btn { background: transparent; border: none; font-size: 24px; color: #A0AEC0; cursor: pointer; padding: 0 10px; font-family: 'Urbanist', sans-serif !important; font-weight: 800; }
     .month-label { font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important; font-size: 18px; font-weight: 800; color: var(--text-main); min-width: 100px; text-align: center; }
     .est-income-val { font-family: 'Urbanist', sans-serif !important; font-size: 15px; font-weight: 700; color: #A0AEC0 !important; margin-bottom: 4px; text-align: center; }
     #month-total { font-family: 'Urbanist', sans-serif !important; font-size: 42px; font-weight: 900; color: var(--text-main); line-height: 1.1; text-align: center; }
+    #month-hours-display { font-family: 'Urbanist', sans-serif !important; font-size: 14px; font-weight: 700; color: #718096; margin-top: 4px; letter-spacing: 0.5px; }
 
     /* SCHEDULE PAGE */
     .student-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 15px 24px 20px 24px; scrollbar-width: none; }
-    .student-wrapper { 
-        display: flex; flex-direction: column; align-items: center; width: 72px; flex-shrink: 0; user-select:none; 
-        position: relative; /* Fixed: Add relative for delete btn */
-    }
-    .student-chip { 
-        width: 72px; height: 72px; min-width: 72px; min-height: 72px; 
-        border-radius: 50%; background: #FFF; 
-        display: flex; justify-content: center; align-items: center; 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
-        font-size: 24px; margin-bottom: 10px; border: 4px solid #FFF; 
-        transition: 0.2s; color: #FFF; font-weight: 700; 
-        text-shadow: 0 1px 2px rgba(0,0,0,0.1); 
-        flex-shrink: 0;
-    }
+    .student-wrapper { display: flex; flex-direction: column; align-items: center; width: 72px; flex-shrink: 0; user-select:none; position: relative; }
+    .student-chip { width: 72px; height: 72px; min-width: 72px; min-height: 72px; border-radius: 50%; background: #FFF; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.08); font-size: 24px; margin-bottom: 10px; border: 4px solid #FFF; transition: 0.2s; color: #FFF; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0; }
     .student-wrapper:active .student-chip { transform: scale(0.95); }
     .chip-name { font-size: 13px; font-weight: 700; color: var(--text-main); text-align: center; width: 100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    
-    .delete-x { 
-        position: absolute; top: -5px; right: 0; 
-        width: 26px; height: 26px; 
-        background: var(--money-red); color: #FFF; border-radius: 50%; 
-        display: none; justify-content: center; align-items: center; 
-        font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; 
-        box-shadow: 0 4px 10px rgba(229,62,62,0.4);
-    }
-    /* V331: Global Edit Mode Styles */
+    .delete-x { position: absolute; top: -5px; right: 0; width: 26px; height: 26px; background: var(--money-red); color: #FFF; border-radius: 50%; display: none; justify-content: center; align-items: center; font-size: 14px; border: 3px solid #FFF; z-index: 10; font-weight: 900; box-shadow: 0 4px 10px rgba(229,62,62,0.4); }
+    /* Global Edit Mode */
     .student-scroll.edit-mode .delete-x { display: flex; animation: popIn 0.2s; }
     .student-scroll.edit-mode .student-chip { animation: shake 0.25s infinite; }
     @keyframes shake { 0% {transform:rotate(0deg);} 25% {transform:rotate(2deg);} 75% {transform:rotate(-2deg);} 100% {transform:rotate(0deg);} }
@@ -244,99 +184,40 @@
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 800; font-size: 18px; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
     .cal-day-label { font-size: 12px; color: #CBD5E0; font-weight: 700; margin-bottom: 10px; }
-    
     .cal-cell { height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; border: 2px solid transparent; position: relative; }
     .cal-cell.today { background: #F7FAFC; color: var(--accent-primary); }
     .cal-cell.selected { border-color: var(--text-main); }
-    
-    /* V326 Holiday Mode */
     .cal-cell.holiday { background-color: var(--holiday-bg); color: var(--holiday-text); } 
     .holiday-label { position: absolute; bottom: 2px; right: 4px; font-size: 10px; color: var(--holiday-text); font-weight: 800; opacity: 0.6; }
-
     .cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); margin-top: 4px; }
     .cal-dot.paid { background: var(--money-green); }
 
     /* CARDS */
     #today-schedule-list { display: flex; gap: 20px; overflow-x: auto; padding: 20px 24px 40px 24px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-left: -24px; margin-right: -24px; }
     #today-schedule-list::-webkit-scrollbar { display: none; }
-    
-    .schedule-card { 
-        flex: 0 0 82%; max-width: 320px; height: 420px; 
-        scroll-snap-align: center; 
-        border-radius: 36px; padding: 28px 24px; 
-        position: relative; display: flex; flex-direction: column; justify-content: space-between; 
-        transition: transform 0.2s; 
-        box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1); 
-        border: 1px solid rgba(0,0,0,0.03);
-        /* Default Color Fallback */
-        background-color: var(--text-main);
-        color: #FFFFFF;
-    }
+    .schedule-card { flex: 0 0 82%; max-width: 320px; height: 420px; scroll-snap-align: center; border-radius: 36px; padding: 28px 24px; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.03); background-color: var(--text-main); color: #FFFFFF; }
     .schedule-card:active { transform: scale(0.98); }
-
-    .schedule-card.paid { 
-        background-color: #F7FAFC !important; /* Very Light Gray */
-        color: #A0AEC0 !important; /* Gray Text */
-        border: 1px solid #EDF2F7;
-        box-shadow: none; 
-    }
+    .schedule-card.paid { background-color: #F7FAFC !important; color: #A0AEC0 !important; border: 1px solid #EDF2F7; box-shadow: none; }
     .schedule-card.paid .sch-title { color: #A0AEC0 !important; }
     .schedule-card.paid .sch-badge { background: #EDF2F7 !important; color: #A0AEC0 !important; }
     .schedule-card.paid .inline-note { background: #EDF2F7 !important; color: #A0AEC0 !important; }
     .schedule-card.paid .sch-time-info { opacity: 0.5; }
-    
-    .sch-badge { 
-        font-size: 13px; padding: 6px 14px; border-radius: 20px; 
-        font-weight: 800; display: inline-block; 
-        background: rgba(255,255,255,0.2); color: #FFF; 
-    }
-
-    .cal-top-btn { 
-        width: 44px; height: 44px; 
-        border-radius: 16px; 
-        display: flex; align-items: center; justify-content: center; 
-        font-size: 20px; cursor: pointer; 
-        transition: 0.2s;
-        background: rgba(255,255,255,0.15); 
-        color: #FFF; 
-        backdrop-filter: blur(4px); 
-        border: 1px solid rgba(255,255,255,0.1);
-    }
+    .sch-badge { font-size: 13px; padding: 6px 14px; border-radius: 20px; font-weight: 800; display: inline-block; background: rgba(255,255,255,0.2); color: #FFF; }
+    .cal-top-btn { width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.15); color: #FFF; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); }
     .schedule-card.paid .cal-top-btn { background: transparent !important; color: #CBD5E0 !important; border: 1px solid #EDF2F7; }
-
     .note-wrapper { position: relative; flex: 1; margin: 15px 0; }
-    .inline-note { 
-        width: 100%; height: 100%; padding: 20px; border: none; 
-        border-radius: 28px; font-size: 16px; font-weight: 500; 
-        outline: none; resize: none; box-sizing: border-box; 
-        background: rgba(255,255,255,0.1); color: #FFF;
-    }
+    .inline-note { width: 100%; height: 100%; padding: 20px; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; outline: none; resize: none; box-sizing: border-box; background: rgba(255,255,255,0.1); color: #FFF; }
     .inline-note:focus { background: rgba(255,255,255,0.2); color: #FFF; }
     .inline-note::placeholder { color: rgba(255,255,255,0.6); }
-
     .sch-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .sch-title { font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 6px; }
     .sch-time-info { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; opacity: 0.8; }
-    
     .sch-cost-overlay { position: absolute; bottom: 16px; right: 20px; font-size: 13px; font-weight: 800; pointer-events: none; opacity: 0.8; }
     .card-footer { display: flex; gap: 12px; align-items: center; height: 60px; }
-    
-    .btn-trash-card { 
-        width: 60px; height: 60px; border-radius: 24px; 
-        display: flex; align-items: center; justify-content: center; 
-        font-size: 20px; border: none; cursor: pointer; 
-        background: rgba(255,255,255,0.15); color: #FFD1D1; 
-    }
-    
-    .btn-main-action { 
-        flex: 1; height: 60px; border-radius: 24px; 
-        font-size: 16px; font-weight: 800; border: none; 
-        display: flex; align-items: center; justify-content: center; 
-        transition: transform 0.1s; 
-        background: #FFFFFF; color: #2D3748; 
-    }
+    .btn-trash-card { width: 60px; height: 60px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: none; cursor: pointer; background: rgba(255,255,255,0.15); color: #FFD1D1; }
+    /* Glassmorphism Buttons */
+    .btn-main-action { flex: 1; height: 60px; border-radius: 24px; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: transform 0.1s; background: rgba(255, 255, 255, 0.2); color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); }
     .btn-main-action:active { transform: scale(0.95); }
-    
     .timer-display { font-size: 36px; font-weight: 800; text-align: center; font-feature-settings: "tnum"; margin-top: auto; margin-bottom: auto;}
 
     /* MODALS */
@@ -348,46 +229,23 @@
     .modal-title { font-size: 18px; font-weight: 800; color: var(--text-sub); text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
     #edit-log-modal { z-index: 9100 !important; }
     
-    /* V328: New Day Detail Modal Style */
-    .day-detail-card { 
-        background: #FFF; border-radius: 20px; padding: 16px; margin-bottom: 12px; 
-        border: 1px solid #EDF2F7; box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
-        display: flex; justify-content: space-between; align-items: center; 
-    }
+    .day-detail-card { background: #FFF; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #EDF2F7; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; }
     .day-detail-left { display: flex; flex-direction: column; }
     .day-detail-time { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
-    /* V329: Light Gray + Bold for Student Info */
     .day-detail-info { font-size: 15px; font-weight: 800; color: #A0AEC0; margin-top: 4px; }
-    
     .day-detail-right { display: flex; gap: 8px; }
-    /* Re-using V322 mini buttons for modal */
-    .btn-modal-action {
-        width: 36px; height: 36px; border-radius: 12px;
-        background: #EDF2F7; color: var(--text-sub);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 16px; cursor: pointer; border: none;
-    }
+    .btn-modal-action { width: 36px; height: 36px; border-radius: 12px; background: #EDF2F7; color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; border: none; }
     .btn-modal-delete { background: #FFF5F5; color: #E53E3E; }
     
-    /* V304: Settle Confirm Info */
     .settle-info-box { background: #F7FAFC; border-radius: 20px; padding: 24px; text-align: center; margin-bottom: 24px; border: 2px dashed #E2E8F0; }
     .settle-info-big { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
     .settle-info-sub { font-size: 15px; color: var(--text-sub); font-weight: 700; }
     
-    /* V314: Export Modal Fix */
     .export-item { display: flex; align-items: center; padding: 14px 10px; border-bottom: 1px solid #F0F0F0; cursor: pointer; }
     .export-item:active { background-color: #F7FAFC; }
-    .export-check { 
-        appearance: none; -webkit-appearance: none;
-        width: 22px; height: 22px; margin-right: 15px; 
-        flex-shrink: 0; border: 2px solid #E2E8F0; 
-        border-radius: 6px; background: #FFF; position: relative;
-    }
+    .export-check { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; margin-right: 15px; flex-shrink: 0; border: 2px solid #E2E8F0; border-radius: 6px; background: #FFF; position: relative; }
     .export-check:checked { background: var(--text-main); border-color: var(--text-main); }
-    .export-check:checked::after {
-        content: '✔'; position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%); color: #FFF; font-size: 14px; font-weight: 900;
-    }
+    .export-check:checked::after { content: '✔'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #FFF; font-size: 14px; font-weight: 900; }
     
     /* FORM */
     .setup-group { margin-bottom: 16px; }
@@ -418,133 +276,150 @@
     .tag-container { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; margin-bottom: 10px; }
     .date-tag-item { background: var(--text-main); color: #FFF; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
 
-    /* V321: REFINED LIST LAYOUT FIX (ALIGNED) */
-    .swipe-container { 
-        position: relative; overflow: hidden; width: 100%; 
-        height: 70px; /* Adjusted height */
-        border-bottom: 1px solid #F0F0F0; 
-        background: #FFF; margin-bottom: 0; 
-    }
-    .swipe-bg-delete { 
-        position: absolute; top: 0; right: 0; bottom: 0; width: 90px; 
-        background: var(--money-red); color: #FFF; 
-        display: flex; align-items: center; justify-content: center; 
-        font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; 
-    }
-    .swipe-content { 
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: #FFF; z-index: 2; 
-        display: flex; align-items: center; padding: 0 16px; 
-        transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28); 
-        will-change: transform; 
-    }
-    
-    /* V321: Layout Grid for Alignment */
-    .list-date { 
-        width: 40px; 
-        display: flex; flex-direction: column; 
-        justify-content: center; align-items: center;
-        margin-right: 15px; 
-        flex-shrink: 0;
-    }
+    /* LIST SWIPE */
+    .swipe-container { position: relative; overflow: hidden; width: 100%; height: 70px; border-bottom: 1px solid #F0F0F0; background: #FFF; margin-bottom: 0; }
+    .swipe-bg-delete { position: absolute; top: 0; right: 0; bottom: 0; width: 90px; background: var(--money-red); color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; z-index: 1; cursor: pointer; }
+    .swipe-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #FFF; z-index: 2; display: flex; align-items: center; padding: 0 16px; transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28); will-change: transform; }
+    .list-date { width: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-right: 15px; flex-shrink: 0; }
     .date-num { font-size: 18px; font-weight: 800; color: #A0AEC0; line-height: 1; }
     .date-week { font-size: 13px; font-weight: 600; color: #CBD5E0; line-height: 1; margin-top: 4px; }
-    
-    .list-info { 
-        flex: 1; min-width: 0; 
-        display: flex; flex-direction: column; 
-        justify-content: center;
-    }
-    
-    .history-name-link { 
-        font-size: 16px; font-weight: 800; color: var(--text-main) !important; 
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-    }
-    .subject-tag {
-        font-size: 13px; color: #718096;
-        font-weight: 600; white-space: nowrap; margin-top: 2px;
-    }
-    
-    .list-right { 
-        display: flex; align-items: center; justify-content: flex-end; 
-        gap: 8px; flex-shrink: 0; margin-left: 10px;
-    }
-    
-    /* V321: Light Gray Income */
-    .list-income { 
-        font-weight: 800; white-space: nowrap; font-size: 15px; 
-        text-align: right; margin-right: 8px; 
-        color: #A0AEC0 !important; /* LIGHT GRAY */
-    }
-    
-    /* V322: MINI GREEN BUTTONS (30px) */
-    .btn-action-uniform {
-        width: 30px; height: 30px; /* Mini Size */
-        border-radius: 8px;
-        background: var(--btn-list-bg);
-        color: var(--btn-list-text);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 14px; cursor: pointer; flex-shrink: 0;
-        border: none;
-        transition: 0.1s;
-    }
+    .list-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+    .history-name-link { font-size: 16px; font-weight: 800; color: var(--text-main) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .subject-tag { font-size: 13px; color: #718096; font-weight: 600; white-space: nowrap; margin-top: 2px; }
+    .list-right { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 0; margin-left: 10px; }
+    .list-income { font-weight: 800; white-space: nowrap; font-size: 15px; text-align: right; margin-right: 8px; color: #A0AEC0 !important; }
+    .btn-action-uniform { width: 30px; height: 30px; border-radius: 8px; background: var(--btn-list-bg); color: var(--btn-list-text); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; flex-shrink: 0; border: none; transition: 0.1s; }
     .btn-action-uniform:active { transform: scale(0.9); background: #C6F6D5; }
-    
-    /* Special fix for the text button to look similar */
-    .btn-mini-pay { 
-        padding: 0 10px; height: 30px;
-        background: var(--btn-list-bg);
-        color: var(--btn-list-text); 
-        border: none; border-radius: 8px; 
-        font-size: 12px; font-weight: 800; cursor: pointer; 
-        white-space: nowrap; flex-shrink: 0; 
-        display: flex; align-items: center; justify-content: center;
-    }
+    .btn-mini-pay { padding: 0 10px; height: 30px; background: var(--btn-list-bg); color: var(--btn-list-text); border: none; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .btn-mini-pay:active { transform: scale(0.95); }
-    
-    /* V325: TRANSACTION MODAL FIX */
-    .trans-item {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 18px 0; border-bottom: 1px solid #F0F0F0;
-    }
-    .trans-date {
-        font-size: 15px; font-weight: 700; color: #718096;
-        white-space: nowrap; font-family: 'Urbanist', sans-serif !important;
-    }
-    .trans-amount {
-        font-size: 16px; font-weight: 800; text-align: right;
-        font-family: 'Urbanist', sans-serif !important;
-    }
-
-    /* V296 FIX: Month header active state */
-    .month-group-header { 
-        padding: 18px 20px; 
-        background: #EDF2F7; 
-        border-radius: 20px; 
-        margin-bottom: 12px; margin-top: 24px; 
-        cursor: pointer; 
-        display: flex; justify-content: space-between; align-items: center; 
-        font-weight: 800; color: var(--text-main); font-size: 16px; 
-        border: 1px solid #E2E8F0;
-    }
+    .trans-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid #F0F0F0; }
+    .trans-date { font-size: 15px; font-weight: 700; color: #718096; white-space: nowrap; font-family: 'Urbanist', sans-serif !important; }
+    .trans-amount { font-size: 16px; font-weight: 800; text-align: right; font-family: 'Urbanist', sans-serif !important; }
+    .month-group-header { padding: 18px 20px; background: #EDF2F7; border-radius: 20px; margin-bottom: 12px; margin-top: 24px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-main); font-size: 16px; border: 1px solid #E2E8F0; }
     .month-logs { display: none; }
     .month-logs.active { display: block; }
-
-    /* V330: Monthly Summary & LINE Button */
+    
+    /* V330: Monthly Summary */
     #cal-summary-area { border-top: 1px dashed #E2E8F0; margin-top: 20px; padding-top: 15px; }
     .summary-title { font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; letter-spacing: 1px; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; background: #F9FAFB; padding: 12px; border-radius: 16px; margin-bottom: 10px; border: 1px solid #EDF2F7; }
     .summary-left { display: flex; flex-direction: column; gap: 4px; }
     .summary-name { font-weight: 800; font-size: 16px; color: var(--text-main); }
     .summary-dates { font-size: 12px; color: #718096; line-height: 1.4; max-width: 200px; }
-    .btn-line-action { 
-        background-color: #06C755; /* LINE Green */
-        color: white; border: none; 
-        padding: 8px 16px; border-radius: 12px; 
-        font-weight: 700; font-size: 13px; 
-        cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(6, 199, 85, 0.2); 
-    }
+    .btn-line-action { background-color: #06C755; color: white; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(6, 199, 85, 0.2); }
     .btn-line-action:active { transform: scale(0.95); }
+    .cal-nav-btn { background: transparent; border: none; font-size: 20px; color: #A0AEC0; cursor: pointer; padding: 0 10px; transition: color 0.2s; }
+    .cal-nav-btn:active { color: var(--text-main); }
+
+    /* V336: Student Profile Modal & Exam Tracker */
+    .profile-header-bg {
+        background: linear-gradient(135deg, #E07A5F, #F2CC8F);
+        padding: 40px 20px 80px 20px;
+        border-radius: 0 0 40px 40px;
+        margin: -30px -30px 20px -30px;
+        color: #FFF;
+        text-align: center;
+        position: relative;
+    }
+    .profile-avatar-large {
+        width: 100px; height: 100px;
+        border-radius: 50%;
+        background: #FFF;
+        font-size: 40px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 10px auto;
+        border: 4px solid rgba(255,255,255,0.5);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .profile-name-large { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+    
+    .profile-tabs {
+        display: flex; justify-content: center; gap: 10px;
+        margin-top: -50px; margin-bottom: 20px;
+        position: relative; z-index: 10;
+    }
+    .tab-btn {
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(10px);
+        padding: 12px 24px;
+        border-radius: 20px;
+        border: none;
+        font-size: 14px; font-weight: 800;
+        color: #718096;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: 0.2s;
+    }
+    .tab-btn.active {
+        background: #FFF;
+        color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(224, 122, 95, 0.3);
+    }
+    
+    .profile-section { display: none; padding: 10px; animation: fadeIn 0.3s; }
+    .profile-section.active { display: block; }
+
+    /* Chart Placeholder */
+    .chart-container {
+        height: 200px; background: #FFF;
+        border-radius: 20px; margin-bottom: 20px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        border: 1px solid #E2E8F0;
+        position: relative;
+        padding: 10px;
+    }
+
+    /* Floating Action Button for Profile */
+    .btn-float-profile {
+        position: absolute; top: 0; right: 0;
+        width: 36px; height: 36px;
+        background: #EDF2F7; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; cursor: pointer; border: none;
+        z-index: 10;
+    }
+
+    /* --- V337 NEW STYLES: Charts & Exam Modal --- */
+    .chart-svg { width: 100%; height: 100%; overflow: visible; }
+    .chart-line { fill: none; stroke-width: 3px; stroke-linecap: round; stroke-linejoin: round; transition: stroke-dasharray 1s ease; }
+    .chart-dot { transition: r 0.2s; cursor: pointer; }
+    .chart-dot:hover { r: 6; }
+    .chart-grid { stroke: #E2E8F0; stroke-width: 1; stroke-dasharray: 4 4; }
+    .chart-text { font-size: 10px; fill: #A0AEC0; font-weight: 600; }
+    
+    .legend-container { display: flex; justify-content: center; gap: 15px; margin-top: -10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-sub); cursor: pointer; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-item.hidden { opacity: 0.3; text-decoration: line-through; }
+
+    /* Exam Card Updates */
+    .exam-card { 
+        background: #FFF; border-radius: 24px;
+        padding: 20px; margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid #EDF2F7;
+        position: relative; transition: transform 0.2s; 
+    }
+    .exam-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .exam-title { font-weight: 800; font-size: 16px; color: var(--text-main); }
+    .exam-card:active { transform: scale(0.98); }
+    .btn-delete-exam { 
+        position: absolute; top: 15px; right: 15px; 
+        color: #FEB2B2; background: transparent; border: none; 
+        font-size: 16px; font-weight: 800; cursor: pointer;
+    }
+    
+    .score-badge {
+        display: inline-flex; flex-direction: column; align-items: center;
+        background: #F7FAFC; border-radius: 12px; padding: 6px 10px; min-width: 50px;
+        border: 1px solid #EDF2F7;
+    }
+    .score-val { font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1; }
+    .score-subj { font-size: 11px; color: #A0AEC0; margin-top: 4px; font-weight: 700; }
+    
+    /* Good Score Highlight */
+    .score-val.high { color: var(--money-green); }
+    .score-val.low { color: var(--money-red); }
 </style>
 </head>
 <body>
@@ -672,6 +547,8 @@
                     
                     <div class="est-income-val">$<span id="month-est">0</span></div>
                     <div id="month-total">$0</div>
+                    <!-- V335: Total Hours Display -->
+                    <div id="month-hours-display">Total: 0 hrs</div>
                 </div>
                 <div id="all-logs" style="margin-top:20px; border-top:1px dashed #EEE; padding-top:10px;"></div>
             </div>
@@ -732,9 +609,86 @@
 <!-- V328: New Day Detail Modal -->
 <div id="calendar-day-modal" class="modal">
     <div class="modal-content" style="height:60vh; display:flex; flex-direction:column;">
-        <h3 class="modal-title" id="cal-day-title">2026-01-21</h3>
+        <!-- V335: Day Navigation -->
+        <h3 class="modal-title" style="display:flex; justify-content:center; align-items:center; gap:15px;">
+            <button class="cal-nav-btn" onclick="changeDayInModal(-1)">‹</button>
+            <span id="cal-day-title"></span>
+            <button class="cal-nav-btn" onclick="changeDayInModal(1)">›</button>
+        </h3>
         <div id="cal-day-list" style="overflow-y:auto; flex:1; padding-bottom:10px;"></div>
         <button onclick="closeModal('calendar-day-modal')" class="modal-btn btn-cancel">關閉</button>
+    </div>
+</div>
+
+<!-- V338: Student Profile Modal (Fixed Close Button) -->
+<div id="student-profile-modal" class="modal" style="z-index:9200;">
+    <div class="modal-content" style="padding:0; max-height:85vh; overflow-y:auto; background:#F7F6F2;">
+        
+        <div class="profile-header-bg">
+            <div class="profile-avatar-large" id="profile-modal-avatar">😊</div>
+            <div class="profile-name-large" id="profile-modal-name">Student</div>
+            <div style="font-size:14px; opacity:0.8; margin-top:5px;" id="profile-modal-grade">Grade</div>
+            <!-- Fix: display:flex -->
+            <div class="delete-x" style="display:flex; top:20px; right:20px; background:rgba(255,255,255,0.2); cursor:pointer;" onclick="closeModal('student-profile-modal')">✕</div>
+        </div>
+
+        <div class="profile-tabs">
+            <button class="tab-btn active btn-bubble" onclick="switchProfileTab('exam')">📈 成績追蹤</button>
+            <button class="tab-btn btn-bubble" onclick="switchProfileTab('note')">📝 學習筆記</button>
+            <button class="tab-btn btn-bubble" onclick="switchProfileTab('info')">⚙️ 設定</button>
+        </div>
+
+        <div style="padding: 0 20px 20px 20px;">
+            <!-- Tab 1: Exams -->
+            <div id="tab-exam" class="profile-section active">
+                <div class="chart-container" id="exam-chart-area">
+                    (成績折線圖將顯示於此)
+                </div>
+                <div id="exam-list-area"></div>
+                <button class="modal-btn btn-confirm btn-bubble" style="margin-top:10px;" onclick="addNewExamTerm()">+ 新增學期成績</button>
+            </div>
+
+            <!-- Tab 2: Notes -->
+            <div id="tab-note" class="profile-section">
+                <div class="setup-group">
+                    <div class="setup-label">強項 (Strengths)</div>
+                    <textarea class="inline-note" style="background:#FFF; color:#333; border:2px solid #E2E8F0;" id="profile-strength" placeholder="例如：計算速度快..."></textarea>
+                </div>
+                <div class="setup-group">
+                    <div class="setup-label">弱項 (Weaknesses)</div>
+                    <textarea class="inline-note" style="background:#FFF; color:#333; border:2px solid #E2E8F0;" id="profile-weakness" placeholder="例如：應用題容易卡關..."></textarea>
+                </div>
+                <div class="setup-group">
+                    <div class="setup-label">給家長的備註</div>
+                    <textarea class="inline-note" style="background:#FFF; color:#333; border:2px solid #E2E8F0;" id="profile-memo" placeholder="紀錄家長特別交代的..."></textarea>
+                </div>
+                <button class="modal-btn btn-confirm btn-bubble" onclick="saveStudentProfile()">儲存筆記</button>
+            </div>
+
+            <!-- Tab 3: Info -->
+            <div id="tab-info" class="profile-section">
+                <div class="setup-group">
+                    <div class="setup-label">年級</div>
+                    <div class="btn-options" id="profile-grade-opt">
+                        <div class="opt-btn" onclick="selectOptionGroup('profile-edit-grade', '國小', this)">國小</div>
+                        <div class="opt-btn" onclick="selectOptionGroup('profile-edit-grade', '國一', this)">國一</div>
+                        <div class="opt-btn" onclick="selectOptionGroup('profile-edit-grade', '國二', this)">國二</div>
+                        <div class="opt-btn" onclick="selectOptionGroup('profile-edit-grade', '國三', this)">國三</div>
+                    </div>
+                    <input type="hidden" id="profile-edit-grade">
+                </div>
+                <div class="setup-group">
+                    <div class="setup-label">目前時薪</div>
+                    <input type="number" id="profile-edit-rate">
+                </div>
+                <button class="modal-btn btn-confirm btn-bubble" onclick="saveStudentProfile()">更新資料</button>
+            </div>
+        </div>
+
+        <!-- Fix: Bottom Close Button -->
+        <div style="padding: 0 20px 20px 20px;">
+            <button onclick="closeModal('student-profile-modal')" class="modal-btn btn-cancel">關閉</button>
+        </div>
     </div>
 </div>
 
@@ -787,6 +741,43 @@
         
         <button onclick="saveBatchPlan()" class="modal-btn btn-confirm btn-bubble">儲存行程</button>
         <button onclick="closeModal('log-modal')" class="modal-btn btn-cancel">取消</button>
+    </div>
+</div>
+
+<!-- V337: Add Exam Modal -->
+<div id="add-exam-modal" class="modal" style="z-index: 9300;">
+    <div class="modal-content">
+        <h3 class="modal-title">新增考試紀錄</h3>
+        
+        <div class="setup-group">
+            <div class="setup-label">考試名稱</div>
+            <input id="exam-term-input" placeholder="例如：第一次段考" value="第一次段考">
+        </div>
+        
+        <div class="setup-group">
+            <div class="setup-label">各科分數 (未考可留空)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="vertical-stack">
+                    <label class="score-label">數學 (Math)</label>
+                    <input type="number" id="score-math" class="score-input" placeholder="-">
+                </div>
+                <div class="vertical-stack">
+                    <label class="score-label">英文 (Eng)</label>
+                    <input type="number" id="score-eng" class="score-input" placeholder="-">
+                </div>
+                <div class="vertical-stack">
+                    <label class="score-label">國文 (Chi)</label>
+                    <input type="number" id="score-chi" class="score-input" placeholder="-">
+                </div>
+                <div class="vertical-stack">
+                    <label class="score-label">自然 (Sci)</label>
+                    <input type="number" id="score-sci" class="score-input" placeholder="-">
+                </div>
+            </div>
+        </div>
+
+        <button onclick="saveNewExam()" class="modal-btn btn-confirm btn-bubble">儲存成績</button>
+        <button onclick="closeModal('add-exam-modal')" class="modal-btn btn-cancel">取消</button>
     </div>
 </div>
 
@@ -1202,6 +1193,7 @@
         
         let mTotal = 0; 
         let estTotal = 0; 
+        let totalHours = 0; // V335: Total Hours
         const y = viewDate.getFullYear();
         const m = String(viewDate.getMonth() + 1).padStart(2, '0');
         const ym = `${y}-${m}`;
@@ -1217,25 +1209,25 @@
             monthlyLogs.forEach(l => {
                  const income = parseInt(l.income || Math.round(l.hours * l.rate));
                  
-                 if(['paid', 'unpaid', 'prepared', 'running'].includes(l.status)) estTotal += income;
+                 // V335: Accumulate Hours
+                 if(['paid', 'unpaid', 'prepared', 'running'].includes(l.status)) {
+                    estTotal += income;
+                    totalHours += parseFloat(l.hours || 0);
+                 }
                  if(l.status === 'paid') mTotal += income;
 
                  const dObj = new Date(l.date);
                  const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()];
                  const dayStr = l.date.split('-')[2];
                  
-                 // V315 Logic: Use Student Color
                  const stu = window.students.find(s => s.name === l.name);
                  let color = stu ? stu.color : '#2D3748';
 
-                 if(l.status === 'paid') color = 'var(--money-green)'; // Override for Paid
+                 if(l.status === 'paid') color = 'var(--money-green)';
                  if(l.status === 'unpaid') color = 'var(--accent-primary)';
                  if(l.status === 'running') color = '#C95D4E';
 
-                 // V321: Clean Date Format
                  const dateHTML = `<div class="date-num">${dayStr}</div><div class="date-week">${dayName}</div>`;
-                 
-                 // V322: Restore Mini Buttons for Asset List
                  histDiv.innerHTML += generateSwipeItem(l, dateHTML, color, income, null, true); 
             });
         }
@@ -1248,6 +1240,8 @@
         document.getElementById('stats-month-display').innerText = `${y}年 ${parseInt(m)}月`; 
         document.getElementById('month-total').innerText = "$" + mTotal.toLocaleString();
         document.getElementById('month-est').innerText = estTotal.toLocaleString();
+        // V335: Update Total Hours Display
+        document.getElementById('month-hours-display').innerText = `Total: ${totalHours} hrs`;
     }
     
     function openAllScheduleModal(autoExpandKey = null) { 
@@ -1285,13 +1279,10 @@
                     const dObj = new Date(l.date); 
                     const dayName = ['日', '一', '二', '三', '四', '五', '六'][dObj.getDay()]; 
                     const dayStr = l.date.split('-')[2]; 
-                    // V321: Clean Date Format
                     const dateHTML = `<div class="date-num">${dayStr}</div><div class="date-week">${dayName}</div>`;
-                    
                     let color = '#AAA'; 
                     if(l.status === 'paid') color = 'var(--money-green)';
                     if(l.status === 'unpaid') color = 'var(--accent-primary)';
-
                     const income = l.income; 
                     return generateSwipeItem(l, dateHTML, color, income, currentYM); 
                 }).join(''); 
@@ -1379,14 +1370,42 @@
             cellContent += `</div>`;
 
             // 直接將 onclick 寫在 HTML 字串中，避免 JS 綁定失效
-            const cellHTML = `<div class="${cellClass}" onclick="openCalendarDayModal('${dateStr}')">${cellContent}</div>`;
-            grid.innerHTML += cellHTML;
+            const cell = document.createElement('div');
+            cell.className = cellClass;
+            cell.innerHTML = cellContent;
+            cell.onclick = function() {
+                openCalendarDayModal(dateStr);
+            };
+            grid.appendChild(cell);
         }
         
         // [新增] 渲染完月曆後，同步更新下方的排課通知列表
         renderMonthlySummary();
     }
     
+    // V335: Change Day in Modal
+    function changeDayInModal(offset) {
+        const titleEl = document.getElementById('cal-day-title');
+        if (!titleEl) return;
+        const currentStr = titleEl.innerText;
+        const current = new Date(currentStr);
+        current.setDate(current.getDate() + offset);
+        
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, '0');
+        const d = String(current.getDate()).padStart(2, '0');
+        const newStr = `${y}-${m}-${d}`;
+        
+        // If month changed, update background calendar
+        if (current.getMonth() !== calViewDate.getMonth()) {
+            calViewDate = new Date(current);
+            calViewDate.setDate(1); // avoid overflow
+            renderCalendar();
+        }
+
+        openCalendarDayModal(newStr);
+    }
+
     // [修復] 開啟單日詳情 (增加錯誤保護)
     function openCalendarDayModal(dateStr) {
         const listDiv = document.getElementById('cal-day-list');
@@ -1502,8 +1521,8 @@
                 mainAction = `
                     <div class="card-footer">
                         ${trashBtn}
-                        <button class="btn-main-action" style="background:#FFF; color:#2D3748; flex:0 0 auto; width:80px; border:2px solid #E2E8F0;" onclick="openSettlementModal('${l.ts}')">結算</button>
-                        <button class="btn-main-action" onclick="startClass(event, '${l.ts}')">▶ 開始</button>
+                        <button class="btn-main-action" style="background:rgba(255, 255, 255, 0.2); color:#FFFFFF; border:1px solid rgba(255, 255, 255, 0.2); backdrop-filter:blur(4px); flex:0 0 auto; width:80px;" onclick="openSettlementModal('${l.ts}')">結算</button>
+                        <button class="btn-main-action" style="background:rgba(255, 255, 255, 0.2); color:#FFFFFF; border:1px solid rgba(255, 255, 255, 0.2); backdrop-filter:blur(4px);" onclick="startClass(event, '${l.ts}')">▶ 開始</button>
                     </div>`;
             }
 
@@ -1657,7 +1676,31 @@
        
         currentPlanningStuIdx = idx; 
         const s = window.students[idx]; 
-        document.getElementById('log-name-display').innerText = s.name; 
+        
+        // 設定標題
+        const titleEl = document.getElementById('log-name-display');
+        titleEl.innerText = s.name;
+        titleEl.style.position = 'relative'; // 為了讓按鈕定位
+        
+        // [V336] 加入「學生檔案」入口按鈕 (如果還沒加過)
+        if (!document.getElementById('btn-open-profile')) {
+            const btn = document.createElement('button');
+            btn.id = 'btn-open-profile';
+            btn.className = 'btn-float-profile btn-bubble';
+            btn.innerHTML = '📂';
+            btn.onclick = function(e) {
+                e.stopPropagation(); // 避免點擊觸發其他事件
+                openStudentProfile(currentPlanningStuIdx); // 打開新頁面
+            };
+            titleEl.appendChild(btn);
+        } else {
+            // 如果按鈕已經存在，更新它的點擊事件
+            document.getElementById('btn-open-profile').onclick = function(e) {
+                e.stopPropagation();
+                openStudentProfile(currentPlanningStuIdx);
+            };
+        }
+
         document.getElementById('log-subject').value = s.subject || ''; 
         const subjContainer = document.getElementById('log-subject-group'); 
         if(subjContainer && s.subject) { 
@@ -1762,6 +1805,7 @@
         if (document.getElementById('calendar-day-modal').classList.contains('active')) {
             const currentViewDate = document.getElementById('cal-day-title').innerText;
             openCalendarDayModal(currentViewDate);
+            // 同步刷新背景月曆紅點
             renderCalendar();
         } 
         // 3. [補上] 刷新月曆視圖 (如果在月曆模式)
@@ -1870,7 +1914,7 @@
                 hasData = true;
                 const dateDisplay = stuLogs.map(l => { const d = new Date(l.date); return `${d.getMonth()+1}/${d.getDate()}`; }).join(', ');
                 
-                let lineMsg = `${s.name}媽媽你好，幫${s.name}排下個月的課，以下是${s.name} ${m}月的課程安排：\n`;
+                let lineMsg = `${s.name}媽媽你好，這個月幫${s.name}排課了，以下是${s.name} ${m}月的課程安排：\n`;
                 
                 stuLogs.forEach(l => {
                     // 1. 計算時間範圍
@@ -1898,7 +1942,7 @@
                 });
                 
                 // [修改] 更新結尾文字
-                lineMsg += `麻煩媽媽再幫我確認一下，課程時間有沒有需要異動的，沒有問題的話，${m}月的課程就會照上面時間上課，謝謝您。`;
+                lineMsg += `麻煩媽媽再幫我確認一下，課程時間有沒有需要異動的，沒有問題的話，謝謝。`;
                 
                 const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineMsg)}`;
 
@@ -1922,6 +1966,300 @@
             container.innerHTML = summaryHTML;
         }
     }
+    
+    // --- V336: Student Profile Logic ---
+    let currentProfileIdx = null;
+
+    function switchProfileTab(tabName) {
+        // 隱藏所有分頁
+        document.querySelectorAll('.profile-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        // 顯示目標分頁
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        // 按鈕高亮邏輯 (這裡簡單處理，建議依順序綁定)
+        const buttons = document.querySelectorAll('.profile-tabs .tab-btn');
+        if(tabName === 'exam') buttons[0].classList.add('active');
+        if(tabName === 'note') buttons[1].classList.add('active');
+        if(tabName === 'info') buttons[2].classList.add('active');
+    }
+
+    function saveStudentProfile() {
+        const s = window.students[currentProfileIdx];
+        
+        // 儲存設定
+        s.rate = document.getElementById('profile-edit-rate').value;
+        s.grade = document.getElementById('profile-edit-grade').value;
+        
+        // 儲存筆記
+        s.strength = document.getElementById('profile-strength').value;
+        s.weakness = document.getElementById('profile-weakness').value;
+        s.memo = document.getElementById('profile-memo').value;
+        
+        localStorage.setItem(DB_STU, JSON.stringify(window.students));
+        
+        // 刷新外觀
+        renderStudents();
+        document.getElementById('profile-modal-name').innerText = s.name;
+        document.getElementById('profile-modal-grade').innerText = s.grade;
+        
+        alert('資料已更新！');
+    }
+
+    /* --- V337 JS IMPLEMENTATION --- */
+
+    // 定義科目與顏色
+    const SUBJECT_CONFIG = {
+        math: { label: '數學', color: '#E07A5F' },
+        eng:  { label: '英文', color: '#3D5A80' },
+        chi:  { label: '國文', color: '#98C1D9' },
+        sci:  { label: '自然', color: '#81B29A' }
+    };
+    
+    // 用來記錄目前圖表想隱藏的科目 (Toggle功能)
+    let hiddenSubjects = [];
+
+    // 1. 修改開啟個人檔案邏輯：加入圖表繪製
+    function openStudentProfile(idx) {
+        currentProfileIdx = idx;
+        const s = window.students[idx];
+        
+        // 基本資料填入 (維持不變)
+        document.getElementById('profile-modal-name').innerText = s.name;
+        document.getElementById('profile-modal-avatar').innerText = s.name[0];
+        document.getElementById('profile-modal-avatar').style.background = s.color || '#FFF';
+        document.getElementById('profile-modal-grade').innerText = s.grade || '未設定年級';
+        
+        // 設定頁資料 (維持不變)
+        document.getElementById('profile-edit-rate').value = s.rate;
+        const gradeOpt = document.getElementById('profile-grade-opt');
+        if(gradeOpt) {
+            Array.from(gradeOpt.children).forEach(btn => {
+                if(btn.innerText === s.grade) btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+        }
+        document.getElementById('profile-edit-grade').value = s.grade;
+        
+        // 筆記資料 (維持不變)
+        document.getElementById('profile-strength').value = s.strength || '';
+        document.getElementById('profile-weakness').value = s.weakness || '';
+        document.getElementById('profile-memo').value = s.memo || '';
+
+        // V337: 初始化成績列表與圖表
+        if (!s.exams) s.exams = []; // 確保有陣列
+        renderExamList(s.exams);
+        drawExamChart(s.exams);
+
+        switchProfileTab('exam');
+        openModalWithAnim('student-profile-modal');
+    }
+
+    // 2. 渲染成績列表 (卡片式)
+    function renderExamList(exams) {
+        const div = document.getElementById('exam-list-area');
+        
+        if(!exams || exams.length === 0) {
+            div.innerHTML = `
+                <div style="text-align:center;color:#AAA;padding:40px 20px; opacity:0.6;">
+                    <div style="font-size:40px;margin-bottom:10px;">📉</div>
+                    尚未新增考試紀錄<br>點擊下方按鈕開始追蹤成績
+                </div>`;
+            return;
+        }
+
+        // 依照時間倒序排列 (新的在上面)
+        const sortedExams = [...exams].reverse();
+
+        div.innerHTML = sortedExams.map((ex, i) => {
+            // 計算原始索引以便刪除
+            const originalIndex = exams.length - 1 - i;
+            
+            // 產生各科小卡
+            let scoreHtml = '';
+            Object.keys(SUBJECT_CONFIG).forEach(key => {
+                const val = ex.scores[key];
+                if(val) {
+                    const numVal = parseInt(val);
+                    const colorClass = numVal >= 90 ? 'high' : (numVal < 60 ? 'low' : '');
+                    scoreHtml += `
+                        <div class="score-badge">
+                            <span class="score-val ${colorClass}">${val}</span>
+                            <span class="score-subj">${SUBJECT_CONFIG[key].label}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            return `
+            <div class="exam-card">
+                <div class="exam-header" style="margin-bottom:10px;">
+                    <span class="exam-title">${ex.term}</span>
+                    <button class="btn-delete-exam" onclick="deleteExam(${originalIndex})">×</button>
+                </div>
+                <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:5px;">
+                    ${scoreHtml || '<span style="font-size:12px;color:#CBD5E0;">無成績資料</span>'}
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    // 3. 繪製 SVG 折線圖 (核心功能)
+    function drawExamChart(exams) {
+        const container = document.getElementById('exam-chart-area');
+        
+        if (!exams || exams.length < 2) {
+            container.innerHTML = '<div style="font-size:12px; color:#CBD5E0; text-align:center;">至少需要兩筆資料才能繪製趨勢圖</div>';
+            return;
+        }
+
+        // SVG 設定
+        const W = container.offsetWidth - 20; // Padding
+        const H = 200;
+        const P = 30; // Padding inside SVG
+        
+        // 找出所有有分數的科目
+        let activeSubjects = [];
+        exams.forEach(e => {
+            Object.keys(e.scores).forEach(s => {
+                if(e.scores[s] && !activeSubjects.includes(s)) activeSubjects.push(s);
+            });
+        });
+
+        // 產生 SVG 內容
+        let svgContent = '';
+        
+        // 繪製背景格線 (0, 60, 80, 100)
+        [0, 60, 80, 100].forEach(score => {
+            const y = H - P - ((score / 100) * (H - 2 * P));
+            svgContent += `<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" class="chart-grid" />`;
+            svgContent += `<text x="${5}" y="${y+3}" class="chart-text">${score}</text>`;
+        });
+
+        // 繪製折線
+        activeSubjects.forEach(subj => {
+            if(hiddenSubjects.includes(subj)) return; // 如果被隱藏則不畫
+
+            const color = SUBJECT_CONFIG[subj] ? SUBJECT_CONFIG[subj].color : '#333';
+            let points = [];
+            
+            exams.forEach((ex, i) => {
+                const score = parseInt(ex.scores[subj] || 0);
+                if(score > 0) {
+                    const x = P + (i * ((W - 2 * P) / (exams.length - 1)));
+                    const y = H - P - ((score / 100) * (H - 2 * P));
+                    points.push({x, y, score});
+                }
+            });
+
+            if(points.length > 0) {
+                // 畫線
+                let pathD = `M ${points[0].x} ${points[0].y}`;
+                points.slice(1).forEach(p => pathD += ` L ${p.x} ${p.y}`);
+                svgContent += `<path d="${pathD}" class="chart-line" stroke="${color}" />`;
+
+                // 畫點
+                points.forEach(p => {
+                    svgContent += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" class="chart-dot"><title>${p.score}</title></circle>`;
+                });
+            }
+        });
+
+        // 產生圖例 (Legend)
+        let legendHtml = Object.keys(SUBJECT_CONFIG).map(key => {
+            const isHidden = hiddenSubjects.includes(key);
+            return `
+                <div class="legend-item ${isHidden?'hidden':''}" onclick="toggleChartSubject('${key}')">
+                    <div class="legend-dot" style="background:${SUBJECT_CONFIG[key].color}"></div>
+                    ${SUBJECT_CONFIG[key].label}
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="legend-container">${legendHtml}</div>
+            <svg class="chart-svg" viewBox="0 0 ${W} ${H}">${svgContent}</svg>
+        `;
+    }
+
+    // Toggle 圖表科目顯示
+    function toggleChartSubject(subj) {
+        if(hiddenSubjects.includes(subj)) {
+            hiddenSubjects = hiddenSubjects.filter(s => s !== subj);
+        } else {
+            hiddenSubjects.push(subj);
+        }
+        // 重新繪製
+        const s = window.students[currentProfileIdx];
+        drawExamChart(s.exams);
+    }
+
+    // 4. 開啟新增考試彈窗
+    function addNewExamTerm() {
+        // 清空輸入框
+        document.getElementById('score-math').value = '';
+        document.getElementById('score-eng').value = '';
+        document.getElementById('score-chi').value = '';
+        document.getElementById('score-sci').value = '';
+        
+        // 預設名稱：第 X 次段考
+        const s = window.students[currentProfileIdx];
+        const count = (s.exams ? s.exams.length : 0) + 1;
+        document.getElementById('exam-term-input').value = `第 ${count} 次段考`;
+        
+        openModalWithAnim('add-exam-modal');
+    }
+
+    // 5. 儲存新考試
+    function saveNewExam() {
+        const term = document.getElementById('exam-term-input').value;
+        const math = document.getElementById('score-math').value;
+        const eng = document.getElementById('score-eng').value;
+        const chi = document.getElementById('score-chi').value;
+        const sci = document.getElementById('score-sci').value;
+
+        if(!term) {
+            alert("請輸入考試名稱");
+            return;
+        }
+
+        const newExam = {
+            ts: Date.now(),
+            term: term,
+            scores: {
+                math: math,
+                eng: eng,
+                chi: chi,
+                sci: sci
+            }
+        };
+
+        const s = window.students[currentProfileIdx];
+        if(!s.exams) s.exams = [];
+        s.exams.push(newExam);
+
+        localStorage.setItem(DB_STU, JSON.stringify(window.students));
+        
+        closeModal('add-exam-modal');
+        
+        // 刷新介面
+        renderExamList(s.exams);
+        drawExamChart(s.exams);
+    }
+
+    // 6. 刪除考試
+    function deleteExam(examIndex) {
+        if(confirm("確定要刪除這筆成績紀錄嗎？")) {
+            const s = window.students[currentProfileIdx];
+            s.exams.splice(examIndex, 1);
+            localStorage.setItem(DB_STU, JSON.stringify(window.students));
+            
+            renderExamList(s.exams);
+            drawExamChart(s.exams);
+        }
+    }
 </script>
 </body>
 </html>
+```
