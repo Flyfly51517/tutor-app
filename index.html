@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V332 (Final Fix: No White Screen, Full Functionality) -->
+<!-- 家教小本本 V334 (Final Fix: All Features Working + Calendar Refresh Fix) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -10,7 +9,7 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V332</title>
+<title>家教小本本 V334</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
@@ -1677,9 +1676,99 @@
     function renderDateTags() { const container = document.getElementById('date-tags'); container.innerHTML = selectedDates.map(date => `<div class="date-tag-item" onclick="removeDateTag('${date}')"><span>${date.slice(5)}</span><span style="font-size:16px;">✕</span></div>`).join(''); }
     function addDateTag() { const d = document.getElementById('log-date').value; if(d && !selectedDates.includes(d)) { selectedDates.push(d); renderDateTags(); } }
     function removeDateTag(date) { selectedDates = selectedDates.filter(d => d !== date); renderDateTags(); }
-    function saveBatchPlan() { const h = document.getElementById('log-hours').value; const subj = document.getElementById('log-subject').value; const note = document.getElementById('log-content-modal').value; const timeVal = document.getElementById('log-time').value; const s = window.students[currentPlanningStuIdx]; if (selectedDates.length === 0) { const pickerDate = document.getElementById('log-date').value; if (pickerDate) selectedDates.push(pickerDate); } if (!h || !subj || selectedDates.length === 0 || !timeVal) { const modalContent = document.querySelector('#log-modal .modal-content'); modalContent.classList.add('shake-error'); setTimeout(() => modalContent.classList.remove('shake-error'), 300); return; } const duplicateDates = selectedDates.filter(date => window.logs.some(l => l.date === date && l.name === s.name)); if(duplicateDates.length > 0) { alert(`⚠️ 注意：${duplicateDates.join(', ')} 已經排過 ${s.name} 的課了！`); selectedDates = selectedDates.filter(date => !duplicateDates.includes(date)); if(selectedDates.length === 0) return; } selectedDates.forEach(date => { window.logs.push({ ts: Date.now() + Math.random(), name: s.name, rate: s.rate, hours: h, subject: subj, content: note, date: date, timeStart: timeVal, status: 'prepared', income: Math.round(h * s.rate) }); }); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); renderSchedule(); closeModal('log-modal'); updateAssets(); }
+    
+    function saveBatchPlan() { 
+        const h = document.getElementById('log-hours').value; 
+        const subj = document.getElementById('log-subject').value; 
+        const note = document.getElementById('log-content-modal').value; 
+        const timeVal = document.getElementById('log-time').value; 
+        const s = window.students[currentPlanningStuIdx]; 
+        
+        if (selectedDates.length === 0) { 
+            const pickerDate = document.getElementById('log-date').value; 
+            if (pickerDate) selectedDates.push(pickerDate); 
+        } 
+        
+        if (!h || !subj || selectedDates.length === 0 || !timeVal) { 
+            const modalContent = document.querySelector('#log-modal .modal-content'); 
+            modalContent.classList.add('shake-error'); 
+            setTimeout(() => modalContent.classList.remove('shake-error'), 300); 
+            return; 
+        } 
+        
+        const duplicateDates = selectedDates.filter(date => window.logs.some(l => l.date === date && l.name === s.name)); 
+        if(duplicateDates.length > 0) { 
+            alert(`⚠️ 注意：${duplicateDates.join(', ')} 已經排過 ${s.name} 的課了！`); 
+            selectedDates = selectedDates.filter(date => !duplicateDates.includes(date)); 
+            if(selectedDates.length === 0) return; 
+        } 
+        
+        selectedDates.forEach(date => { 
+            window.logs.push({ ts: Date.now() + Math.random(), name: s.name, rate: s.rate, hours: h, subject: subj, content: note, date: date, timeStart: timeVal, status: 'prepared', income: Math.round(h * s.rate) }); 
+        }); 
+        
+        localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
+        closeModal('log-modal'); 
+        
+        // --- 刷新介面邏輯 ---
+        renderSchedule(); 
+        updateAssets();
+        
+        // [新增] 針對月曆介面的即時刷新
+        if (document.getElementById('calendar-day-modal').classList.contains('active')) {
+            const currentViewDate = document.getElementById('cal-day-title').innerText;
+            openCalendarDayModal(currentViewDate);
+            renderCalendar();
+        } else if (isCalendarView) {
+            renderCalendar();
+        }
+    }
+    
     function openEditLogModal(ts) { closeAllSwipes(); const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; document.getElementById('edit-log-ts').value = log.ts; document.getElementById('edit-log-date').value = log.date; document.getElementById('edit-log-time').value = log.timeStart || ''; document.getElementById('edit-log-hours').value = log.hours; document.getElementById('edit-log-subject').value = log.subject; document.getElementById('edit-log-content').value = log.content || ''; const hoursContainer = document.querySelector('#edit-log-modal .btn-options'); if(hoursContainer) { Array.from(hoursContainer.children).forEach(btn => { if(btn.innerText === String(log.hours)) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } const subjContainer = document.getElementById('edit-subject-group'); if(subjContainer) { Array.from(subjContainer.children).forEach(btn => { if(btn.innerText === log.subject) btn.classList.add('selected'); else btn.classList.remove('selected'); }); } openModalWithAnim('edit-log-modal'); }
-    function saveEditedLog() { const ts = document.getElementById('edit-log-ts').value; const log = window.logs.find(l => String(l.ts) === String(ts)); if(!log) return; const newDate = document.getElementById('edit-log-date').value; const newTime = document.getElementById('edit-log-time').value; const newHours = document.getElementById('edit-log-hours').value; if(!newDate || !newHours) { alert('日期和時數為必填'); return; } log.date = newDate; log.timeStart = newTime; log.hours = newHours; log.subject = document.getElementById('edit-log-subject').value; log.content = document.getElementById('edit-log-content').value; log.income = Math.round(newHours * log.rate); localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); closeModal('edit-log-modal'); updateAssets(); renderSchedule(); if(document.getElementById('all-schedule-modal').classList.contains('active')) { const d = new Date(newDate); const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; openAllScheduleModal(targetMonthKey); } }
+    
+    function saveEditedLog() { 
+        const ts = document.getElementById('edit-log-ts').value; 
+        const log = window.logs.find(l => String(l.ts) === String(ts)); 
+        if(!log) return; 
+        
+        const newDate = document.getElementById('edit-log-date').value; 
+        const newTime = document.getElementById('edit-log-time').value; 
+        const newHours = document.getElementById('edit-log-hours').value; 
+        
+        if(!newDate || !newHours) { alert('日期和時數為必填'); return; } 
+        
+        log.date = newDate; 
+        log.timeStart = newTime; 
+        log.hours = newHours; 
+        log.subject = document.getElementById('edit-log-subject').value; 
+        log.content = document.getElementById('edit-log-content').value; 
+        log.income = Math.round(newHours * log.rate); 
+        
+        localStorage.setItem(DB_LOG, JSON.stringify(window.logs)); 
+        closeModal('edit-log-modal'); 
+        
+        // --- 刷新介面 ---
+        updateAssets(); 
+        renderSchedule(); 
+        
+        // 1. 刷新歷史紀錄 (如果有開)
+        if(document.getElementById('all-schedule-modal').classList.contains('active')) { 
+            const d = new Date(newDate); 
+            const targetMonthKey = `${d.getFullYear()}年 ${d.getMonth()+1}月`; 
+            openAllScheduleModal(targetMonthKey); 
+        } 
+
+        // 2. [補上] 刷新月曆當日詳情 (如果有開)
+        if (document.getElementById('calendar-day-modal').classList.contains('active')) {
+            const currentViewDate = document.getElementById('cal-day-title').innerText;
+            openCalendarDayModal(currentViewDate);
+            renderCalendar();
+        } 
+        // 3. [補上] 刷新月曆視圖 (如果在月曆模式)
+        else if (isCalendarView) {
+            renderCalendar();
+        }
+    }
     
     // [修復] 刪除課程邏輯
     function deleteLog(e, ts) { 
@@ -1762,7 +1851,7 @@
     function triggerImport() { document.getElementById('import-file').click(); }
     function importData(input) { if(input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if(confirm("確定要還原備份資料嗎？現有資料將被覆蓋！")) { if(data.students) localStorage.setItem(DB_STU, JSON.stringify(data.students)); if(data.logs) localStorage.setItem(DB_LOG, JSON.stringify(data.logs)); if(data.bank) localStorage.setItem(DB_BANK, JSON.stringify(data.bank)); if(data.profile) localStorage.setItem(DB_PROF, JSON.stringify(data.profile)); alert("還原成功！"); location.reload(); } } catch(err) { alert("檔案格式錯誤"); } }; reader.readAsText(input.files[0]); } }
     
-    // V330: Render Monthly Summary & LINE Button
+    // V334: Render Monthly Summary & LINE Button (Add Weekday)
     function renderMonthlySummary() {
         const container = document.getElementById('cal-summary-area');
         const y = calViewDate.getFullYear();
@@ -1780,9 +1869,11 @@
             if(stuLogs.length > 0) {
                 hasData = true;
                 const dateDisplay = stuLogs.map(l => { const d = new Date(l.date); return `${d.getMonth()+1}/${d.getDate()}`; }).join(', ');
-                let lineMsg = `${s.name}媽媽你好，這個月幫${s.name}排課了，以下是${s.name}這個月的課程：\n`;
+                
+                let lineMsg = `${s.name}媽媽你好，幫${s.name}排下個月的課，以下是${s.name} ${m}月的課程安排：\n`;
                 
                 stuLogs.forEach(l => {
+                    // 1. 計算時間範圍
                     let timeRange = "";
                     if (l.timeStart) {
                         if (l.hours) {
@@ -1792,14 +1883,23 @@
                             const endM = Math.floor(totalMin % 60);
                             const endTime = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
                             timeRange = `${l.timeStart}-${endTime}`;
-                        } else { timeRange = `${l.timeStart}`; }
+                        } else { 
+                            timeRange = `${l.timeStart}`; 
+                        }
                     }
+                    
+                    // 2. 處理日期與星期
                     const d = new Date(l.date);
                     const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-                    lineMsg += `${dateStr} ${l.subject || '課程'} ${timeRange}\n`;
+                    const dayChar = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+                    
+                    // 3. 組合訊息
+                    lineMsg += `${dateStr} ${dayChar} ${l.subject || '課程'} ${timeRange}\n`;
                 });
                 
-                lineMsg += `麻煩媽媽再幫我確認一下，課程時間方不方便、有沒有錯誤、或者需要異動的，謝謝。`;
+                // [修改] 更新結尾文字
+                lineMsg += `麻煩媽媽再幫我確認一下，課程時間有沒有需要異動的，沒有問題的話，${m}月的課程就會照上面時間上課，謝謝您。`;
+                
                 const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineMsg)}`;
 
                 summaryHTML += `
