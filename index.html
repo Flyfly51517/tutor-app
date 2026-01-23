@@ -1,8 +1,8 @@
-V340 (Dynamic Accounts & Layout Fix)
+🚀 V341
 
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V340 (Dynamic Accounts, Add Bank, Layout Fix) -->
+<!-- 家教小本本 V341 (Bank Swipe Delete & Asset Sync) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -11,7 +11,7 @@ V340 (Dynamic Accounts & Layout Fix)
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V340</title>
+<title>家教小本本 V341</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
@@ -127,7 +127,7 @@ V340 (Dynamic Accounts & Layout Fix)
     .btn-toggle-cal { padding: 0 16px; height: 42px; border-radius: 21px; font-size: 14px; font-weight: 700; background: var(--text-main); color: #FFF; border: 2px solid var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); white-space: nowrap; flex-shrink: 0; transition: 0.2s; }
     .btn-toggle-cal.active { background: #FFF; color: var(--text-main); border-color: #EDF2F7; }
 
-    /* ASSETS V340 Update: Alignment Fixes */
+    /* ASSETS */
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px 12px; margin-bottom: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02); }
     .asset-card { 
         background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #2D3748 0%, #E07A5F 100%);
@@ -1203,6 +1203,7 @@ V340 (Dynamic Accounts & Layout Fix)
         }
     }
     
+    // V341: Bank History with Swipe Delete
     function openBankHistory(id) { 
         const sortedLogs = window.bankLogs.filter(b => b.accountId === id).sort((a,b) => new Date(b.date) - new Date(a.date)); 
         const listDiv = document.getElementById('bank-history-list');
@@ -1210,15 +1211,32 @@ V340 (Dynamic Accounts & Layout Fix)
         if(sortedLogs.length === 0) {
             listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">無交易紀錄</div>';
         } else {
-            listDiv.innerHTML = sortedLogs.map(b => `
-                <div class="trans-item">
-                    <div class="trans-date">${b.date}</div>
-                    <div class="trans-amount" style="color:${b.type==='deposit'?'var(--money-green)':'var(--money-red)'}">
-                        ${b.type==='deposit'?'+':'-'}$${b.amount}
+            listDiv.innerHTML = sortedLogs.map(b => {
+                const swipeId = `bank-swipe-${b.ts}`;
+                return `
+                <div class="swipe-container" id="${swipeId}" style="height: 60px;">
+                    <div class="swipe-bg-delete" onclick="deleteBankLog('${b.ts}', '${id}')">刪除</div>
+                    <div class="swipe-content" ontouchstart="handleSwipeStart(event, '${swipeId}')" ontouchmove="handleSwipeMove(event, '${swipeId}')" ontouchend="handleSwipeEnd(event, '${swipeId}')">
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <div class="trans-date" style="font-size:15px; color:#718096; font-weight:700;">${b.date}</div>
+                            <div class="trans-amount" style="font-size:16px; font-weight:800; color:${b.type==='deposit'?'var(--money-green)':'var(--money-red)'}">
+                                ${b.type==='deposit'?'+':'-'}$${b.amount}
+                            </div>
+                        </div>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
         openModalWithAnim('bank-history-modal'); 
+    }
+
+    function deleteBankLog(ts, accountId) {
+        if(confirm("確定刪除此筆交易？")) {
+            window.bankLogs = window.bankLogs.filter(b => String(b.ts) !== String(ts));
+            localStorage.setItem(DB_BANK, JSON.stringify(window.bankLogs));
+            updateAssets();
+            openBankHistory(accountId); // Refresh the list
+        }
     }
     
     function changeMonth(d) {
