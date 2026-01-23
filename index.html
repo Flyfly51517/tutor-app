@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V342 (Layout Fixes, No Chinese, UI Polish) -->
+<!-- 家教小本本 V343 (Fix: Viewport Overflow & Horizontal Scroll Lock) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V342</title>
+<title>家教小本本 V343</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
@@ -54,7 +54,8 @@
         color: var(--text-main); 
         overscroll-behavior-y: none; -webkit-font-smoothing: antialiased;
         padding-top: 140px !important;
-        overflow-y: auto; /* Fix infinite scroll: Allow natural scroll */
+        overflow-y: auto; /* Allow vertical scroll */
+        overflow-x: hidden; /* V343 Fix: Strictly forbid body horizontal scroll */
         padding-bottom: 40px;
     }
 
@@ -115,7 +116,7 @@
     .sidebar-item { padding: 18px; border-radius: 22px; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: var(--text-main); background: rgba(255, 255, 255, 0.6); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.6); }
     .sidebar-item:active { transform: scale(0.98); background: #FFF; }
     
-    /* V342: Version Text */
+    /* V343: Version Text */
     .sidebar-version { 
         margin-top: auto; text-align: center; 
         font-size: 14px; font-weight: 800; 
@@ -123,9 +124,11 @@
     }
 
     /* LAYOUT */
-    #main-viewport { width: 100vw; overflow: visible; position: relative; z-index: 1; }
+    /* V343 FIX: overflow: hidden is CRITICAL to stop side-by-side scrolling */
+    #main-viewport { width: 100vw; overflow: hidden; position: relative; z-index: 1; }
+    
     #page-slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(0); }
-    /* V342 Fix: Better padding management for scroll */
+    
     .page { width: 100vw; flex-shrink: 0; padding: 10px 16px 80px 16px; min-height: calc(100vh - 140px); }
     
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; gap: 10px; }
@@ -439,7 +442,7 @@
     }
     .profile-note-input:focus { border-color: var(--text-main); }
     
-    /* V342: Sidebar Version */
+    /* V343: Version Text */
     .sidebar-version {
         margin-top: auto;
         padding-top: 30px;
@@ -474,8 +477,8 @@
     <div class="sidebar-item" onclick="exportData()">📤 備份資料</div>
     <div class="sidebar-item" onclick="triggerImport()">📥 還原資料</div>
     <div class="sidebar-item" style="color:red; margin-top:auto;" onclick="hardReset()">⚠️ 重置所有資料</div>
-    <!-- V342: Version Text -->
-    <div class="sidebar-version">🚀 V342</div>
+    <!-- V343: Version Text -->
+    <div class="sidebar-version">🚀 V343</div>
     <input type="file" id="import-file" style="display:none" onchange="importData(this)">
 </div>
 
@@ -2297,7 +2300,7 @@
         // 清空輸入框
         document.getElementById('score-math').value = '';
         document.getElementById('score-eng').value = '';
-        document.getElementById('score-chi').value = '';
+        // document.getElementById('score-chi').value = ''; // Removed
         document.getElementById('score-sci').value = '';
         
         // 預設名稱：第 X 次段考
@@ -2313,7 +2316,7 @@
         const term = document.getElementById('exam-term-input').value;
         const math = document.getElementById('score-math').value;
         const eng = document.getElementById('score-eng').value;
-        const chi = document.getElementById('score-chi').value;
+        // const chi = document.getElementById('score-chi').value;
         const sci = document.getElementById('score-sci').value;
 
         if(!term) {
@@ -2327,7 +2330,7 @@
             scores: {
                 math: math,
                 eng: eng,
-                chi: chi,
+                // chi: chi,
                 sci: sci
             }
         };
@@ -2359,4 +2362,3 @@
 </script>
 </body>
 </html>
-
