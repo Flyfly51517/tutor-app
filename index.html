@@ -1,6 +1,27 @@
+這是一個很棒的功能擴充！這會讓你的 App 從「寫死」的記帳工具變成真正通用的資產管理工具。
+
+這是 **V340 (Dynamic Accounts & Layout Fix)**。
+
+### 🚀 V340 修改重點：
+
+1.  **[介面優化] 帳戶與金額橫向對齊**：
+    *   重寫了帳戶卡片的 CSS。現在「銀行名稱」與「金額」會強制置於同一行（左右對齊），字體加大更清晰。
+    *   按鈕（存/提/明細）會整齊地排列在下方，不會再擠在一起或跑版。
+2.  **[新功能] 新增銀行帳戶**：
+    *   在 Accounts 標題旁新增了 **「+」按鈕**。
+    *   點擊後可輸入「銀行名稱」與「初始金額」。
+    *   新增的銀行會自動納入總資產計算，並且擁有獨立的存提款紀錄功能。
+3.  **[系統升級] 動態資產計算**：
+    *   不再只計算台灣銀行跟永豐證券，系統會自動加總所有你新增的帳戶餘額。
+
+---
+
+請直接**全選複製**下方的完整程式碼覆蓋：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- 家教小本本 V339 (Layout Fix: Card Overflow & Profile Scroll) -->
+<!-- 家教小本本 V340 (Dynamic Accounts, Add Bank, Layout Fix) -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,7 +30,7 @@
 <meta name="theme-color" content="#F7F6F2">
 <meta name="format-detection" content="telephone=no">
 
-<title>家教小本本 V339</title>
+<title>家教小本本 V340</title>
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="shortcut icon" href="icon.png">
@@ -125,7 +146,7 @@
     .btn-toggle-cal { padding: 0 16px; height: 42px; border-radius: 21px; font-size: 14px; font-weight: 700; background: var(--text-main); color: #FFF; border: 2px solid var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); white-space: nowrap; flex-shrink: 0; transition: 0.2s; }
     .btn-toggle-cal.active { background: #FFF; color: var(--text-main); border-color: #EDF2F7; }
 
-    /* ASSETS */
+    /* ASSETS V340 Update: Alignment Fixes */
     .card { background: var(--card-bg); border-radius: 28px; padding: 24px 12px; margin-bottom: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02); }
     .asset-card { 
         background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #2D3748 0%, #E07A5F 100%);
@@ -137,12 +158,20 @@
     .asset-card::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
     .asset-label { font-size: 14px; font-weight: 700; opacity: 0.9; margin-bottom: 8px; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .asset-amount { font-size: 48px; font-weight: 800; color: #FFF; line-height: 1; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    .account-item { display: flex; justify-content: space-between; padding: 20px 6px; border-bottom: 1px solid #EDF2F7; align-items: center; }
-    .acc-name { font-size: 16px; font-weight: 800; color: var(--text-main); white-space: nowrap; margin-right: 15px; }
-    .acc-right { display: flex; flex-direction: column; align-items: flex-end; width: 100%; }
-    .acc-val { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
-    .btn-group { display: flex; gap: 8px; width: 100%; justify-content: flex-end; }
-    .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); }
+    
+    /* V340 Account Item Layout */
+    .account-item { 
+        padding: 20px 10px; border-bottom: 1px solid #EDF2F7; 
+        display: flex; flex-direction: column; gap: 12px;
+    }
+    .acc-row-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .acc-name { font-size: 16px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .acc-val { font-size: 20px; font-weight: 800; color: var(--text-main); font-variant-numeric: tabular-nums; }
+    .acc-row-bottom { display: flex; justify-content: flex-end; width: 100%; }
+    .btn-group { display: flex; gap: 8px; }
+    .btn-bank { padding: 8px 16px; background: #EDF2F7; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; color: var(--text-main); transition:0.2s; }
+    .btn-bank:active { transform:scale(0.95); background:#E2E8F0; }
+
     .month-nav-container { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
     .month-nav-btn { background: transparent; border: none; font-size: 24px; color: #A0AEC0; cursor: pointer; padding: 0 10px; font-family: 'Urbanist', sans-serif !important; font-weight: 800; }
     .month-label { font-family: 'Urbanist', 'Noto Sans TC', sans-serif !important; font-size: 18px; font-weight: 800; color: var(--text-main); min-width: 100px; text-align: center; }
@@ -176,7 +205,7 @@
     .cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); margin-top: 4px; }
     .cal-dot.paid { background: var(--money-green); }
 
-    /* CARDS - V339 Layout Fix */
+    /* CARDS */
     #today-schedule-list { display: flex; gap: 20px; overflow-x: auto; padding: 20px 24px 40px 24px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-left: -24px; margin-right: -24px; }
     #today-schedule-list::-webkit-scrollbar { display: none; }
     
@@ -196,10 +225,9 @@
         border: 1px solid rgba(0,0,0,0.03); 
         background-color: var(--text-main); 
         color: #FFFFFF; 
-        overflow: hidden; /* Fix: Prevent overflow */
+        overflow: hidden; 
     }
     .schedule-card:active { transform: scale(0.98); }
-    
     .schedule-card.paid { background-color: #F7FAFC !important; color: #A0AEC0 !important; border: 1px solid #EDF2F7; box-shadow: none; }
     .schedule-card.paid .sch-title { color: #A0AEC0 !important; }
     .schedule-card.paid .sch-badge { background: #EDF2F7 !important; color: #A0AEC0 !important; }
@@ -209,7 +237,6 @@
     .cal-top-btn { width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.15); color: #FFF; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); }
     .schedule-card.paid .cal-top-btn { background: transparent !important; color: #CBD5E0 !important; border: 1px solid #EDF2F7; }
     
-    /* V339: Note Wrapper Flex Fix */
     .note-wrapper { position: relative; flex: 1; margin: 15px 0; min-height: 0; display: flex; flex-direction: column; }
     .inline-note { width: 100%; flex: 1; padding: 20px; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; outline: none; resize: none; box-sizing: border-box; background: rgba(255,255,255,0.1); color: #FFF; }
     .inline-note:focus { background: rgba(255,255,255,0.2); color: #FFF; }
@@ -220,7 +247,6 @@
     .sch-time-info { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; opacity: 0.8; }
     .sch-cost-overlay { position: absolute; bottom: 16px; right: 20px; font-size: 13px; font-weight: 800; pointer-events: none; opacity: 0.8; }
     
-    /* V339: Card Footer Fix */
     .card-footer { display: flex; gap: 12px; align-items: center; height: 60px; flex-shrink: 0; margin-top: auto; }
     .btn-trash-card { width: 60px; height: 60px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: none; cursor: pointer; background: rgba(255,255,255,0.15); color: #FFD1D1; flex-shrink: 0; }
     /* Glassmorphism Buttons */
@@ -231,7 +257,6 @@
     /* MODALS */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9000; justify-content: center; align-items: center; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
     .modal.active { opacity: 1; }
-    /* V339 Fix: Hidden overflow-x */
     .modal-content { background: #FFF; width: 90%; max-width: 380px; border-radius: 32px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; overflow-x: hidden; transition: 0.1s; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
     .modal.active .modal-content { transform: scale(1); }
     .modal-content.shake-error { animation: shake 0.3s ease-in-out; border: 2px solid var(--money-red); }
@@ -521,29 +546,12 @@
             <div class="card">
                 <div class="section-header" style="margin-top:0;">
                     <div class="section-title">Accounts</div>
+                    <!-- V340: Add Bank Button -->
+                    <button class="header-action-btn btn-bubble" style="background:#EDF2F7; color:var(--text-main); width:32px; height:32px; padding:0; font-size:18px;" onclick="openAddBankModal()">+</button>
                 </div>
-                <div class="account-item">
-                    <div class="acc-name">🏦 台灣銀行</div>
-                    <div class="acc-right">
-                        <div id="taiwan-bank-balance" class="acc-val">$0</div>
-                        <div class="btn-group">
-                            <button class="btn-bank btn-bubble" onclick="openBankInput('deposit', 'taiwan_bank')">存</button>
-                            <button class="btn-bank btn-bubble" onclick="openBankInput('withdraw', 'taiwan_bank')">提</button>
-                            <button class="btn-bank btn-bubble" onclick="openBankHistory('taiwan_bank')">明細</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="account-item" style="border-bottom:none;">
-                    <div class="acc-name">📉 永豐證券</div>
-                    <div class="acc-right">
-                        <div id="sinopac-balance" class="acc-val">$0</div>
-                        <div class="btn-group">
-                            <button class="btn-bank btn-bubble" onclick="openBankInput('deposit', 'sinopac')">存</button>
-                            <button class="btn-bank btn-bubble" onclick="openBankInput('withdraw', 'sinopac')">提</button>
-                            <button class="btn-bank btn-bubble" onclick="openBankHistory('sinopac')">明細</button>
-                        </div>
-                    </div>
-                </div>
+                
+                <!-- Dynamic Account List -->
+                <div id="account-list-container"></div>
             </div>
             
             <div class="card">
@@ -566,6 +574,23 @@
 </div>
 
 <!-- MODALS -->
+<!-- V340: Add Bank Modal -->
+<div id="add-bank-modal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">新增銀行帳戶</h3>
+        <div class="setup-group">
+            <div class="setup-label">銀行名稱</div>
+            <input id="new-bank-name" placeholder="例如：國泰世華">
+        </div>
+        <div class="setup-group">
+            <div class="setup-label">初始金額</div>
+            <input type="number" id="new-bank-balance" placeholder="$0" inputmode="decimal">
+        </div>
+        <button onclick="addNewBank()" class="modal-btn btn-confirm btn-bubble">確認新增</button>
+        <button onclick="closeModal('add-bank-modal')" class="modal-btn btn-cancel">取消</button>
+    </div>
+</div>
+
 <div id="setup-modal" class="modal">
     <div class="modal-content">
         <h3 class="modal-title">新增學生</h3>
@@ -918,9 +943,10 @@
     const DB_LOG = 'tutor_v15_logs';
     const DB_BANK = 'tutor_v27_bank';
     const DB_PROF = 'tutor_v33_profile'; 
+    const DB_ACCOUNTS = 'tutor_v340_accounts';
 
     let currentPlanningStuIdx = null, selectedDates = [], currentPage = 0;
-    let currentBankAction = 'deposit', currentAccountId = 'taiwan_bank';
+    let currentBankAction = 'deposit', currentAccountId = '';
     let viewDate = new Date();
     viewDate.setDate(1); 
     
@@ -944,14 +970,22 @@
         catch (e) { console.error("Data Reset:", key); return defaultVal; }
     }
 
+    // Default Accounts if none exist
+    const defaultAccounts = [
+        { id: 'taiwan_bank', name: '🏦 台灣銀行', baseBalance: 100000 },
+        { id: 'sinopac', name: '📉 永豐證券', baseBalance: 13107 }
+    ];
+
     window.students = safeLoad(DB_STU, []);
     window.logs = safeLoad(DB_LOG, []);
     window.bankLogs = safeLoad(DB_BANK, []);
+    window.accounts = safeLoad(DB_ACCOUNTS, defaultAccounts);
     let profileData = safeLoad(DB_PROF, { avatar: '🧸', moods: [], name: 'Tutor' });
 
     window.onload = function() {
         renderStudents();
         renderSchedule();
+        renderAccounts(); // V340
         updateAssets();
         updateProfileDisplay();
         
@@ -1111,6 +1145,47 @@
     function openSetupModal() { openModalWithAnim('setup-modal'); }
     function openProfileModal() { openModalWithAnim('profile-modal'); }
     
+    // V340: Dynamic Account Logic
+    function openAddBankModal() {
+        document.getElementById('new-bank-name').value = '';
+        document.getElementById('new-bank-balance').value = '';
+        openModalWithAnim('add-bank-modal');
+    }
+
+    function addNewBank() {
+        const name = document.getElementById('new-bank-name').value;
+        const bal = parseInt(document.getElementById('new-bank-balance').value);
+        if(name && !isNaN(bal)) {
+            const newId = 'acc_' + Date.now();
+            window.accounts.push({ id: newId, name: name, baseBalance: bal });
+            localStorage.setItem(DB_ACCOUNTS, JSON.stringify(window.accounts));
+            closeModal('add-bank-modal');
+            renderAccounts();
+            updateAssets();
+        } else {
+            alert('請輸入完整資訊');
+        }
+    }
+
+    function renderAccounts() {
+        const container = document.getElementById('account-list-container');
+        container.innerHTML = window.accounts.map(acc => `
+            <div class="account-item">
+                <div class="acc-row-top">
+                    <div class="acc-name">${acc.name}</div>
+                    <div id="balance-${acc.id}" class="acc-val">$0</div>
+                </div>
+                <div class="acc-row-bottom">
+                    <div class="btn-group">
+                        <button class="btn-bank btn-bubble" onclick="openBankInput('deposit', '${acc.id}')">存</button>
+                        <button class="btn-bank btn-bubble" onclick="openBankInput('withdraw', '${acc.id}')">提</button>
+                        <button class="btn-bank btn-bubble" onclick="openBankHistory('${acc.id}')">明細</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
     function openBankInput(t, id) { 
         currentBankAction=t; 
         currentAccountId=id; 
@@ -1184,21 +1259,25 @@
     }
 
     function updateAssets() {
-        let tw = 100000; 
-        let sp = 13107;
+        let totalAssets = 0;
         
-        if(window.bankLogs) {
-            window.bankLogs.forEach(b => {
-                const amt = parseInt(b.amount);
-                if(!isNaN(amt)) {
-                    if(b.accountId === 'taiwan_bank') {
-                        tw += (b.type === 'deposit' ? amt : -amt);
-                    } else {
-                        sp += (b.type === 'deposit' ? amt : -amt);
-                    }
+        // Calculate each account's balance
+        window.accounts.forEach(acc => {
+            let balance = acc.baseBalance || 0;
+            // Add/Sub from logs
+            window.bankLogs.filter(log => log.accountId === acc.id).forEach(log => {
+                const amt = parseInt(log.amount);
+                if (!isNaN(amt)) {
+                    balance += (log.type === 'deposit' ? amt : -amt);
                 }
             });
-        }
+            
+            totalAssets += balance;
+            
+            // Update UI for this account
+            const el = document.getElementById(`balance-${acc.id}`);
+            if(el) el.innerText = "$" + balance.toLocaleString();
+        });
         
         let mTotal = 0; 
         let estTotal = 0; 
@@ -1241,11 +1320,8 @@
             });
         }
 
-        const finalTotal = tw + sp;
-        animateValue(document.getElementById('total-assets-val'), 0, finalTotal, 800);
+        animateValue(document.getElementById('total-assets-val'), 0, totalAssets, 800);
 
-        document.getElementById('taiwan-bank-balance').innerText = "$" + tw.toLocaleString();
-        document.getElementById('sinopac-balance').innerText = "$" + sp.toLocaleString();
         document.getElementById('stats-month-display').innerText = `${y}年 ${parseInt(m)}月`; 
         document.getElementById('month-total').innerText = "$" + mTotal.toLocaleString();
         document.getElementById('month-est').innerText = estTotal.toLocaleString();
@@ -2271,3 +2347,4 @@
 </script>
 </body>
 </html>
+```
